@@ -1,0 +1,18 @@
+#lang racket/base
+
+(provide (all-defined-out))
+
+(require racket/dict
+         unlike-assets/logging)
+
+(define (report+summary proc)
+  (define counts (with-report/counts proc))
+  (define nwarnings (dict-ref counts 'warning 0))
+  (define nerrors (+ (dict-ref counts 'error 0)
+                     (dict-ref counts 'fatal 0)))
+  (with-report/void
+    (λ ()
+      (<info "# warnings: ~a" nwarnings)
+      (<info "# errors:   ~a" nerrors)))
+
+  (exit (if (> nerrors 0) 1 0)))
