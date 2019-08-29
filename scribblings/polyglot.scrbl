@@ -31,23 +31,30 @@ directory contains a @italic{distribution} built from assets.
 @section{How to prepare a @racket[polyglot] project}
 
 @verbatim[#:indent 2]|{
-$ mkdir assets
-$ vim assets/index.md
+$ raco polyglot start my-website
+$ raco polyglot build my-website
+$ cd my-website
 $ raco polyglot build .
 }|
 
-The @racket["."] used in the build command is the designated @italic{project directory}.
-@racket[polyglot] expects to read all files in an @racket["assets"] directory therein, and to have
-write access to a @racket["dist"] directory. The @racket["dist"] directory will be
-created if it does not already exist. To start the build, @racket[polyglot] will try to
-load @racket["assets/index.md"].
+The @racket["my-website"] used in the start command creates a new @italic{project directory}
+with example content that uses @racket[polyglot]'s features. The code inside will contain
+helpful comments.
+
+@racket[polyglot] commands expect you to specify a path to a project directory to read, whereas @racket[start]
+will try to create a directory with the given name.
+
+When you run the @racket[build] command, @racket[polyglot] will read @racket["<project>/assets/index.md"]
+and write content to the @racket["<project>/dist"] directory, creating it if it does not already exist.
 
 As with the README, once you build the website you will see a dist directory appear.
-But instead of the directory appearing in your working directory, it will appear
+But instead of the directory appearing in your working directory, it will always appear
 in the project directory.
 
 In this example, @racket[polyglot] only parses Markdown, wraps the content in an HTML5
-document structure, and writes the resulting HTML to @racket["dist/index.html"].
+document structure, and writes the resulting HTML to @racket["dist/index.html"]. You
+will also see other files because @racket[polyglot] discovers dependencies of your pages
+and processes them too.
 
 @section{Writing Racket in Markdown}
 

@@ -14,6 +14,7 @@
   "build.rkt"
   "develop.rkt"
   "publish.rkt"
+  "start.rkt"
   "demo.rkt")
 
 (show-debug?       #f)
@@ -30,10 +31,12 @@
   ("develop" . "Build website in response to changes")
   ("publish" . "Publish website to S3 using your credentials file")
   ("demo"    . "Run demo page and place README.html in working directory")
+  ("start"   . "Create a new Polyglot project at a given directory")
   ("build"   . "Build the website once")))
 (define action-table `#hash(
   ("develop" . ,develop)
   ("publish" . ,publish)
+  ("start"   . ,start)
   ("demo"    . ,demo)
   ("build"   . ,build)))
 
