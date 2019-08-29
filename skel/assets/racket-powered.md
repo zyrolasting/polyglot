@@ -43,6 +43,7 @@ system knows to display the code for you to read, and then run it.
 (require racket/format racket/list)
 (provide sierpinsky-triangle)
 
+; Derived from https://goessner.net/articles/svg/fractals/index.html
 (define (sierpinsky-triangle iterations color id-prefix)
   (define (gid n) (format "~a~e" id-prefix n))
   (define (rf n) (format "#~a" (gid n)))
