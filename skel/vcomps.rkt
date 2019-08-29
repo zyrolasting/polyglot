@@ -22,7 +22,7 @@
   `(script ((type "application/rackdown") (id ,id))
            ,@lines))
 
-; ...such as actual code samples.
+; ...such as code samples combined with their actual output.
 (define (rackdown-code-sample name . lines)
   `(div ((class "code-sample"))
         (pre . ,(add-newlines lines))
