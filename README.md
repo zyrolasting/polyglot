@@ -1,4 +1,4 @@
-`polyglot` is a static website generator that lets you use `#lang` language you want to author content among Markdown.
+`polyglot` is a static website generator that lets you use any `#lang` language you want to author content among Markdown.
 
 ```
 $ raco pkg install polyglot
