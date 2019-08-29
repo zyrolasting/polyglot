@@ -15,8 +15,8 @@ This module uses @racket[unlike-compiler%] to generate
 static websites written in Markdown and any language
 supported by Racket.
 
-The author's website uses @racket[polyglot] and has a page demonstrating
-use. The @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "README in the source code"] also doubles an an example page.
+The author's website uses @racket[polyglot] and @hyperlink["https://sagegerard.com/racket-powered.html"]{has a page demonstrating use}.
+The @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "README in the source code"] also doubles an an example page.
 The demo command builds the README using @racket[polyglot].
 
 @verbatim[#:indent 2]|{
@@ -170,7 +170,8 @@ If a CSS file changes, dependent markdown files will only update outdated refere
 @racket[polyglot] offers sufficient flexibility for authoring content within a page,
 but it handles web asset dependencies in an opinionated way.
 
-@racket[polyglot]'s compiler class is @racket[polyglot%]. If you wish to extend your website
+@defclass[polyglot% unlike-compiler% ()]{
+@racket[polyglot]'s compiler class. If you wish to extend your website
 to do things like bundle JavaScript, just subclass @racket[polyglot%] and follow
 the documentation for @racket[unlike-compiler%].
 
@@ -179,7 +180,8 @@ and its @method[unlike-compiler% clarify] method will map any values of @italic{
 attributes to complete paths if they are readable on your system. This is likely enough for most cases,
 so you'd probably just want to override @method[unlike-compiler% delegate] to recognize new dependencies.
 
-You can, if you so wish, conditionally override the Markdown processing entirely. I wouldn't recommend it.
+You can even override Markdown processing entirely, but I wouldn't recommend it.
+}
 
 @section{Publishing to S3}
 
