@@ -5,7 +5,7 @@ $ raco pkg install polyglot
 $ raco docs polyglot
 ```
 
-Documentation on [racket-lang.org](https://docs.racket-lang.org/polyglot/index.html).
+[Documentation](https://docs.racket-lang.org/polyglot/index.html)
 
 If this project helps you, please [show your support with a donation! :heart:](https://www.paypal.com/paypalme2/sagegerard)
 
