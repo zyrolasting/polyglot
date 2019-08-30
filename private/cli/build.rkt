@@ -18,7 +18,7 @@
   (command-line
     #:program "build"
     #:args (dir)
-    (polyglot-project-directory (simplify-path dir))
+    (polyglot-project-directory (path->complete-path (simplify-path dir)))
     (report+summary (λ _
       (make-directory* (dist-rel))
       (empty-directory (dist-rel))

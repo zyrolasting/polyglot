@@ -49,7 +49,7 @@
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
     #:args (dir)
-    (polyglot-project-directory (simplify-path dir))
+    (polyglot-project-directory (path->complete-path (simplify-path dir)))
     (make-directory* (dist-rel))
     (empty-directory (dist-rel))
     (send compiler add! (send compiler clarify "index.md"))
