@@ -89,7 +89,7 @@
     [("-r" "--region")  reg ("Set AWS S3 region. Default: us-east-2")
                         (region reg)]
     #:args (dir s3-bucket-name)
-      (polyglot-project-directory dir)
+      (polyglot-project-directory (path->complete-path (simplify-path dir)))
       (bucket s3-bucket-name))
 
   (read-keys/aws-cli)
