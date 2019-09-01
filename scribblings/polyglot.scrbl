@@ -114,11 +114,35 @@ collected and will replace the script element in the internal
 Additionally, the Racket module from an application element
 can set a layout for the page using @racket[(provide layout)].
 
-Note that the Racket modules created from library elements will
-not be visited or instantiated unless a Racket module
-in the application element does so itself. To avoid confusion
+@racket[polyglot] will continue processing a page until no
+application elements remain. You can leverage this to generate
+application elements within an application element. One use case
+is creating code samples paired with actual output embedded in
+the page.
+
+@racketblock[
+(define code '("#lang racket"
+               "(write `(h1 \"Hello, meta.\"))"))
+
+(write `(pre . ,code))
+(write `(script ((id "example") (type "application/rackdown")) ,@code))
+]
+
+@subsection{Design implications}
+
+@itemlist[
+@item{If an application element behaves in a way that generates infinitely
+many application elements, then a @racket[polyglot] build will not
+terminate.}
+@item{A Racket module created from a library element will
+not be visited or instantiated until a Racket module
+in an application element tries to use it. To avoid confusion
 or unwanted output, avoid using the printer in the top-level
-of library element code.
+of library element code.}
+@item{A Markdown+Racket file can have its own dependencies and therefore
+won't build on every system where @racket[polyglot] is installed. Be careful
+to use @racket[info.rkt] or a setup script to make your website's dependencies
+available.}]
 
 @section{Dependency discovery and processing}
 
@@ -160,6 +184,11 @@ access resources that are useful for multiple pages.
 (provide (rename-out [two-column layout]))
 </script>
 }|
+
+If you are using Windows, @racket[polyglot] will likely not have permission
+to create links on your system. In that case you can try running
+@racket[polyglot] commands as an Administrator, or granting permission
+to create links specifically.
 
 @section{Responding to change}
 
