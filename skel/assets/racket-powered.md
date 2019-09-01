@@ -5,7 +5,8 @@
 (define layout (λ (kids) (page "I Built This Website Using Racket. Here's What I Can Do Now." kids)))
 </script>
 
-_The original article can be found [here](https://sagegerard.com/racket-powered.html)._
+_This is an excerpt from the announcement page for the project.
+The original article can be found [here](https://sagegerard.com/racket-powered.html)._
 
 It looks like there's not much to see here. Isn't it great?
 Barring exceptional cases, every page on this website takes up fewer than
@@ -78,26 +79,6 @@ system knows to display the code for you to read, and then run it.
     "                       '(\"margin: 0 auto\")"
     "                       \";\")))"
     "             ,(sierpinsky-triangle 4 \"#800\" \"tri\")))"))
-</script>
-
-Here I use [rash][rash]&mdash;a shell dialect by William Hatch&mdash;to compute the download size
-of Bootstrap. Honestly, I did it just because I can. I'd have to configure Webpack
-for countless hours to get this kind of flexibility.
-
-<script type="application/rackdown">
-#lang racket/base
-(require "project/vcomps.rkt")
-(write (rackdown-code-sample "alt-measure"
-  "#lang rash"
-  "(define size-box (box \"Unknown\"))"
-  ""
-  "curl -so /dev/null -w '\"%{size_download}\" \\"
-  "  https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css \\"
-  "  |>> set-box! size-box"
-  ""
-  "(write `(span ((style \"color: rebeccapurple\"))"
-  "        \"The total download size of Bootstrap v4.3.1 is \""
-  "        ,(unbox size-box) \" bytes\"))"))
 </script>
 
 This page starts as a Markdown file. Since Markdown supports use of HTML tags,
