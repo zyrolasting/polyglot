@@ -95,6 +95,6 @@
   (read-keys/aws-cli)
   (s3-region (region))
 
-  (exit (with-handlers ([exn? (λ (e) (<error "~a" e) 1)])
+  (exit (with-handlers ([exn? (λ (e) (<error "~a" (exn-message e)) 1)])
           (with-report/void publish-website)
           0)))

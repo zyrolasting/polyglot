@@ -15,6 +15,6 @@
   (make-directory* (dist-rel))
 
   (with-report/void
-    (λ _ (with-handlers ([exn:fail? (λ (e) (<error "~a" e))])
+    (λ _ (with-handlers ([exn:fail? (λ (e) (<error "~a" (exn-message e)))])
          (send compiler add! asset)
          (send compiler compile!)))))
