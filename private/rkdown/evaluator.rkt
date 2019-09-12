@@ -14,9 +14,11 @@
   "../txexpr.rkt"
   "./scripts.rkt")
 
+(define (default-layout kids)
+  `(html (head (title "Untitled")) (body . ,kids)))
 
-(define (apply-rackdown tmp-rel elements)
-  (define (layout kids) `(html (head (title "Untitled")) (body ,@kids)))
+(define (apply-rackdown tmp-rel elements [initial-layout default-layout])
+  (define layout initial-layout)
   (define expanded
     (expand-forest elements
                    app-script?
@@ -49,8 +51,11 @@
     (λ ()
        (delete-directory/files (tmp-rel)))))
 
-(define (run-rackdown elements)
-  (with-libraries elements apply-rackdown))
+(define (run-rackdown elements [initial-layout default-layout])
+  (with-libraries elements (λ (tmp-rel elements)
+                             (apply-rackdown tmp-rel
+                                             elements
+                                             initial-layout))))
 
 (module+ test
   (require rackunit markdown)

@@ -4,6 +4,7 @@
                     txexpr
                     unlike-assets
                     racket/base
+                    racket/dict
                     racket/class]]
 
 @title{Build static websites using any language}
@@ -13,7 +14,8 @@
 
 This module uses @racket[unlike-compiler%] to generate
 static websites written in Markdown and any language
-supported by Racket.
+supported by Racket in @racket[<script>] elements.
+This mixed code is called Rackdown for linguistic convenience.
 
 The author's website uses @racket[polyglot] and @hyperlink["https://sagegerard.com/racket-powered.html"]{has a page demonstrating use}.
 The @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "README in the source code"] also doubles an an example page.
@@ -218,6 +220,86 @@ so you'd probably just want to override @method[unlike-compiler% delegate] to re
 
 You can even override Markdown processing entirely, but I wouldn't recommend it.
 }
+
+@section{Writing Custom Workflows}
+
+If @racket[polyglot]'s default workflow does not suit your needs, then
+you can use @racket[polyglot] to write your own workflow or add
+Rackdown-processing to existing tools.
+
+Before anything else, you will need to set your project directory.
+
+@defthing[polyglot-project-directory (parameter/c directory-exists?) #:value (current-directory)]{
+@racket[polyglot] assumes that this directory holds all of your project's assets.
+
+If this value is not correct, then Rackdown script elements may be
+unable to find their local dependencies.}
+
+@defproc[(rackdown->txexpr! [path-or-string (or/c path? string?)]
+                            [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
+                                            identity])
+					    (or/c (listof txexpr?) txexpr?)]{
+Renders Rackdown to Tagged X-Expressions.
+
+If @racket[path-or-string] is a path, then the content is assumed to be a path to a file to load as Markdown for processing.
+
+If @racket[path-or-string] is a string, then it is assumed to be Rackdown code.
+
+Rackdown scripts are the authority of their own layout, but you may specify an @racket[initial-layout] that will act as the layout in the event the Rackdown does not specify one.
+
+Side-effects:
+
+@itemlist[
+@item{Unique and short-lived directories will appear in your temp
+directory for the purpose of storing ephemeral Racket modules found in
+your Rackdown files. Each of these directories will hold a symlink
+to @racket[(polyglot-project-path)]. All of these files will be deleted
+by the time @racket[rackdown->txexpr!] terminates.}
+
+@item{Events will appear on @racket[unlike-assets-logger]. Info-level
+events will report the content fragments created by your script
+elements.  Any output on @racket[(current-error-port)] caused by
+script elements will apperar as error-level events.}
+]
+
+Note that @racket[rackdown->txexpr!] does not operate on dependencies.}
+
+@defproc[(discover-dependencies [txexpr-page txexpr?]) (listof string?)]{
+Returns the values of @racket[href] or @racket[src] attributes in
+@racket[txexpr-page] that appear to refer to assets on a local file system.
+
+@racket[polyglot%] uses this to iteratively find other Rackdown files
+and learn what static assets should appear in a distribution.
+}
+
+@defproc[(apply-manifest [txexpr-page txexpr?]
+			 [manifest dict?])
+			 txexpr?]{
+Returns a new @racket[txexpr] such that all @racket[href] and
+@racket[src] attribute values that appear as keys in @racket[manifest]
+are replaced with the values in @racket[manifest]. Pair this with
+@racket[discover-dependencies] to set up a workflow where discovered
+build-time assets are replaced with production-ready assets.
+
+@racketblock[
+(define page (rackdown->txexpr! markdown-file layout))
+
+(define optimized (foldl (λ (dep res)
+                           (dict-set res dep (optimize! dep)))
+			 #hash()
+			 (discover-dependencies page)))
+
+(code:comment "Replace things like <img src=\"logo.png\" /> with <img src=\"809a2d.png\" />")
+(define production-ready (apply-manifest page optimized))
+
+(with-output-to-file "page.html"
+  #:exists 'truncate
+  (λ ()
+    (displayln "<!DOCTYPE html>")
+    (displayln (xexpr->html page))))
+]
+}
+
 
 @section{Publishing to S3}
 

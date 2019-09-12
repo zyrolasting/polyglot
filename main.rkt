@@ -1,6 +1,9 @@
 #lang racket/base
 
-(provide polyglot%)
+(provide polyglot%
+         rackdown->txexpr!
+         discover-dependencies
+         apply-manifest)
 (require
   racket/path
   racket/class
@@ -9,6 +12,7 @@
   "./private/fs.rkt"
   "./private/paths.rkt"
   "./private/default-file-handling.rkt"
+  "./private/rkdown/dependencies.rkt"
   "./private/rkdown/compiler.rkt")
 
 (define polyglot%
