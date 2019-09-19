@@ -180,10 +180,12 @@ Markdown file, except with an @racket[".html"] extension.
 
 @subsection{Racket Module Handling}
 
-Any referenced @racket[".rkt"] files are loaded using @racket[(dynamic-require path 'write-dist-file)].
-The module must @racket[(provide write-dist-file)] such that @racket[write-dist-file] is an
-@racket[advance/c] procedure that writes to some file in the dist directory
-and returns the complete path to the new file.
+Any referenced @racket[".rkt"] files load via @racket[(dynamic-require path 'write-dist-file)].
+The module must @racket[provide] @racket[write-dist-file] as an
+@racket[advance/c] procedure. That procedure must write to some file in the
+dist directory and return a complete path to the new file. @racket[polyglot]
+will replace the value of the @racket[src] or @racket[href] attribute with
+a path relative to the distribution for you.
 
 This allows you to turn this...
 
