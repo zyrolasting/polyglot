@@ -181,6 +181,9 @@ Markdown file, except with an @racket[".html"] extension.
 @subsection{Racket Module Handling}
 
 Any referenced @racket[".rkt"] files load via @racket[(dynamic-require path 'write-dist-file)].
+If you are writing a website on a live build using the @racket[raco polyglot develop] command,
+changes to your Racket dependencies will be captured and reloaded using @racket[dynamic-rerequire].
+
 The module must @racket[provide] @racket[write-dist-file] as an
 @racket[advance/c] procedure. That procedure must write to some file in the
 dist directory and return a complete path to the new file. @racket[polyglot]
