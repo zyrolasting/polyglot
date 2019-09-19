@@ -1,6 +1,13 @@
 #lang racket/base
 
-(provide polyglot%)
+(provide polyglot%
+         path-el/c
+         polyglot-project-directory
+         polyglot-rel
+         project-rel
+         assets-rel
+         dist-rel
+         system-temp-rel)
 (require
   racket/path
   racket/class
@@ -8,6 +15,7 @@
   unlike-assets/policy
   "./private/fs.rkt"
   "./private/paths.rkt"
+  "./private/racket-as-asset.rkt"
   "./private/default-file-handling.rkt"
   "./private/rkdown/compiler.rkt")
 
@@ -16,6 +24,7 @@
       (define/override (delegate path)
         (case (path-get-extension path)
           [(#".md") markdown->dependent-xexpr]
+          [(#".rkt") delegate-to-asset-module]
           [else copy-hashed]))
 
       (define/override (clarify unclear)
