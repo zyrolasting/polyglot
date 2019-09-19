@@ -33,9 +33,9 @@
          compiler))
 
   (define (ripple clear dep/clear history)
-    (if (equal? (path-get-extension clear) #".css")
-        next
-        (first history)))
+    (if (equal? (path-get-extension clear) #".md")
+        (first history)
+        next))
 
   (for ([unclear unclear-dependencies])
     (send compiler add!

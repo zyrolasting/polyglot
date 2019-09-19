@@ -141,36 +141,108 @@ not be visited or instantiated until a Racket module
 in an application element tries to use it. To avoid confusion
 or unwanted output, avoid using the printer in the top-level
 of library element code.}
-@item{A Markdown+Racket file can have its own dependencies and therefore
+@item{The dependency discovery pass will not capture @racket[src] attributes for
+@racket["application/rackdown"] or @racket["text/racket"] @racket[script] elements
+because those elements would be replaced by the time @racket[polyglot] starts looking
+for dependencies.}
+@item{A Markdown+Racket file can have its own dependencies on Racket modules and therefore
 won't build on every system where @racket[polyglot] is installed. Be careful
 to use @racket[info.rkt] or a setup script to make your website's dependencies
 available.}]
 
 @section{Dependency discovery and processing}
 
-You may have noticed the links in the above example go to other Markdown files.
-This is a good time to bring up how @racket[polyglot] views the relationship
-between your web assets.
+You may have noticed in an earlier example that links can go to other Markdown files.
+
+@racketblock[
+(write `(a ((href "about.md"))))
+]
 
 @racket[polyglot] scans all @racket[href] and @racket[src] attribute values
-in a page once it has fully expanded. If those values look like they
-are meant to be paths (including @racket["file:"] URLs), they
-are considered dependencies of your page.
+in a page once that page no longer has any application or library elements.
+
+If any of those values look like they are meant to be paths
+(including @racket["file:"] URLs), they are considered dependencies of your page.
 
 Note that these values that are @bold{either absolute paths on
-your filesystem, or paths relative to your assets directory.}
+your filesystem, or paths relative to your assets directory} (See @racket[assets-rel]).
 So in the above example, @racket["about.md"] corresponds to
 a complete path like @racket[/home/sage/dir-from-command-line/assets/about.md].
 
-@racket[polyglot] will iteratively discover and process any referenced Markdown
-files. All Markdown files will appear in the dist directory with the same
-name, except for the extension being changed to @racket[".html"].
+@subsection{Markdown Handling}
 
-Any non-Markdown files you reference are copied to the dist directory,
+@racket[polyglot] will process any referenced Markdown files just like the
+one it processed before. All Markdown files will have their application
+and library elements expand into tagged X-expressions as normal, and
+all of @italic{their} dependencies process in turn.
+
+@racket[polyglot] writes the resulting content as HTML5
+to a file in the dist directory with the same name as the original
+Markdown file, except with an @racket[".html"] extension.
+
+@subsection{Racket Module Handling}
+
+Any referenced @racket[".rkt"] files load via @racket[(dynamic-require path 'write-dist-file)].
+If you are writing a website on a live build using the @racket[raco polyglot develop] command,
+changes to your Racket dependencies will be captured and reloaded using @racket[dynamic-rerequire].
+
+The module must @racket[provide] @racket[write-dist-file] as an
+@racket[advance/c] procedure. That procedure must write to some file in the
+dist directory and return a complete path to the new file. @racket[polyglot]
+will replace the value of the @racket[src] or @racket[href] attribute with
+a path relative to the distribution for you.
+
+This allows you to turn this...
+
+@verbatim[#:indent 2]{
+<link href="compute-stylesheet.rkt" />
+}
+
+...into this...
+
+@verbatim[#:indent 2]{
+<link href="5f9bb103.css" />
+}
+
+...using this:
+
+@racketmod[
+#:file "compute-stylesheet.rkt"
+racket
+
+(provide write-dist-file)
+(require file/sha1 polyglot)
+
+(define (write-dist-file clear compiler)
+  (define css "body { font-size: 20px }\n")
+  (define port (open-input-string css))
+  (define file-name
+    (path-replace-extension
+      (substring (sha1 port) 0 8)
+      #".css"))
+
+  (define path (dist-rel file-name))
+  (close-input-port port)
+  (display-to-file #:mode 'text #:exists 'replace
+                   css path)
+  path)
+]
+
+The difference between this approach and writing equivalent Racket
+code in an application element is @italic{when} the code runs. This
+code runs after the dependency discovery phase for a Markdown file,
+but before writing HTML5 to disk.
+
+You can also use this approach to programmatically @method[unlike-compiler% add!]
+dependencies to the build.
+
+@subsection{Default File Handling}
+
+Any other files you reference are copied to the dist directory,
 such that the file name is the first eight characters of the SHA1 hash of the
-file content. This is for cache busting in general.
+file content. This is strictly for cache busting.
 
-To customize this behavior, see @secref["extending"]
+To customize any of the above behavior, see @secref["extending"]
 
 @section{Accessing shared content}
 
@@ -201,7 +273,8 @@ $ raco polyglot develop .
 }|
 
 If a Markdown file changes, dependent markdown files will not rebuild.
-If a CSS file changes, dependent markdown files will only update outdated references to fulfilled dependencies.
+If any other file changes, dependent markdown files will rebuild
+starting from the dependency discovery stage.
 
 @section[#:tag "extending"]{Extending @racket[polyglot]}
 
@@ -221,19 +294,46 @@ so you'd probably just want to override @method[unlike-compiler% delegate] to re
 You can even override Markdown processing entirely, but I wouldn't recommend it.
 }
 
+@section{Project paths}
+
+@racket[polyglot] uses several computed paths. You'll need them to process project files.
+
+@defthing[polyglot-project-directory (parameter/c complete-path?) #:value (current-directory)]{
+This is the primary directory where @racket[polyglot] will do its work. It may
+change according to user preferences and will impact the output of all below
+procedures:
+}
+
+@deftogether[(
+@defthing[path-el/c (and/c (or/c path-for-some-system? path-string?)
+                           (not/c complete-path?))]
+@defproc[(project-rel [path-element path-el/c] ...) path?]
+@defproc[(assets-rel [path-element path-el/c] ...) path?]
+@defproc[(dist-rel [path-element path-el/c] ...) path?]
+@defproc[(polyglot-rel [path-element path-el/c] ...) path?]
+@defproc[(system-temp-rel [path-element path-el/c] ...) path?]
+)]{
+These procedures behave like @racket[build-path], except each returns a path
+relative to a different directory:
+
+@itemlist[
+@item{@racket[project-rel] is relative to @racket[(polyglot-project-directory)].}
+@item{@racket[assets-rel] is relative to @racket[(project-rel "assets")]}
+@item{@racket[dist-rel] is relative to @racket[(project-rel "dist")]}
+@item{@racket[polyglot-rel] is relative to the @racket[polyglot] package's installation directory on your system.}
+@item{@racket[system-temp-rel] is relative to the temp directory where ephemeral modules will appear when processing Racket in your pages.}
+]
+}
+
 @section{Writing Custom Workflows}
 
 If @racket[polyglot]'s default workflow does not suit your needs, then
 you can use @racket[polyglot] to write your own workflow or add
 Rackdown-processing to existing tools.
 
-Before anything else, you will need to set your project directory.
-
-@defthing[polyglot-project-directory (parameter/c directory-exists?) #:value (current-directory)]{
-@racket[polyglot] assumes that this directory holds all of your project's assets.
-
+Before anything else, you will need to set @racket[polyglot-project-directory].
 If this value is not correct, then Rackdown script elements may be
-unable to find their local dependencies.}
+unable to find their local dependencies. You've been setting this using the command line interface.
 
 @defproc[(rackdown->txexpr! [path-or-string (or/c path? string?)]
                             [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
@@ -299,7 +399,6 @@ build-time assets are replaced with production-ready assets.
     (displayln (xexpr->html page))))
 ]
 }
-
 
 @section{Publishing to S3}
 
