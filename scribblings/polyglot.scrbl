@@ -268,7 +268,8 @@ $ raco polyglot develop .
 }|
 
 If a Markdown file changes, dependent markdown files will not rebuild.
-If a CSS file changes, dependent markdown files will only update outdated references to fulfilled dependencies.
+If any other file changes, dependent markdown files will rebuild
+starting from the dependency discovery stage.
 
 @section[#:tag "extending"]{Extending @racket[polyglot]}
 
