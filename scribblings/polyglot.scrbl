@@ -150,29 +150,55 @@ available.}]
 
 @section{Dependency discovery and processing}
 
-You may have noticed the links in the above example go to other Markdown files.
-This is a good time to bring up how @racket[polyglot] views the relationship
-between your web assets.
+You may have noticed in an earlier example that links can go to other Markdown files.
+
+@racketblock[
+(write `(a ((href "about.md"))))
+]
 
 @racket[polyglot] scans all @racket[href] and @racket[src] attribute values
-in a page once it has fully expanded. If those values look like they
-are meant to be paths (including @racket["file:"] URLs), they
-are considered dependencies of your page.
+in a page once that page no longer has any application or library elements.
+
+If any of those values look like they are meant to be paths
+(including @racket["file:"] URLs), they are considered dependencies of your page.
 
 Note that these values that are @bold{either absolute paths on
-your filesystem, or paths relative to your assets directory.}
+your filesystem, or paths relative to your assets directory} (See @racket[assets-rel]).
 So in the above example, @racket["about.md"] corresponds to
 a complete path like @racket[/home/sage/dir-from-command-line/assets/about.md].
+
+@subsection{Markdown Handling}
 
 @racket[polyglot] will iteratively discover and process any referenced Markdown
 files. All Markdown files will appear in the dist directory with the same
 name, except for the extension being changed to @racket[".html"].
 
-Any non-Markdown files you reference are copied to the dist directory,
-such that the file name is the first eight characters of the SHA1 hash of the
-file content. This is for cache busting in general.
+@subsection{Racket Module Handling}
 
-To customize this behavior, see @secref["extending"]
+Any referenced @racket[".rkt"] files are loaded using @racket[(dynamic-require path 'preprocess)].
+The module must @racket[(provide preprocess)] such that @racket[preprocess]
+is a procedure is a procedure that writes to some file in the dist directory
+and returns the complete path to that file.
+
+This allows you to turn this:
+
+@verbatim[#:indent 2]{
+<link href="compute-stylesheet.rkt" />
+}
+
+Into this:
+
+@verbatim[#:indent 2]{
+<link href="872a39fe.css" />
+}
+
+@subsection{Default File Handling}
+
+Any other files you reference are copied to the dist directory,
+such that the file name is the first eight characters of the SHA1 hash of the
+file content. This is strictly for cache busting.
+
+To customize any of the above behavior, see @secref["extending"]
 
 @section{Accessing shared content}
 
