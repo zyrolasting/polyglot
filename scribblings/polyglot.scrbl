@@ -169,28 +169,65 @@ a complete path like @racket[/home/sage/dir-from-command-line/assets/about.md].
 
 @subsection{Markdown Handling}
 
-@racket[polyglot] will iteratively discover and process any referenced Markdown
-files. All Markdown files will appear in the dist directory with the same
-name, except for the extension being changed to @racket[".html"].
+@racket[polyglot] will process any referenced Markdown files just like the
+one it processed before. All Markdown files will have their application
+and library elements expand into tagged X-expressions as normal, and
+all of @italic{their} dependencies process in turn.
+
+@racket[polyglot] writes the resulting content as HTML5
+to a file in the dist directory with the same name as the original
+Markdown file, except with an @racket[".html"] extension.
 
 @subsection{Racket Module Handling}
 
-Any referenced @racket[".rkt"] files are loaded using @racket[(dynamic-require path 'preprocess)].
-The module must @racket[(provide preprocess)] such that @racket[preprocess]
-is a procedure is a procedure that writes to some file in the dist directory
-and returns the complete path to that file.
+Any referenced @racket[".rkt"] files are loaded using @racket[(dynamic-require path 'write-dist-file)].
+The module must @racket[(provide write-dist-file)] such that @racket[write-dist-file] is an
+@racket[advance/c] procedure that writes to some file in the dist directory
+and returns the complete path to the new file.
 
-This allows you to turn this:
+This allows you to turn this...
 
 @verbatim[#:indent 2]{
 <link href="compute-stylesheet.rkt" />
 }
 
-Into this:
+...into this...
 
 @verbatim[#:indent 2]{
-<link href="872a39fe.css" />
+<link href="5f9bb103.css" />
 }
+
+...using this:
+
+@racketmod[
+#:file "compute-stylesheet.rkt"
+racket
+
+(provide write-dist-file)
+(require file/sha1 polyglot)
+
+(define (write-dist-file clear compiler)
+  (define css "body { font-size: 20px }\n")
+  (define port (open-input-string css))
+  (define file-name
+    (path-replace-extension
+      (substring (sha1 port) 0 8)
+      #".css"))
+
+  (define path (dist-rel file-name))
+  (close-input-port port)
+  (display-to-file #:mode 'text #:exists 'replace
+                   css path)
+  path)
+]
+
+The difference between this approach and writing equivalent Racket
+code in an application element is @italic{when} the code runs. This
+code runs after the dependency discovery phase for a Markdown file,
+but before writing HTML5 to disk.
+
+You can also use this approach to programmatically @method[unlike-compiler% add!]
+dependencies to the build.
 
 @subsection{Default File Handling}
 
