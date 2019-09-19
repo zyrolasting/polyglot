@@ -139,7 +139,11 @@ not be visited or instantiated until a Racket module
 in an application element tries to use it. To avoid confusion
 or unwanted output, avoid using the printer in the top-level
 of library element code.}
-@item{A Markdown+Racket file can have its own dependencies and therefore
+@item{The dependency discovery pass will not capture @racket[src] attributes for
+@racket["application/rackdown"] or @racket["text/racket"] @racket[script] elements
+because those elements would be replaced by the time @racket[polyglot] starts looking
+for dependencies.}
+@item{A Markdown+Racket file can have its own dependencies on Racket modules and therefore
 won't build on every system where @racket[polyglot] is installed. Be careful
 to use @racket[info.rkt] or a setup script to make your website's dependencies
 available.}]
@@ -217,6 +221,37 @@ attributes to complete paths if they are readable on your system. This is likely
 so you'd probably just want to override @method[unlike-compiler% delegate] to recognize new dependencies.
 
 You can even override Markdown processing entirely, but I wouldn't recommend it.
+}
+
+@section{Project paths}
+
+@racket[polyglot] uses several computed paths. You'll need them to process project files.
+
+@defthing[polyglot-project-directory (parameter/c complete-path?) #:value (current-directory)]{
+This is the primary directory where @racket[polyglot] will do its work. It may
+change according to user preferences and will impact the output of all below
+procedures:
+}
+
+@deftogether[(
+@defthing[path-el/c (and/c (or/c path-for-some-system? path-string?)
+                           (not/c complete-path?))]
+@defproc[(project-rel [path-element path-el/c] ...) path?]
+@defproc[(assets-rel [path-element path-el/c] ...) path?]
+@defproc[(dist-rel [path-element path-el/c] ...) path?]
+@defproc[(polyglot-rel [path-element path-el/c] ...) path?]
+@defproc[(system-temp-rel [path-element path-el/c] ...) path?]
+)]{
+These procedures behave like @racket[build-path], except each returns a path
+relative to a different directory:
+
+@itemlist[
+@item{@racket[project-rel] is relative to @racket[(polyglot-project-directory)].}
+@item{@racket[assets-rel] is relative to @racket[(project-rel "assets")]}
+@item{@racket[dist-rel] is relative to @racket[(project-rel "dist")]}
+@item{@racket[polyglot-rel] is relative to the @racket[polyglot] package's installation directory on your system.}
+@item{@racket[system-temp-rel] is relative to the temp directory where ephemeral modules will appear when processing Racket in your pages.}
+]
 }
 
 @section{Publishing to S3}

@@ -1,7 +1,7 @@
 #lang racket/base
 
 (provide polyglot%
-         path-rel
+         path-el/c
          polyglot-project-directory
          polyglot-rel
          project-rel
