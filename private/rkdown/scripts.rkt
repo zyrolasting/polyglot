@@ -69,7 +69,8 @@
                "(write \"a\" (current-error-port))"
                "(write \"b\" (current-error-port))"))
     (define spath (script->path element system-temp-rel))
-    (define-values (fragment errors) (load-script element system-temp-rel))
+    (write-script element system-temp-rel)
+    (define-values (fragment errors) (load-script spath))
     (check-equal? fragment '("x" "y"))
     (check-equal? errors '("a" "b"))
 
