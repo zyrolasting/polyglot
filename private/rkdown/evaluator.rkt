@@ -2,7 +2,7 @@
 
 ;;; Allows author to embed arbitrary languages in Markdown prose.
 
-(provide run-rackdown)
+(provide run-rackdown default-layout)
 
 (require
   racket/file
