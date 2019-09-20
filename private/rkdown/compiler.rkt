@@ -18,11 +18,12 @@
 (module+ test
   (require rackunit))
 
-(define (rackdown->txexpr! path-or-string [initial-layout (λ (kids) kids)])
-  (run-rackdown (parse-markdown path-or-string) initial-layout))
+(define (run-txexpr! tx-expressions [initial-layout (λ (kids) kids)])
+  (run-rackdown tx-expressions initial-layout))
 
 (define (markdown->dependent-xexpr clear compiler)
-  (define txexpr/expanded (rackdown->txexpr! clear))
+  (define txexpr/parsed (parse-markdown clear))
+  (define txexpr/expanded (run-txexpr! txexpr/parsed))
   (define unclear-dependencies (discover-dependencies txexpr/expanded))
 
   (define next
@@ -98,7 +99,7 @@
 
     (test-equal?
         "Process Rackdown externally"
-        (rackdown->txexpr! rackdown
-                           (λ (kids)
-                             `(body . ,kids)))
+        (run-txexpr! (parse-markdown rackdown)
+                     (λ (kids)
+                       `(body . ,kids)))
         '(body (p "Hello") (p "test!")))))

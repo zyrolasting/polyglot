@@ -31,7 +31,10 @@
        (equal? (get-tag x) 'script)
        (equal? type (attr-ref x 'type #f))))
 
-(define app-script? (curry script-of-type? "application/rackdown"))
+(define (app-script? x)
+  (or (script-of-type? "application/rackdown" x)
+      (script-of-type? "application/racket" x)))
+
 (define lib-script? (curry script-of-type? "text/racket"))
 
 (define (pipe-port->data port)

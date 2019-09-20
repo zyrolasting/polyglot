@@ -1,7 +1,7 @@
 #lang racket/base
 
 (provide polyglot%
-         rackdown->txexpr!
+         run-txexpr!
          discover-dependencies
          apply-manifest
          path-el/c
