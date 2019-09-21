@@ -31,7 +31,10 @@
        (equal? (get-tag x) 'script)
        (equal? type (attr-ref x 'type #f))))
 
-(define app-script? (curry script-of-type? "application/rackdown"))
+(define (app-script? x)
+  (or (script-of-type? "application/rackdown" x)
+      (script-of-type? "application/racket" x)))
+
 (define lib-script? (curry script-of-type? "text/racket"))
 
 (define (pipe-port->data port)
@@ -66,7 +69,8 @@
                "(write \"a\" (current-error-port))"
                "(write \"b\" (current-error-port))"))
     (define spath (script->path element system-temp-rel))
-    (define-values (fragment errors) (load-script element system-temp-rel))
+    (write-script element system-temp-rel)
+    (define-values (fragment errors) (load-script spath))
     (check-equal? fragment '("x" "y"))
     (check-equal? errors '("a" "b"))
 

@@ -1,6 +1,9 @@
 #lang racket/base
 
 (provide polyglot%
+         run-txexpr!
+         discover-dependencies
+         apply-manifest
          path-el/c
          polyglot-project-directory
          polyglot-rel
@@ -8,6 +11,7 @@
          assets-rel
          dist-rel
          system-temp-rel)
+
 (require
   racket/path
   racket/class
@@ -17,6 +21,7 @@
   "./private/paths.rkt"
   "./private/racket-as-asset.rkt"
   "./private/default-file-handling.rkt"
+  "./private/rkdown/dependencies.rkt"
   "./private/rkdown/compiler.rkt")
 
 (define polyglot%
