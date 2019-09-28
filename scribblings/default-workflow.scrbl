@@ -177,6 +177,16 @@ describes how this works in tutorial form.
 If you override this, take care to call it from your subclass when you
 encounter Markdown or Racket files unless you know the consequences.
 }
+
+@defmethod[(preprocess-txexprs [tx-expressions (listof txexpr?)]) (listof txexpr?)]{
+In the default workflow, this method transforms @racket[tx-expressions] parsed
+from a source Markdown file into a new list of tagged X-expressions. This transformation
+occurs before processing any script elements with @racket[run-txexpr!].
+
+Use this to sanitize untrusted code, generate application elements based on content,
+or attach common metadata to documents.
+}
 }
 
+@include-section["macros.scrbl"]
 @include-section["publishing.scrbl"]

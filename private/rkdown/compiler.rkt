@@ -23,7 +23,8 @@
 
 (define (markdown->dependent-xexpr clear compiler)
   (define txexpr/parsed (parse-markdown clear))
-  (define txexpr/expanded (run-txexpr! txexpr/parsed default-layout))
+  (define txexpr/preprocessed (send compiler preprocess-txexprs txexpr/parsed))
+  (define txexpr/expanded (run-txexpr! txexpr/preprocessed default-layout))
   (define unclear-dependencies (discover-dependencies txexpr/expanded))
 
   (define next
