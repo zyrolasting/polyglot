@@ -1,7 +1,7 @@
 #lang racket/base
 
+(require racket/contract)
 (provide polyglot%
-         run-txexpr!
          discover-dependencies
          apply-manifest
          path-el/c
@@ -10,13 +10,17 @@
          project-rel
          assets-rel
          dist-rel
-         system-temp-rel)
+         system-temp-rel
+         (contract-out
+          [run-txexpr! (-> (or/c (non-empty-listof txexpr?) txexpr?)
+                           (non-empty-listof txexpr?))]))
 
 (require
   racket/path
   racket/class
   unlike-assets
   unlike-assets/policy
+  txexpr
   "./private/fs.rkt"
   "./private/paths.rkt"
   "./private/racket-as-asset.rkt"

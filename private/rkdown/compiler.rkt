@@ -18,8 +18,13 @@
 (module+ test
   (require rackunit))
 
+
 (define (run-txexpr! tx-expressions [initial-layout (λ (kids) kids)])
-  (run-rackdown tx-expressions initial-layout))
+  (run-rackdown
+   (if (txexpr? tx-expressions)
+       (list tx-expressions)
+       tx-expressions)
+   initial-layout))
 
 (define (markdown->dependent-xexpr clear compiler)
   (define txexpr/parsed (parse-markdown clear))
@@ -65,6 +70,13 @@
   (define manifest (create-manifest unclear-deps compiler))
   (write-page path (apply-manifest txexpr/expanded manifest))
   path)
+
+(module+ test
+  (test-case
+    "Output does not change when normalizing arguments"
+    (define node '(p () "a"))
+    (check-equal? (run-txexpr! node)
+                  (run-txexpr! `(,node)))))
 
 (module+ test
   (require racket/file

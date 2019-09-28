@@ -10,7 +10,7 @@
 
 If @racket[polyglot]'s default workflow does not suit your needs, then you can write your own.
 
-@defproc[(run-txexpr! [tx-expressions (non-empty-listof txexpr?)]
+@defproc[(run-txexpr! [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
                       [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
                                       identity])
                       (or/c (listof txexpr?) txexpr?)]{
