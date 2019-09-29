@@ -80,17 +80,22 @@ racket/base
   (define page-title (attr-ref target 'data-title))
 
   (code:comment "polyglot will add new line characters for us.")
-  `(script ((type "application/racket"))
+  (code:comment "NOTE: This is a LIST containing a script element!")
+  `((script ((type "application/racket"))
     "#lang racket/base"
     "(require \"project/assets/layouts.rkt\")"
     "(provide layout)"
     "(define (layout kids)"
-    ,(format "(two-column ~e (nav-layout) kids))" page-title)))
+    ,(format "(two-column ~e (nav-layout) kids))" page-title))))
 ]
 
 In this setup, @racket[target] is the entire @tt{<meta>} element
 as a @racket[txexpr]. @racket[replace-element] will simply return
 the layout-defining application element to take its place.
+
+@italic{Take careful note that @racket[replace-element] is returning a list
+containing only a @tt{script} element.} Like application elements, procedures
+acting as macros can replace one element with many.
 
 If you are dreading writing one file per macro, don't worry.
 You can specify an expected provided identifier after the module
