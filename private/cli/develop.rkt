@@ -16,7 +16,7 @@
   "shared.rkt")
 
 (define timeout (make-parameter 500))
-(define compiler (new polyglot%))
+(define compiler (new (polyglot-class)))
 
 (define (changed? activity)
   (equal? (second activity) 'change))

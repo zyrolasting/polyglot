@@ -3,7 +3,10 @@
 (provide (all-defined-out))
 
 (require racket/dict
-         unlike-assets/logging)
+         unlike-assets/logging
+         "../../main.rkt")
+
+(define polyglot-class (make-parameter polyglot%))
 
 (define (report+summary proc)
   (define counts (with-report/counts proc))
