@@ -32,6 +32,8 @@
   "./private/rkdown/dependencies.rkt"
   "./private/rkdown/compiler.rkt")
 
+(define fallback-provided-name 'replace-element)
+
 (define polyglot%
   (class* unlike-compiler% () (super-new)
       (define/override (delegate path)
@@ -65,7 +67,7 @@
                (define provided
                  (if (> (length modspec/list) 1)
                      (string->symbol (cadr modspec/list))
-                     'replace-element))
+                     fallback-provided-name))
 
                (<debug "data-macro: load `~a` from `~a`"
                        provided
@@ -74,3 +76,52 @@
                (dynamic-rerequire module-path)
                ((dynamic-require module-path provided) x))))
           new-content))))
+
+(module+ test
+  (require rackunit
+           racket/file)
+  (test-case
+    "Can preprocess tagged X-expressions from asset folder"
+    (define provided-name "replacer")
+
+    (define (e2e provided-name)
+      (define compiler (new polyglot%))
+      (define module-name (format "macro-~a" provided-name))
+      (define tmpdir (system-temp-rel "pg-test"))
+
+      (empty-directory tmpdir)
+      (parameterize ([polyglot-project-directory tmpdir])
+        (empty-directory (assets-rel))
+        (define module-path (assets-rel (format "~a.rkt" module-name)))
+
+        (display-lines-to-file
+         `("#lang racket/base"
+           "(require txexpr)"
+           ,(format "(provide ~a)" provided-name)
+           ,(format "(define (~a other)" provided-name)
+           "`(p ,(attr-ref other 'data-foo)))")
+         module-path)
+
+        ; We don't want to specify the compiler's fallback name in the input code.
+        ; How else would we know if the compiler used the fallback correc
+        (define input-code
+          `((meta ((itemprop "build")
+                   (data-foo "made it")
+                   (data-macro ,(format "~a ~a"
+                                       module-name
+                                       (if (equal? provided-name fallback-provided-name)
+                                           ""
+                                           provided-name)))))))
+
+        (define changed
+          (car (send compiler
+                     preprocess-txexprs
+                     input-code)))
+
+        (check-true (and (txexpr? changed)
+                         (equal? (get-tag changed) 'p)
+                         (equal? (car (get-elements changed))
+                                 "made it")))))
+
+    (e2e "different-name")
+    (e2e fallback-provided-name)))
