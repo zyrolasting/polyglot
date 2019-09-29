@@ -6,6 +6,7 @@
          apply-manifest
          path-el/c
          polyglot-project-directory
+         polyglot-temp-directory
          polyglot-rel
          project-rel
          assets-rel
