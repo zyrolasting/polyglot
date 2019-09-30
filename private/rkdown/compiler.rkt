@@ -4,7 +4,9 @@
 (require
   racket/list
   racket/class
+  racket/dict
   racket/path
+  racket/string
   unlike-assets
   unlike-assets/logging
   unlike-assets/policy
@@ -39,16 +41,19 @@
          clear
          compiler))
 
-  (define (ripple clear dep/clear history)
-    (if (equal? (path-get-extension clear) #".md")
-        (first history)
-        next))
+  (define (ripple . _) next)
 
   (for ([unclear unclear-dependencies])
-    (send compiler add!
-          (send compiler clarify unclear)
-          clear
-          ripple))
+    (define dep/clear (send compiler clarify unclear))
+    (if (equal? (path-get-extension dep/clear) #".md")
+        (send compiler
+              add!
+              dep/clear)
+        (send compiler
+              add!
+              dep/clear
+              clear
+              ripple)))
 
   next)
 
@@ -69,7 +74,18 @@
 (define (build-page txexpr/expanded unclear-deps clear compiler)
   (define path (get-html-path clear))
   (define manifest (create-manifest unclear-deps compiler))
-  (write-page path (apply-manifest txexpr/expanded manifest))
+
+  ; Account for the fact we do not mark .md files as dependencies of one another.
+  (define manifest/patched
+    (for/fold ([modified #hash()])
+              ([(k v) (in-dict manifest)])
+      (dict-set modified k
+                (if (string-suffix? k ".md")
+                    (dist-rel (regexp-replace #rx"\\.md$" k ".html"))
+                    v))))
+
+  (write-page path (apply-manifest txexpr/expanded
+                                   manifest/patched))
   path)
 
 (module+ test
