@@ -17,7 +17,6 @@
                            (non-empty-listof txexpr?))]))
 
 (require
-  txexpr
   racket/class
   racket/path
   racket/rerequire
@@ -25,7 +24,7 @@
   unlike-assets
   unlike-assets/logging
   unlike-assets/policy
-  txexpr
+  "./private/txexpr.rkt"
   "./private/fs.rkt"
   "./private/paths.rkt"
   "./private/racket-as-asset.rkt"
@@ -49,34 +48,31 @@
         path)
 
       (define/public (preprocess-txexprs tx-expressions)
-        (for/list ([tx (in-list tx-expressions)])
-          (define-values (new-content _)
-            (splitf-txexpr
-             tx
-             (λ (x)
-               (and (txexpr? x)
-                    (string? (attr-ref x 'data-macro #f))))
-             (λ (x)
-               (define modspec/list
-                 (regexp-split #px"\\s+"
-                               (string-trim (attr-ref x 'data-macro))))
+        (expand-forest
+         tx-expressions
+         (λ (x)
+           (and (txexpr? x)
+                (string? (attr-ref x 'data-macro #f))))
+         (λ (x)
+           (define modspec/list
+             (regexp-split #px"\\s+"
+                           (string-trim (attr-ref x 'data-macro))))
 
-               (define module-path
-                 (assets-rel (format "~a.rkt"
-                                     (car modspec/list))))
+           (define module-path
+             (assets-rel (format "~a.rkt"
+                                 (car modspec/list))))
 
-               (define provided
-                 (if (> (length modspec/list) 1)
-                     (string->symbol (cadr modspec/list))
-                     fallback-provided-name))
+           (define provided
+             (if (> (length modspec/list) 1)
+                 (string->symbol (cadr modspec/list))
+                 fallback-provided-name))
 
-               (<debug "data-macro: load `~a` from `~a`"
-                       provided
-                       module-path)
+           (<debug "data-macro: load `~a` from `~a`"
+                   provided
+                   module-path)
 
-               (dynamic-rerequire module-path)
-               ((dynamic-require module-path provided) x))))
-          new-content))))
+           (dynamic-rerequire module-path)
+           ((dynamic-require module-path provided) x))))))
 
 (module+ test
   (require rackunit
@@ -100,7 +96,7 @@
            "(require txexpr)"
            ,(format "(provide ~a)" provided-name)
            ,(format "(define (~a other)" provided-name)
-           "`(p ,(attr-ref other 'data-foo)))")
+           "  `((p ,(attr-ref other 'data-foo))))")
          module-path)
 
         ; We don't want to specify the compiler's fallback name in the input code.
