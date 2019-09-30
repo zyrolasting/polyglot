@@ -94,8 +94,8 @@ as a @racket[txexpr]. @racket[replace-element] will simply return
 the layout-defining application element to take its place.
 
 @italic{Take careful note that @racket[replace-element] is returning a list
-containing only a @tt{script} element.} Like application elements, procedures
-acting as macros can replace one element with many.
+containing only a @tt{script} element.} Like application elements,
+these procedures can replace one element with many.
 
 If you are dreading writing one file per macro, don't worry.
 You can specify an expected provided identifier after the module
