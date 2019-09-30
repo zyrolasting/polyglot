@@ -15,7 +15,8 @@
   "develop.rkt"
   "publish.rkt"
   "start.rkt"
-  "demo.rkt")
+  "demo.rkt"
+  "shared.rkt")
 
 (show-debug?       #f)
 (show-colors?      #t)
@@ -58,6 +59,10 @@
     #:once-each
     [("-v" "--verbose")       "Include debug-level logging in output"
                               (show-debug? #t)]
+    [("-b" "--by-module") module-path
+                          "Use alternative polyglot% (sub)class provided as `polyglot+%`"
+                          "from module-path"
+                          (polyglot-class (dynamic-require module-path 'polyglot+%))]
     #:args (action . _)
     (parameterize ([current-command-line-arguments (get-subcommand-args action)])
       ((hash-ref action-table action (λ _ show-subcommands))))))

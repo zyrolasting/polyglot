@@ -3,7 +3,10 @@
 (provide (all-defined-out))
 
 (require racket/dict
-         unlike-assets/logging)
+         unlike-assets/logging
+         "../../main.rkt")
+
+(define polyglot-class (make-parameter polyglot%))
 
 (define (log-exn e)
   (<error "~a" ((error-display-handler) (exn-message e) e)))
