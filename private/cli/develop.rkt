@@ -15,40 +15,44 @@
   "../paths.rkt"
   "shared.rkt")
 
-(define timeout (make-parameter 500))
-(define compiler (new (polyglot-class)))
-
-(define (changed? activity)
-  (equal? (second activity) 'change))
-(define (removed? activity)
-  (equal? (second activity) 'removed))
-(define (filter-activity pred activity-log)
-  (filter
-    (λ (ref) (send compiler has? ref))
-    (map third (filter pred activity-log))))
-
-(define (get-changed activity-log)
-  (filter-activity changed? activity-log))
-(define (get-removed activity-log)
-  (filter-activity removed? activity-log))
-
-(define (build changed removed)
-  (with-report/counts
-    (λ _ (with-handlers ([exn:fail? (λ (e) (<error "~a" (exn-message e)))])
-                                 (send compiler compile!
-                                       #:changed changed
-                                       #:removed removed)))))
-
-(define (on-break e)
-  (displayln "Shutting down"))
-
 (define (develop)
+  (define timeout (make-parameter 500))
+
   (command-line
     #:program "develop"
     #:once-each
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
     #:args (dir)
+    (define compiler (new (polyglot-class)))
+
+    (define (changed? activity)
+      (equal? (second activity) 'change))
+
+    (define (removed? activity)
+      (equal? (second activity) 'removed))
+
+    (define (filter-activity pred activity-log)
+      (filter
+       (λ (ref) (send compiler has? ref))
+       (map third (filter pred activity-log))))
+
+    (define (get-changed activity-log)
+      (filter-activity changed? activity-log))
+
+    (define (get-removed activity-log)
+      (filter-activity removed? activity-log))
+
+    (define (build changed removed)
+      (with-report/counts
+        (λ _ (with-handlers ([exn:fail? (λ (e) (<error "~a" (exn-message e)))])
+               (send compiler compile!
+                     #:changed changed
+                     #:removed removed)))))
+
+    (define (on-break e)
+      (displayln "Shutting down"))
+
     (polyglot-project-directory (path->complete-path (simplify-path dir)))
     (make-directory* (dist-rel))
     (empty-directory (dist-rel))
@@ -76,7 +80,7 @@
         (when (> (+ (length changed) (length removed)) 0)
           (build changed removed))
         (loop)))))
-    
+
     (with-handlers ([exn:break? (λ _
                                    (printf "~nStopped.~n")
                                    (kill-thread aggregator)
