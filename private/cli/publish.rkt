@@ -12,7 +12,8 @@
   aws/keys
   "../../main.rkt"
   "../fs.rkt"
-  "../paths.rkt")
+  "../paths.rkt"
+  "shared.rkt")
 
 (define bucket (make-parameter "default-bucket"))
 (define dry-run? (make-parameter #f))
@@ -95,6 +96,6 @@
   (read-keys/aws-cli)
   (s3-region (region))
 
-  (exit (with-handlers ([exn? (λ (e) (<error "~a" (exn-message e)) 1)])
+  (exit (with-handlers ([exn? (λ (e) (log-exn e) 1)])
           (with-report/void publish-website)
           0)))

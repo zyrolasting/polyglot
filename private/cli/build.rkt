@@ -23,5 +23,5 @@
       (make-directory* (dist-rel))
       (empty-directory (dist-rel))
       (send compiler add! (send compiler clarify "index.md"))
-      (with-handlers ([exn:fail? (λ (e) (<error "~a" (exn-message e)))])
+      (with-handlers ([exn:fail? log-exn])
         (send compiler compile!))))))

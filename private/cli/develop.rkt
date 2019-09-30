@@ -45,7 +45,7 @@
 
     (define (build changed removed)
       (with-report/counts
-        (λ _ (with-handlers ([exn:fail? (λ (e) (<error "~a" (exn-message e)))])
+        (λ _ (with-handlers ([exn:fail? log-exn])
                (send compiler compile!
                      #:changed changed
                      #:removed removed)))))
