@@ -188,5 +188,28 @@ or attach common metadata to documents.
 }
 }
 
+@section{Using Your @racket[polyglot%] Extensions}
+
+When you subclass @racket[polyglot%], it won't apply to the
+default workflow unless you tell the CLI to use it.
+
+First, write your subclass in a module and expose it using
+@racket[(provide polyglot+%)].
+
+@racketmod[#:file "my-polyglot.rkt"
+racket/base
+(require racket/class polyglot)
+(provide polyglot+%)
+(define polyglot+% (class* polyglot% () (super-new) #;...))
+]
+
+Then, using the CLI, specify your module using
+after the @tt{polyglot} command, but before the
+subcommand.
+
+@verbatim[#:indent 2]|{
+$ raco polyglot -b my-polyglot.rkt build my-site
+}|
+
 @include-section["macros.scrbl"]
 @include-section["publishing.scrbl"]

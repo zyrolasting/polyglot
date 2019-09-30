@@ -14,7 +14,7 @@
 
 
 (define (build)
-  (define compiler (new polyglot%))
+  (define compiler (new (polyglot-class)))
   (command-line
     #:program "build"
     #:args (dir)
