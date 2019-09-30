@@ -5,6 +5,9 @@
 (require racket/dict
          unlike-assets/logging)
 
+(define (log-exn e)
+  (<error "~a" ((error-display-handler) (exn-message e) e)))
+
 (define (report+summary proc)
   (define counts (with-report/counts proc))
   (define nwarnings (dict-ref counts 'warning 0))
