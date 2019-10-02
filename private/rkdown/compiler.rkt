@@ -11,9 +11,9 @@
   unlike-assets/logging
   unlike-assets/policy
   [except-in markdown xexpr->string]
+  "../../txexpr.rkt"
   "../paths.rkt"
   "../fs.rkt"
-  "../txexpr.rkt"
   "./dependencies.rkt"
   "./evaluator.rkt")
 

@@ -11,7 +11,7 @@
   racket/function
   unlike-assets/logging
   "../dynamic-modules.rkt"
-  "../txexpr.rkt"
+  "../../txexpr.rkt"
   "./scripts.rkt")
 
 (define (default-layout kids)
@@ -20,19 +20,19 @@
 (define (apply-rackdown tmp-rel elements [initial-layout default-layout])
   (define layout initial-layout)
   (define expanded
-    (expand-forest elements
-                   app-script?
-                   (λ (x)
-                      (define path (write-script x tmp-rel))
-                      (define-values (fragment errors) (load-script path))
-                      (<info "<script> ~a yields fragment:" path)
-                      (<info "~e" fragment)
-                      (set! layout (dynamic-require path 'layout (thunk layout)))
-                      (delete-file path)
-                      (for ([err errors]) (<error err))
-                      fragment)))
+    (interlace-txexprs
+     elements
+     app-script?
+     (λ (x)
+       (define path (write-script x tmp-rel))
+       (define-values (fragment errors) (load-script path))
+       (<info "<script> ~a yields fragment:" path)
+       (<info "~e" fragment)
+       (set! layout (dynamic-require path 'layout (thunk layout)))
+       (delete-file path)
+       (for ([err errors]) (<error err))
+       fragment)))
   (layout expanded))
-
 
 ;; Declare all script nodes expressing inline Racket modules.
 (define (with-libraries elements proc)
@@ -42,7 +42,7 @@
     (λ ()
       (proc
         tmp-rel
-        (expand-forest
+        (interlace-txexprs
             elements
             lib-script?
             (λ (x)
@@ -52,10 +52,16 @@
        (delete-directory/files (tmp-rel)))))
 
 (define (run-rackdown elements [initial-layout default-layout])
-  (with-libraries elements (λ (tmp-rel elements)
-                             (apply-rackdown tmp-rel
-                                             elements
-                                             initial-layout))))
+  (define expanded
+    (with-libraries elements (λ (tmp-rel elements)
+                               (apply-rackdown tmp-rel
+                                               elements
+                                               initial-layout))))
+  (interlace-txexprs
+   expanded
+   (λ (x) (and (tag-equal? 'p x)
+               (= (length (get-elements x)) 0)))
+   (λ _ null)))
 
 (module+ test
   (require rackunit markdown)

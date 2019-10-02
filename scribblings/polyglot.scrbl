@@ -20,6 +20,7 @@ your own.
 @include-section["rackdown.scrbl"]
 @include-section["default-workflow.scrbl"]
 @include-section["your-workflow.scrbl"]
+@include-section["txexpr.scrbl"]
 
 @section{License and contributions}
 
