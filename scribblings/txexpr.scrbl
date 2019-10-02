@@ -14,6 +14,11 @@ documented workflow.
 Returns @racket[#t] if @racket[tx] is a tagged X-expression and its tag is @racket[equal?] to @tt{tag}.
 }
 
+@defproc[(make-tag-predicate [tags (non-empty-listof symbol?)]) (-> any/c boolean?)]{
+Returns a procedure that checks if a value causes @racket[tag-equal?] to return
+@racket[#t] for any of the given @tt{tags}.
+}
+
 @defproc[(substitute-many-in-txexpr [tx txexpr?]
                                     [replace? (-> txexpr-element? any/c)]
                                     [replace (-> txexpr-element? (listof txexpr-element?))])
@@ -82,8 +87,10 @@ To guarentee full replacement of elements, use @racket[substitute-many-in-txexpr
 (substitute-many-in-txexpr '(p "old" (p "old") "old")
                            string?
                            (λ _ '("new")))]
-@racketresult['(p "new" (p "old") "new")]
-@racketresult['((p "old" (p "old") "old"))]
+@racketblock[
+'(p "new" (p "old") "new")
+'((p "old" (p "old") "old"))
+]
 }
 
 @defproc[(substitute-many-in-txexpr/loop [tx txexpr?]
@@ -117,8 +124,14 @@ it iterates once more after performing @tt{max-replacements}.
  (non-empty-listof txexpr?)
 ]{
 @racket[interlace-txexprs] returns a list of tagged X-expressions
-constructed by a variable number of @tt{passes} over @tt{tx-expressions}
-using at least one pair of @tt{replace?} and @tt{replace} procedures.
+constructed by a variable number of @tt{passes} over @tt{tx-expressions}.
+
+Unlike the other substitution procedures, @racket[interlace-txexprs]
+accepts multiple pairings of @tt{replace?} and @tt{replace}. If
+@tt{replace?/list-or-proc} or @tt{replace/list-or-proc} are not lists,
+they will be treated as if they were lists containing the original value as
+the only element. The lists must have the same number of elements,
+just like if you had provided them to @racket[map] or @racket[foldl].
 
 For each pass, the following happens:
 
@@ -130,12 +143,37 @@ For each pass, the following happens:
                                              #:max-replacements max-replacements)]}
 @item{If any replacements occurred, repeat.}]
 
-If @tt{replace?/list-or-proc} or @tt{replace/list-or-proc} are not lists,
-they will be treated as if they were lists containing the original value as
-the only element. The lists must have the same number of elements,
-just like if you had provided them to @racket[map] or @racket[foldl].
-
-@racket[interlace-txexprs] returns only the transformed list of tagged X-expressions.
+@racket[interlace-txexprs] returns only the transformed list of tagged X-expressions,
+or raises @racket[exn:fail] if it would exceed @tt{max-passes}.
 
 This is the procedure you would likely use to write more flexible workflows.
+Here is an example program that parses a Markdown file, and
+defines a pass to remove all script and style elements, then
+all elements with no children. Because the procedure
+will continue until no substitutions are possible,
+only the heading will remain.
+
+@racketblock[
+(require racket/list
+         racket/string
+         markdown
+         polyglot/txexpr)
+
+(define (discard . _) null)
+
+(define md (string-join '("# Hello, world"
+                          "<script>blah</script>"
+                          "<b><i><br></i></b>")
+                        "\n"))
+
+(interlace-txexprs (parse-markdown md)
+                   (list (make-tag-predicate '(script style))
+                         (λ (x) (and (txexpr? x)
+                                     (empty? (get-elements x)))))
+                   (list discard
+                         discard))
+]
+@racketblock[
+'((h1 ((id "hello-world")) "Hello, world"))
+]
 }
