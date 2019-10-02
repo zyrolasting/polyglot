@@ -29,20 +29,22 @@ Normally you do not need to call this directly, but it is helpful to understand
 how it works. This is useful if you want to build a "stepper" to inspect
 replacements in a broader pipeline.
 
+A matching element can be replaced by @italic{at least zero} elements, so
+the @tt{replace} procedure must return a list of @racket[txexpr].
+
 @racketinput[
 (substitute-many-in-txexpr
   '(main (div (p "1") (p "2")))
-  (λ (x) (tag-equal? x 'p))
+  (λ (x) (tag-equal? 'p x))
   (λ _ '((b) (b))))
 ]
 @racketblock[
-'(main (div (p "1") (p "2")))
-'()
+'(main (div (b) (b) (b) (b)))
+'((div (p "1") (p "2")))
 ]
 
-A matching element can be replaced by @italic{at least zero} elements, so
-the @tt{replace} procedure must return a list of @racket[txexpr]. Return an empty
-list to remove the element outright (possibly leaving an empty parent element).
+Return an empty list to remove the element
+outright (possibly leaving an empty parent element).
 
 @racketinput[
 (substitute-many-in-txexpr
@@ -115,11 +117,17 @@ it iterates once more after performing @tt{max-replacements}.
  (non-empty-listof txexpr?)
 ]{
 @racket[interlace-txexprs] returns a list of tagged X-expressions
-constructed by a variable number of @tt{passes} over @tt{tx-expressions}.
+constructed by a variable number of @tt{passes} over @tt{tx-expressions}
+using at least one pair of @tt{replace?} and @tt{replace} procedures.
+
 For each pass, the following happens:
 
 @itemlist[#:style 'ordered
-@item{For each @tt{replace?} and @tt{replace} procedure, apply @racket[(substitute-many-in-txexpr/loop (cons (gensym) tx-expressions) replace? replace #:max-replacements max-replacements)].}
+@item{For each @tt{replace?} and @tt{replace} procedure, do this:
+@racketblock[(substitute-many-in-txexpr/loop (cons (gensym) tx-expressions)
+                                             replace?
+                                             replace
+                                             #:max-replacements max-replacements)]}
 @item{If any replacements occurred, repeat.}]
 
 If @tt{replace?/list-or-proc} or @tt{replace/list-or-proc} are not lists,
@@ -128,4 +136,6 @@ the only element. The lists must have the same number of elements,
 just like if you had provided them to @racket[map] or @racket[foldl].
 
 @racket[interlace-txexprs] returns only the transformed list of tagged X-expressions.
+
+This is the procedure you would likely use to write more flexible workflows.
 }
