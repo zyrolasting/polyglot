@@ -15,7 +15,7 @@
   racket/function
   racket/file
   "../dynamic-modules.rkt"
-  "../txexpr.rkt")
+  "../../txexpr.rkt")
 
 (define get-script-cdata (curry filter string?))
 

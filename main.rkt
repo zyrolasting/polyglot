@@ -24,7 +24,7 @@
   unlike-assets
   unlike-assets/logging
   unlike-assets/policy
-  "./private/txexpr.rkt"
+  "./txexpr.rkt"
   "./private/fs.rkt"
   "./private/paths.rkt"
   "./private/racket-as-asset.rkt"
@@ -48,7 +48,7 @@
         path)
 
       (define/public (preprocess-txexprs tx-expressions)
-        (expand-forest
+        (interlace-txexprs
          tx-expressions
          (λ (x)
            (and (txexpr? x)

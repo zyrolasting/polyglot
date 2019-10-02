@@ -15,7 +15,7 @@
   net/url
   unlike-assets
   unlike-assets/policy
-  "../txexpr.rkt")
+  "../../txexpr.rkt")
 
 (module+ test
   (require rackunit))
