@@ -163,6 +163,21 @@
                   (list (λ _ _) (λ _ _))
                   (λ _ _))))
 
+  (test-exn "Prevent exceeding max passes"
+            exn:fail?
+            (λ _ (interlace-txexprs #:max-passes 2
+                                    '((a))
+                                    (list (λ _ #t) (λ _ #t))
+                                    (list (λ _ '((b))) (λ _ '((a)))))))
+
+  (test-exn "Prevent exceeding max replacements"
+            exn:fail?
+            (λ _ (substitute-many-in-txexpr/loop
+                  #:max-replacements 10
+                  '((a))
+                  (λ _ #t)
+                  (λ _ '((a))))))
+
   (test-equal? "Match/replace fragments using two procedures"
     (interlace-txexprs
       '((i) (p (i) (i)) (b) (s) (b (i)) (i))
