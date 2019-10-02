@@ -31,7 +31,8 @@
                              (#:max-replacements exact-integer?)
                              (values transformed/c replaced/c))]
                        [interlace-txexprs
-                        (->* ((non-empty-listof txexpr?)
+                        (->* ((or/c txexpr?
+                                    (non-empty-listof txexpr?))
                               (or/c txe-predicate/c
                                     (non-empty-listof txe-predicate/c))
                               (or/c replacer/c
@@ -112,6 +113,7 @@
   (define (normalize-argument v)
     (if (list? v) v (list v)))
 
+  (define elements/normalized (if (txexpr? elements) (list elements) elements))
   (define replace?/normalized (normalize-argument replace?))
   (define replace/normalized (normalize-argument replace))
   (define replace?/len (length replace?/normalized))
@@ -126,7 +128,7 @@
   ;; A mock root element created with (gensym) lets us treat top-level
   ;; elements like subtrees, simplifying the problem.
   (define-values (under-mock-root need-new-pass?)
-    (for/fold ([new-elements (cons (gensym) elements)]
+    (for/fold ([new-elements (cons (gensym) elements/normalized)]
                [any-replacements? #f])
               ([replace? replace?/normalized]
                [replace replace/normalized])
@@ -155,6 +157,16 @@
   (require rackunit racket/function)
   (define i-element? (curry tag-equal? 'i))
   (define s-element? (curry tag-equal? 's))
+
+  (test-case
+    "Output does not change when normalizing arguments"
+    (define node '(i))
+    (check-equal? (interlace-txexprs node
+                                     i-element?
+                                     (λ _ '((b))))
+                  (interlace-txexprs `(,node)
+                                     i-element?
+                                     (λ _ '((b))))))
 
   (test-exn "Length mismatch throws a contract error"
             exn:fail:contract?

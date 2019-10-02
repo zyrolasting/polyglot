@@ -57,11 +57,11 @@
                                (apply-rackdown tmp-rel
                                                elements
                                                initial-layout))))
-  (interlace-txexprs
-   expanded
-   (λ (x) (and (tag-equal? 'p x)
-               (= (length (get-elements x)) 0)))
-   (λ _ null)))
+  (car (interlace-txexprs
+        expanded
+        (λ (x) (and (tag-equal? 'p x)
+                    (= (length (get-elements x)) 0)))
+        (λ _ null))))
 
 (module+ test
   (require rackunit markdown)

@@ -114,7 +114,7 @@ it iterates once more after performing @tt{max-replacements}.
 
 @defproc[
 (interlace-txexprs
- [tx-expressions (non-empty-listof txexpr?)]
+ [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
  [replace?/list-or-proc (or/c (-> txexpr? any/c)
                         (non-empty-listof (-> txexpr? any/c)))]
  [replace/list-or-proc  (or/c (-> txexpr? (listof txexpr?))
