@@ -2,11 +2,43 @@
 
 ;;; Provides operations used in this project for tagged X-expressions
 
-(require txexpr
+(require racket/contract
+         txexpr
          xml)
 
+(define txe-predicate/c (-> txexpr-element? any/c))
+(define replacer/c (-> txexpr-element? (listof txexpr-element?)))
+(define transformed/c (or/c (listof txexpr-element?) txexpr?))
+(define replaced/c (listof txexpr?))
+
 (provide (all-from-out txexpr xml)
-         (all-defined-out))
+         (contract-out [tag-equal?
+                        (-> symbol?
+                            any/c
+                            boolean?)]
+                       [make-tag-predicate
+                        (-> (non-empty-listof symbol?)
+                            (-> any/c boolean?))]
+                       [substitute-many-in-txexpr
+                        (-> txexpr?
+                            txe-predicate/c
+                            replacer/c
+                            (values transformed/c replaced/c))]
+                       [substitute-many-in-txexpr/loop
+                        (->* (txexpr?
+                              txe-predicate/c
+                              replacer/c)
+                             (#:max-replacements exact-integer?)
+                             (values transformed/c replaced/c))]
+                       [interlace-txexprs
+                        (->* ((non-empty-listof txexpr?)
+                              (or/c txe-predicate/c
+                                    (non-empty-listof txe-predicate/c))
+                              (or/c replacer/c
+                                    (non-empty-listof replacer/c)))
+                             (#:max-replacements exact-integer?
+                              #:max-passes exact-integer?)
+                             (non-empty-listof txexpr?))]))
 
 (define (tag-equal? t tx)
   (and (txexpr? tx)
