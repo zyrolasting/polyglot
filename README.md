@@ -1,6 +1,6 @@
-`polyglot` is a static website generator that lets you use any `#lang` language you want
-to author rich content among Markdown. And if you'd rather use a different language
-than Markdown for prose, you can.
+`polyglot` is a build tool that lets you use any `#lang` language you want
+to program rich content among tagged X-expressions. Ships with a static
+website generator and publisher that accepts a Markdown/Racket mix as input.
 
 ```
 $ raco pkg install polyglot

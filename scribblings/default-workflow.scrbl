@@ -7,16 +7,17 @@
                     racket/dict
                     racket/class]]
 
-@title[#:tag "default-workflow"]{Default Workflow}
-
-@racket[polyglot] ships with a command-line tool that makes you follow a certain workflow.
-We cover what it does here in more detail.
+@title[#:tag "default-workflow"]{The Default Workflow}
 
 We saw @racket[polyglot] generate static websites written in Markdown and any
 language supported by Racket in @racket[<script>] elements. The use of Markdown
-is not required in a custom workflow, but it is expected when using the CLI.
+is not required, but it is required in workflows that expect it.
 
-@section[#:tag "dependencies"]{How @racket[raco polyglot build] Works}
+The CLI allows you to specify the @racket[polyglot%] (sub)class that implements
+your workflow. When you don't specify one, it will use @racket[polyglot%], which
+implements the workflow documented here.
+
+@section[#:tag "dependencies"]{How @racket[raco polyglot build] Works in the Default Workflow}
 
 @itemlist[
 #:style 'ordered

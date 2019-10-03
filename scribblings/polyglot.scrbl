@@ -5,14 +5,14 @@
 @author{Sage Gerard}
 @defmodule[polyglot]
 
-@racket[polyglot] lets you express web content using any Racket language among Markdown
-or @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"].
-All websites built with @racket[polyglot] get cache-busting and Webpack-like dependency
-handling for free.
+@racket[polyglot] is a collection of workflows and libraries that
+process Racket modules within @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"].
 
-@racket[polyglot] ships with a CLI to create arbitrarily rich websites and publish them to S3
-using a default workflow. If you do not agree with that workflow, there's an API to write
-your own.
+For example, @racket[polyglot] ships with a CLI to create arbitrarily rich websites
+using a Markdown/Racket mix and publish them to S3. All websites built with this workflow
+get cache-busting and Webpack-like dependency handling for free.
+
+But if you do not agree with that workflow, there's an API to write your own.
 
 @table-of-contents[]
 @include-section["setup.scrbl"]

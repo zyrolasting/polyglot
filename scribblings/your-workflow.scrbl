@@ -8,7 +8,8 @@
 
 @title{Writing Custom Workflows}
 
-If @racket[polyglot]'s default workflow does not suit your needs, then you can write your own.
+If the workflows included in the collection do not suit your needs,
+then you can write your own.
 
 @defproc[(run-txexpr! [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
                       [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))

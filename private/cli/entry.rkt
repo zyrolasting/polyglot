@@ -61,7 +61,7 @@
                               (show-debug? #t)]
     [("-b" "--by-module") module-path
                           "Use alternative polyglot% (sub)class provided as `polyglot+%`"
-                          "from module-path"
+                          "from module-path. Use this to change workflows."
                           (polyglot-class (dynamic-require module-path 'polyglot+%))]
     #:args (action . _)
     (parameterize ([current-command-line-arguments (get-subcommand-args action)])

@@ -14,8 +14,8 @@
   racket/string
   racket/function
   racket/file
-  "../dynamic-modules.rkt"
-  "../../txexpr.rkt")
+  "./dynamic-modules.rkt"
+  "../txexpr.rkt")
 
 (define get-script-cdata (curry filter string?))
 
@@ -58,7 +58,7 @@
 (module+ test
   (require
     rackunit
-    "../paths.rkt")
+    "./paths.rkt")
 
   (test-case "load-script"
     (define element

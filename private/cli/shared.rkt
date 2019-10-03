@@ -4,9 +4,9 @@
 
 (require racket/dict
          unlike-assets/logging
-         "../../main.rkt")
+         "../../workflows/imperative.rkt")
 
-(define polyglot-class (make-parameter polyglot%))
+(define polyglot-class (make-parameter polyglot/imperative%))
 
 (define (log-exn e)
   (define string-port (open-output-string))
