@@ -5,55 +5,62 @@
 
 @title[#:tag "rackdown"]{Mixed-mode Racket}
 
-@racket[polyglot]'s treats HTML @racket[<script>] elements (in the form of tagged X-expressions)
-as if they were part of a broader Racket project.
+The workflows shipped with @racket[polyglot] target HTML @tt{<script>}
+elements in the form of tagged X-expressions. We'll focus on
+the rules for those script elements here, and discuss how those
+rules apply depending on your workflow.
 
-There are two kinds of @racket[<script>] elements: @defterm{library elements}
-and @defterm{application elements}. @racket[polyglot] processes them in that
+There are two kinds of @tt{<script>} elements: @defterm{library ("lib") elements}
+and @defterm{application ("app") elements}. @racket[polyglot] processes them in that
 order, but we will cover application elements first.
 
-Each element holds the source code for a Racket module as CDATA. The @racket[src]
-attribute on these @racket[<script>] elements are ignored, because they contribute
-complexity without added benefit in the context of @racket[polyglot]. However,
-the @racket[src] attributes on all other script elements work according to
-the @secref{default-workflow} section.
+Each app or lib element holds the source code for a Racket module as CDATA,
+including the @tt{#lang} line. The @tt{src} attribute on these @tt{<script>}
+elements are ignored, because they contribute complexity without added benefit in
+the context of @racket[polyglot]. The @racket[src] attributes on all other script
+elements work according to a given workflow.
 
-@racket[<script id=foo ...>] causes @racket[polyglot] to write the CDATA of
-that script element to @racket["<tmp>/foo.rkt"], where @racket["<tmp>"] is a
+@tt{<script id="foo" ...>} causes @racket[polyglot] to write the CDATA of
+that script element to @tt{<tmp>/foo.rkt}, where @tt{<tmp>} is a
 temporary directory created inside @racket[(system-temp-rel)]. If you do
-not specify a value for an @racket[id] attribute, @racket[polyglot] will
+not specify a value for an @tt{id} attribute, @racket[polyglot] will
 generate one for you.
 
 @margin-note{On Windows, your account might not have permission to create links. Either run @racket[polyglot] as an Administrator, or (better yet) get permission to create links.}
 Since the Racket modules exist in the same directory when processed together,
 they can @racket[require] each other. @racket[polyglot] also leaves a symlink
-named @racket["<tmp>/project"] pointing to your project directory so that
+named @tt{project} pointing to your project directory so that
 multiple pages can share code and data.
 
-Be careful to include any Racket-level dependencies in @racket[info.rkt] or a
-setup script, since they will not be as easy to detect using static analysis.
+Be careful to include any Racket-level dependencies in @tt{info.rkt} or a
+setup script.
 
 @section{Relationship to Markdown}
 
-Markdown supports use of HTML tags, so we can just write the @racket[<script>] elements
+@racket[polyglot] includes workflows that accept Markdown as input. Markdown
+is not required for custom workflows, but it helps to understand why it appears.
+Examples in this documentation will use Markdown since they can be built using
+the @secref{cli}.
+
+Markdown supports use of HTML tags, so we can just write the @tt{<script>} elements
 we want directly among prose. This gives a nice experience where you can "drop into"
 any DSL to work on the underlying page model when plain language won't cut it.
 
 Clearly out of a fit of inspiration and unrestrained genius, we'll call the
 mix of Racket and Markdown @defterm{Rackdown}. To be clear, Rackdown isn't special.
-Any Markdown parser can parse pages written for @racket[polyglot]'s default workflow.
-
-@racket[polyglot]'s handling of scripts and Markdown are decoupled.
-If you write your own workflow, you do not @italic{have} to use Markdown.
-Here I assume you are using Markdown for simplicity, and to illustrate
-how script processing works with Markdown examples. All of these examples
-work with @racket[raco polyglot build].
+Any Markdown parser can parse pages written for @racket[polyglot]'s workflows.
 
 @section{Application Elements}
-
 @margin-note{@racket["application/rackdown"] is also accepted for backwards compatibility.}
 
-@defterm{application elements} are HTML script elements of media type @racket["application/racket"]. @racket[polyglot] will run them as they are encountered, in order from the beginning of the page to the end.
+@defterm{application elements} are HTML script elements of media type
+@racket["application/racket"]. @racket[polyglot] will run them in the
+order they are encountered. The way the application elements run
+depends on the workflow you use.
+
+Here's an example from @secref{default-workflow}. In this workflow, app
+elements @racket[write] tagged X-expressions to replace the surrounding
+app element.
 
 @verbatim[#:indent 2]|{
 # Hello, world
@@ -66,7 +73,7 @@ work with @racket[raco polyglot build].
 </script>
 }|
 
-In the default workflow, this would produce something like:
+This would produce something like:
 
 @verbatim[#:indent 2]|{
 <!DOCTYPE html>
@@ -81,72 +88,26 @@ In the default workflow, this would produce something like:
 </html>
 }|
 
-Application elements uses @secref["printing" #:doc '(lib "scribblings/reference/reference.scrbl")] in @racket[write] mode to emit tagged X-Expressions. The zero or more written elements will replace the one script element in the internal @racket[txexpr] representing the page.
-
-Don't use @racket[print] or @racket[display] unless you know what @racket[polyglot] would @racket[read] and place in your page.
-
-
-@subsection{Setting a Page Layout}
-
-Application elements may use @racket[(provide layout)] to set a layout for a page.
-@racket[polyglot] avoids the complexity of templating engines by
-letting content place itself within another @racket[txexpr].
+Here's an equivalent example from @secref{functional-workflow},
+where an app element can provide a procedure to replace the
+entire page.
 
 @verbatim[#:indent 2]|{
 # Hello, world
 
 <script type="application/racket" id="main">
 #lang racket/base
+(provide replace-page)
+(require racket/format
+         racket/date
+         polyglot)
 
-(provide layout)
-(require racket/format racket/date)
-
-(write `(p ,(format "Today is ~a" (date->string (current-date)))))
-
-(define (layout kids)
-  `(html (head (link ((rel "stylesheet") (href "styles.css")))
-               (title "My page"))
-	 (body . , kids)))
+(define (replace-page page)
+  (replace page
+           (current-app-element-predicate)
+           `((p ,(format "Today is ~a" (date->string (current-date)))))))
 </script>
 }|
-
-This produces:
-
-@verbatim[#:indent 2]|{
-<!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-    <title>My page</title>
-  </head>
-  <body>
-    <h1>Hello, world</h1>
-    <p>Today is Friday, September 20th, 2019</p>
-  </body>
-</html>
-}|
-
-If multiple application elements in a page each provide a layout,
-@racket[polyglot] will use the last layout specified.
-
-
-@subsection{Generating Application Elements}
-
-@racket[polyglot] will continue processing content until no
-application elements remain. You can leverage this to generate
-application elements within an application element. One use case
-is creating code samples paired with actual output embedded in
-the page.
-
-@racketblock[
-(define code '("#lang racket"
-               "(write `(h1 \"Hello, meta.\"))"))
-
-(write `(pre . ,code))
-(write `(script ((id "example") (type "application/racket")) ,@code))
-]
-
-If a build generates infinitely many application elements, then it will not terminate.
 
 
 @section{Library Elements}
@@ -196,14 +157,9 @@ the page.
 }|
 
 In this example @racket[polyglot] will consume the @racket["text/racket"]
-script (removing it from the output HTML) and write it to @racket["<tmp>/components.rkt"].
+script (removing it from the output HTML) and write it to @tt{<tmp>/components.rkt}.
 It's especially important to name your libraries with an @racket[id] attribute, or else
 you will not know what name it has on disk in an application element.
-
-A Racket module created from a library element will not be visited or instantiated
-until an application element uses it. To avoid confusion or unwanted output,
-either avoid using the printer in the top-level of library element code or capture
-any output produced as a side-effect of instantiating a library element's module.
 
 
 @section{Accessing shared content}
@@ -213,10 +169,8 @@ To share code and data @italic{across} pages, place related files
 in your project directory and use the @racket["project"] symlink
 to access them.
 
-You'll need this to avoid duplicating layout code, for example:
-
 @verbatim[#:indent 2]|{
-<script type="application/racket" id="main">
+<script type="text/racket" id="main">
 #lang racket/base
 (require "project/components.rkt")
 (provide (rename-out [two-column layout]))

@@ -5,7 +5,7 @@
   racket/cmdline
   racket/file
   "../fs.rkt"
-  "../paths.rkt")
+  "../../paths.rkt")
 
 (define (start)
   (command-line

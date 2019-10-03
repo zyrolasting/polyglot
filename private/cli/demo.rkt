@@ -6,8 +6,8 @@
   racket/file
   unlike-assets/logging
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "shared.rkt")
 
 (define (demo)

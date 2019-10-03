@@ -8,8 +8,8 @@
   unlike-assets/logging
   unlike-assets
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "shared.rkt")
 
 

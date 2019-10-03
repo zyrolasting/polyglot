@@ -13,7 +13,7 @@
 
 (require
   racket/file
-  "./paths.rkt")
+  "../paths.rkt")
 
 (define (dynamic-require/multi module-path syms)
  (foldl

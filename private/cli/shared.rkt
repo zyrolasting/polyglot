@@ -4,7 +4,7 @@
 
 (require racket/dict
          unlike-assets/logging
-         "../../workflows/imperative.rkt")
+         "../../imperative.rkt")
 
 (define polyglot-class (make-parameter polyglot/imperative%))
 

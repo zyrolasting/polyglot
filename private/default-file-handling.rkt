@@ -13,7 +13,7 @@
   racket/path
   file/sha1
   unlike-assets
-  "./paths.rkt")
+  "../paths.rkt")
 
 (define (get-output-path path)
   (call-with-input-file

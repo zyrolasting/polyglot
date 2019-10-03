@@ -9,8 +9,8 @@
   unlike-assets
   file-watchers
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "build.rkt"
   "develop.rkt"
   "publish.rkt"

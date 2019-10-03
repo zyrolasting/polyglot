@@ -58,7 +58,7 @@
 (module+ test
   (require
     rackunit
-    "./paths.rkt")
+    "../paths.rkt")
 
   (test-case "load-script"
     (define element

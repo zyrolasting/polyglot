@@ -2,6 +2,7 @@
 
 (require racket/contract)
 (provide polyglot/imperative%
+         (rename-out [polyglot/imperative% polyglot%])
          (contract-out
           [run-txexpr! (-> (or/c (non-empty-listof txexpr?) txexpr?)
                            (non-empty-listof txexpr?))]))
@@ -19,17 +20,14 @@
   unlike-assets/logging
   unlike-assets/policy
   [except-in markdown xexpr->string]
-  "../txexpr.rkt"
-  "../private/scripts.rkt"
-  "../private/fs.rkt"
-  "../private/paths.rkt"
-  "../private/fs.rkt"
-  "../private/racket-as-asset.rkt"
-  "../private/dynamic-modules.rkt"
-  "../private/default-file-handling.rkt"
-  "../private/dependencies.rkt"
-  "../private/writer.rkt"
-  )
+  "./private/default-file-handling.rkt"
+  "./private/dependencies.rkt"
+  "./private/dynamic-modules.rkt"
+  "./private/fs.rkt"
+  "./private/scripts.rkt"
+  "./private/writer.rkt"
+  "./paths.rkt"
+  "./txexpr.rkt")
 
 (module+ test
   (require racket/file
@@ -40,6 +38,11 @@
 
 (define (default-layout kids)
   `(html (head (title "Untitled")) (body . ,kids)))
+
+(define/contract (delegate-to-asset-module clear compiler) advance/c
+  (<info "Delegating to ~a's write-dist-file" clear)
+  (dynamic-rerequire clear)
+  (dynamic-require clear 'write-dist-file))
 
 (define (apply-rackdown tmp-rel elements [initial-layout default-layout])
   (define layout initial-layout)

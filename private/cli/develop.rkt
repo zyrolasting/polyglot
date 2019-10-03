@@ -11,8 +11,8 @@
   unlike-assets
   file-watchers
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "shared.rkt")
 
 (define (develop)

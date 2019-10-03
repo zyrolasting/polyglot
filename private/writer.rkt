@@ -6,7 +6,7 @@
          racket/string
          unlike-assets
          "../txexpr.rkt"
-         "./paths.rkt"
+         "../paths.rkt"
          "./fs.rkt"
          "./dependencies.rkt")
 

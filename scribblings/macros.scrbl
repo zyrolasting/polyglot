@@ -2,14 +2,14 @@
 
 @require[@for-label[racket/base racket/class txexpr polyglot]]
 
-@title[#:tag "polyglot-macros"]{Page Macros and Preprocessing}
+@title[#:tag "polyglot-macros"]{Page Macros and Preproessing}
 
 Racket macros replace Racket code inside of application elements and libraries.
 However, they do not operate on the page containing the elements themselves.
 
 Consider an application element that only sets the layout of the page.
 
-I omit the @racket[<script>] markup for brevity.
+I omit the @tt{<script>} markup for brevity.
 
 @racketmod[racket/base
 (require "project/assets/layouts.rkt")
@@ -113,7 +113,7 @@ a default identifier to seek if none is specified.
 If you don't want to use @tt{data-macro}, you'll need your own matching procedure.
 
 Subclass @racket[polyglot%] and override
-@method[polyglot% preprocess-txexprs].
+@method[polyglot/imperative% preprocess-txexprs].
 
 @racketblock[
 (require polyglot txexpr)
@@ -142,54 +142,3 @@ language. This can be help with untrusted code.
 If you want to specialize @racket[polyglot]'s preprocessing
 and still leverage @tt{data-macro}, call @racket[(super preprocess-txexprs txexprs)]
 in your overriding method.
-
-
-@section{A Cautionary Tale About Invalid HTML}
-
-@racket[polyglot]'s Markdown parser happens to handle
-invalid elements, making code golf easy. But there's a
-gotcha.
-
-You could make the earlier @tt{data-macro} example use an undefined
-@tt{<m>} element, for example.
-
-@verbatim[#:indent 2]|{
-<m data-macro="set-layout replace-element"
-   data-title="My Page Title">
-}|
-
-If you have your own matcher, you can bring it all home.
-
-@verbatim[#:indent 2]|{
-<layout title="My Page Title">
-}|
-
-You can build this with @racket[polyglot], and you'll get output.
-
-Only it won't work as expected because you forgot to close the elements,
-XHTML style. If you add the missing @tt{/}s, it will work.
-
-@verbatim[#:indent 2]|{
-<m data-macro="set-layout replace-element"
-   data-title="My Page Title" />
-}|
-@verbatim[#:indent 2]|{
-<layout title="My Page Title" />
-}|
-
-XML rules? In @italic{my} HTML5?!
-
-The Markdown parser will treat HTML5 void elements as self-closing,
-but you must explicitly close anything you make up. If my opinion matters
-here, I'd strongly suggest @bold{only using valid HTML5}.
-
-For one thing, that is the document type that @racket[polyglot] delivers
-to end-users.
-
-Additionally, having valid HTML5 among Markdown helps keep your content
-decoupled from @racket[polyglot]'s default workflow.
-
-If you want to incorporate macro-like functionality among your prose
-(e.g. Wordpress shortcodes), remember that @racket[polyglot] operates
-on @racket[txexpr] values at its core.  You can always parse your own
-prose language instead of Markdown.

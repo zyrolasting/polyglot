@@ -7,44 +7,112 @@
                     racket/dict
                     racket/class]]
 
-@title[#:tag "default-workflow"]{The Default Workflow}
+@title[#:tag "default-workflow"]{The Imperative Workflow (Default)}
+@defmodule[polyglot/imperative]
 
-We saw @racket[polyglot] generate static websites written in Markdown and any
-language supported by Racket in @racket[<script>] elements. The use of Markdown
-is not required, but it is required in workflows that expect it.
+The imperative workflow has a PHP-like development experience where
+you can "drop into" an app element and use any @tt{#lang} to write
+content to appear in place. The workflow accepts mixed-mode Markdown
+as input and writes HTML5 pages to @racket[dist-rel] as output.
 
-The CLI allows you to specify the @racket[polyglot%] (sub)class that implements
-your workflow. When you don't specify one, it will use @racket[polyglot%], which
-implements the workflow documented here.
+This approach has the benefit of being familiar and intuitive to many
+web developers. This approach also works naturally with @tt{#lang}s
+that print data as a side-effect. The drawback is that this workflow
+does not scale well, and requires a larger API to handle more corner
+cases. If you want a leaner workflow with less room for error,
+use @secref{functional-workflow}.
 
-@section[#:tag "dependencies"]{How @racket[raco polyglot build] Works in the Default Workflow}
+This is the default workflow, meaning that it applies when no
+workflow is specified at the @secref{cli}.
 
+@section[#:tag "imperative-apps"]{Imperative App and Library Elements}
+
+Imperative app elements use @secref["printing" #:doc '(lib "scribblings/reference/reference.scrbl")] in @racket[write] mode to emit tagged X-Expressions. The zero or more written elements will replace the printing script element in the internal @racket[txexpr] representing the page.
+
+@verbatim[#:indent 2]|{
+# Hello, world
+
+<script type="application/racket" id="main">
+#lang racket/base
+(require racket/format racket/date)
+
+(write `(p ,(format "Today is ~a" (date->string (current-date)))))
+</script>
+}|
+
+Two notes of caution:
 @itemlist[
-#:style 'ordered
-@item{Set @racket[polyglot-project-directory] to the path provided by the user.}
-@item{Parse @racket[(assets-rel "index.md")]}
-@item{Process all applicable script elements according to @secref{rackdown}}
-@item{Process any dependencies}
+@item{Don't use @racket[print] or @racket[display] unless you know what
+@racket[polyglot] would @racket[read] and place in your page.}
+@item{A Racket module created from a library element will not be visited or instantiated
+until an application element uses it. To avoid confusion or unwanted output,
+either avoid using the printer in the top-level of library element code or capture
+any output produced as a side-effect of instantiating a library element's module.}]
+
+@subsection[#:tag "imperative-layouts"]{Setting a Page Layout}
+Application elements may use @racket[(provide layout)] to set a layout for a page.
+
+@verbatim[#:indent 2]|{
+# Hello, world
+
+<script type="application/racket" id="main">
+#lang racket/base
+
+(provide layout)
+(require racket/format racket/date)
+
+(write `(p ,(format "Today is ~a" (date->string (current-date)))))
+
+(define (layout kids)
+  `(html (head (link ((rel "stylesheet") (href "styles.css")))
+               (title "My page"))
+	 (body . , kids)))
+</script>
+}|
+
+This produces:
+
+@verbatim[#:indent 2]|{
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+    <title>My page</title>
+  </head>
+  <body>
+    <h1>Hello, world</h1>
+    <p>Today is Friday, September 20th, 2019</p>
+  </body>
+</html>
+}|
+
+If multiple application elements in a page each provide a layout,
+@racket[polyglot] will use the last layout specified.
+
+@subsection[#:tag "gen-app-elements"]{Generating Imperative App Elements}
+@racket[polyglot] will continue processing content until no
+application elements remain. You can leverage this to generate
+application elements within an application element. One use case
+is creating code samples paired with actual output embedded in
+the page.
+
+@racketblock[
+(define code '("#lang racket"
+               "(write `(h1 \"Hello, meta.\"))"))
+
+(write `(pre . ,code))
+(write `(script ((id "example") (type "application/racket")) ,@code))
 ]
 
-Let's talk about the dependency step.
+If a build generates infinitely many application elements, then it will not terminate.
 
-Once there are no more application or library elements to process
-in a Markdown file, @racket[polyglot] checks all @racket[href]
-and @racket[src] attribute values in a page and keeps the ones
-that look like assets on your disk (including @racket["file:"] URLs).
-These values are @bold{either absolute paths on your filesystem, or
-paths relative to your assets directory} (See @racket[assets-rel]).
+@section[#:tag "imperative-dependencies"]{Dependency Discovery and Processing}
 
-So if there is a link to @racket["contact.md"] somewhere on
-your page during Step 4, @racket[polyglot] will try to process that
-file from @racket[(assets-rel "contact.md")].
-
-For each dependency, @racket[polyglot] will do one of the below depending
-on the file extension:
+This workflow offers special processing for Markdown files
+and Racket module files. It also includes fallback processing
+for any other file.
 
 @subsection{Markdown Handling (@racket[".md"])}
-
 You may link to other Markdown files in your pages.
 
 @verbatim[#:indent 2]|{
@@ -53,15 +121,11 @@ You may link to other Markdown files in your pages.
 <nav><a href="about.md">About</a></nav>
 }|
 
-@racket[polyglot] will process any referenced Markdown files according to
-@secref{rackdown}. This process will iteratively consume all referenced Markdown
-to produce a working, linked collection of @racket[".html"] files in
-the dist directory with the same name (sans extension) of the original Markdown files.
+The imperative workflow will process any referenced Markdown files
+to produce a working, linked collection of @racket[".html"] files.
 
 @subsection[#:tag "handle-rkt"]{Racket Module Handling (@racket[".rkt"])}
-
-Assume you want to create a stylesheet using Racket, which
-has nice things like @seclink["top" #:doc '(lib "css-expr/css-expr.scrbl") "css-expr"].
+Assume you want to create a stylesheet using Racket.
 You can write Racket code to generate optimized styles and
 list the module that does it as a dependency.
 
@@ -100,68 +164,29 @@ racket
                    css path)
   path)
 ]
-
-There's a lot happening here that you don't see. Let's bring it all
-out into the open.
-
-Any referenced @racket[".rkt"] files load via @racket[(dynamic-require
-(assets-rel src-or-href) 'write-dist-file)] (or just
-@racket[src-or-href], if its a complete path). If you are writing a
-website according to @secref{live}, @racket[dynamic-rerequire]
-captures your changes to any Racket modules in your assets directory.
-
-The difference between this approach and writing equivalent Racket
-code in an application element is @italic{when} the code runs. This
-code runs after finding dependencies in a page, but before writing HTML5 to disk.
-
-Use this approach to "spot optimize" assets and defer preparation
-of certain files until after the processing stage for a page. See
-@secref{extending} for other uses.
-
-Note that the module is following a particular format that assumes
-familiarity with how @racket[unlike-compiler%] works.
-
 First, it must @racket[provide] @racket[write-dist-file] as an
 @racket[advance/c] procedure that eventually returns a @racket[complete-path?]
 to the processed file as a fulfilled @racket[unlike-asset/c].
-That file must exist in @racket[(dist-rel)].
+That file must exist in @racket[(dist-rel)]. @racket[polyglot] will
+replace the value of the @racket[src] or @racket[href] attribute based on the path you return.
 
-@racket[polyglot] will replace the value of the @racket[src] or @racket[href]
-attribute based on the path you return.
+The difference between this approach and writing equivalent Racket
+code in an application element is @italic{when} the code runs. This
+code runs after finding dependencies in a page, but before writing
+HTML to disk.
 
 @subsection{Default File Handling}
-
 Any other files you reference are copied to @racket[(dist-rel)],
 such that the file name is the first eight characters of the SHA1 hash of the
 file content for cache busting.
 
-To customize any of the above behavior, see @secref{extending}.
+@include-section["macros.scrbl"]
 
-@section[#:tag "live"]{Live Builds}
+@section{Imperative Workflow API Reference}
+@defclass[polyglot/imperative% unlike-compiler% ()]{
+Implements the workflow documented on this page.
 
-Let's step back to the CLI. Use the @racket[develop] command to
-rebuild your website in response to changes in assets.
-
-@verbatim[#:indent 2]|{
-$ raco polyglot develop my-website
-}|
-
-If a Markdown file changes, dependent markdown files will not rebuild.
-If a non-Markdown file changes, dependent Markdown files will repeat Step 4
-in @secref{dependencies}.
-
-@section[#:tag "extending"]{Extending @racket[polyglot]}
-
-@racket[polyglot] depends on @seclink["top" #:doc '(lib "unlike-assets/scribblings/unlike-assets.scrbl") "unlike-assets"] under the hood. @racket[unlike-assets] models dependencies between assets that are, well, not like one another. An HTML page depending on images, Racket files, and Markdown files are an example of that.
-
-@subsection{Specialized @racket[unlike-compiler%] Class}
-
-@defclass[polyglot% unlike-compiler% ()]{
-@racket[polyglot]'s compiler class. If you wish to extend your website
-to do things like bundle JavaScript, just subclass @racket[polyglot%] and follow
-the documentation for @racket[unlike-compiler%].
-
-In the terminology of unlike-assets, @racket[polyglot%] uses complete paths as @racket[clear/c] names.
+In the terminology of unlike-assets, @racket[polyglot/imperative%] uses complete paths as @racket[clear/c] names.
 
 @defmethod[(clarify [unclear unclear/c]) clear/c]{
 If the string looks like a readable path on your system, returns a complete path.
@@ -172,7 +197,7 @@ If the completed path path does not refer to a readable file, this will raise @r
 }
 
 @defmethod[(delegate [clear clear/c]) unlike-asset/c]{
-This implements the default workflow. @secref{dependencies}
+This implements the default workflow. @secref{imperative-dependencies}
 describes how this works in tutorial form.
 
 If you override this, take care to call it from your subclass when you
@@ -189,28 +214,40 @@ or attach common metadata to documents.
 }
 }
 
-@section{Using Your @racket[polyglot%] Extensions}
+@defthing[polyglot% class?]{
+An alias for @racket[polyglot/imperative%] kept for backwards compatibility.
+}
 
-When you subclass @racket[polyglot%], it won't apply to the
-default workflow unless you tell the CLI to use it.
+@defproc[(run-txexpr! [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
+                      [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
+                                      identity])
+                      (or/c (listof txexpr?) txexpr?)]{
+Runs @racket[tx-expressions] as if they were a collection of interdependent Racket modules.
+Use this procedure to leverage the benefits of the imperative workflow without needing
+the CLI or @racket[polyglot/imperative%].
 
-First, write your subclass in a module and expose it using
-@racket[(provide polyglot+%)].
+Assumes that @racket[tx-expressions] contains representations of application
+and library elements according to @secref{imperative-apps}.
 
-@racketmod[#:file "my-polyglot.rkt"
-racket/base
-(require racket/class polyglot)
-(provide polyglot+%)
-(define polyglot+% (class* polyglot% () (super-new) #;...))
+Note that you do not have to use Markdown before using this function, or even
+tagged expressions that represent valid HTML. You only need to represent
+application or library @tt{<script>} elements as tagged X-expressions.
+
+This will functionally replace Racket application and library elements inside the
+provided tagged X-Expressions and return the expanded expressions within a layout.
+
+Remember from @secref{imperative-layouts} that the application elements within the
+@racket[tx-expressions] are the authority of their own layout, but you may specify
+an @racket[initial-layout] that will apply if the application elements don't supply one.
+
+This procedure has side-effects:
+
+@itemlist[
+@item{Unique and short-lived directories and Racket modules will appear in @racket[(system-temp-rel)] according to @secref{rackdown}. They are deleted by the time control leaves this procedure.}
+@item{Events will appear on @racket[unlike-assets-logger]. Info-level events will report summarized content fragments created by your application elements.  Any output on @racket[(current-error-port)] caused by script elements will apperar as error-level events.}
 ]
 
-Then, using the CLI, specify your module using
-after the @tt{polyglot} command, but before the
-subcommand.
+Note that this procedure does not do anything with dependencies.
+Use @racket[discover-dependencies] to analyze the output and
+find more assets to process.}
 
-@verbatim[#:indent 2]|{
-$ raco polyglot -b my-polyglot.rkt build my-site
-}|
-
-@include-section["macros.scrbl"]
-@include-section["publishing.scrbl"]
