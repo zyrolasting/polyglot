@@ -11,7 +11,7 @@
   "shared.rkt")
 
 (define (demo)
-  (define compiler (new polyglot%))
+  (define compiler (new polyglot/imperative%))
   (define asset (polyglot-rel "README.md"))
   (make-directory* (dist-rel))
 

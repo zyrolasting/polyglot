@@ -1,14 +1,16 @@
 #lang racket/base
 
 (provide start)
-(require
-  racket/cmdline
-  racket/file
-  "../fs.rkt"
-  "../../paths.rkt")
+(require racket/class
+         racket/cmdline
+         racket/file
+         "../../main.rkt"
+         "../fs.rkt"
+         "./shared.rkt")
 
 (define (start)
-  (command-line
-    #:program "start"
-    #:args (dir)
-    (copy-directory/files (polyglot-rel "skel") dir)))
+  (command-line #:program "start" #:args (dir)
+    (copy-skeleton (if (is-a? (make-compiler) polyglot/functional%)
+                       "functional"
+                       "imperative")
+                   dir)))

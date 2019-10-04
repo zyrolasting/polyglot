@@ -4,148 +4,209 @@
 (provide polyglot/functional%
          (contract-out
           [run-txexpr/functional! (-> (or/c (non-empty-listof txexpr?))
-                                      (non-empty-listof txexpr?))]))
+                                      (non-empty-listof txexpr?))]
+          
+          [tx-replace-me (-> txexpr?
+                             (-> txexpr?
+                                 (listof txexpr-element?))
+                             txexpr?)]))
 
-(require 
-  racket/class
-  racket/dict
-  racket/file
-  racket/function
-  racket/list
-  racket/path
-  racket/rerequire
-  racket/string
-  unlike-assets
-  unlike-assets/logging
-  unlike-assets/policy
-  [except-in markdown xexpr->string]
-  "./private/default-file-handling.rkt"
-  "./private/dependencies.rkt"
-  "./private/dynamic-modules.rkt"
-  "./private/fs.rkt"
-  "./private/scripts.rkt"
-  "./private/writer.rkt"
-  "./paths.rkt"
-  "./txexpr.rkt")
+(require racket/class
+         racket/file
+         racket/function
+         racket/list
+         racket/path
+         racket/rerequire
+         racket/string
+         unlike-assets
+         unlike-assets/logging
+         [except-in markdown xexpr->string]
+         "./private/base-workflow.rkt"
+         "./private/dynamic-modules.rkt"
+         "./private/fs.rkt"
+         "./private/scripts.rkt"
+         "./paths.rkt"
+         "./txexpr.rkt")
 
-(module+ test
-  (require racket/file
-           racket/string
-           rackunit))
+;; Represent a script group in a page and on the filesystem in one value.
+; ------------------------------------------------------------------------
+(struct script-info (element path predicate))
 
-(define fallback-provided-name 'replace-element)
+(define (group-scripts! tx tmp-rel match?)
+  (define matches (findf*-txexpr tx match?))
+  (if (list? matches)
+      (for/list ([x (in-list matches)])
+        (script-info x
+                     (write-script x tmp-rel)
+                     (λ (other) (and (txexpr? other)
+                                     (equal? (attr-ref other 'id #f)
+                                             (attr-ref x 'id))))))
+      '()))
+    
 
-(define (default-layout kids)
-  `(html (head (title "Untitled")) (body . ,kids)))
+; Allow user to replace the same script elements in which their code runs.
+; ------------------------------------------------------------------------
+(define current-app-element-predicate (make-parameter (λ _ #f)))
+(define (tx-replace-me page-tx replacer)
+  (tx-replace page-tx
+              (current-app-element-predicate)
+              replacer))
 
-(define (apply-rackdown tmp-rel elements [initial-layout default-layout])
-  (define layout initial-layout)
-  (define expanded
-    (interlace-txexprs
-     elements
-     app-script?
-     (λ (x)
-       (define path (write-script x tmp-rel))
-       (define-values (fragment errors) (load-script path))
-       (<info "<script> ~a yields fragment:" path)
-       (<info "~e" fragment)
-       (set! layout (dynamic-require path 'layout (thunk layout)))
-       (delete-file path)
-       (for ([err errors]) (<error err))
-       fragment)))
-  (layout expanded))
 
-;; Declare all script nodes expressing inline Racket modules.
-(define (with-libraries elements proc)
-  (define tmp-rel (make-temp-ephmod-directory))
+; Guarentee unique IDs on relevant script elements.
+; ------------------------------------------------------------------------
+(define (replace-page/scripts-with-ids page)
+  (define all-ids
+    (map (λ (with-id) (attr-ref with-id 'id))
+         (or (findf*-txexpr page
+                            (λ (x) (and (txexpr? x)
+                                        (attrs-have-key? x 'id)
+                                        (attr-ref x 'id #f))))
+             '())))
+
+  (define longest-id
+    (for/fold ([longest ""])
+              ([id (in-list all-ids)])
+      (if (> (string-length id)
+             (string-length longest))
+          id
+          longest)))
+
+  (<debug "Longest ID to be used as prefix: ~a" longest-id)
+  
+  (tx-replace
+   page
+   (λ (x) (and (or (app-script? x)
+                   (lib-script? x))
+               (= (string-length (attr-ref x 'id "")) 0)))
+   (λ (x)
+     (list (attr-set x
+                     'id
+                     (string-append longest-id
+                                    (symbol->string (gensym))))))))
+
+; Allow user to replace page using an app element.
+; ------------------------------------------------------------------------
+(define (replace-page/user-defined page path predicate)
+  (parameterize ([current-app-element-predicate predicate])
+    (<info "Applying replace-page in ~a" path)
+    ((dynamic-require path
+                      'replace-page
+                      (λ _ identity))
+     page)))
+
+; These are for hygienic post-processing, and to help prevent infinite
+; loops due to straggling script elements that have already been used.
+; ------------------------------------------------------------------------
+(define (replace-page/remove-all page predicates)
+  (for/fold ([pruned page])
+            ([p predicates])
+    (tx-replace pruned p (λ _ null))))
+
+(define (replace-page/no-empty-paragraphs page)
+  (tx-replace
+   page
+   (λ (x) (and (tag-equal? 'p x)
+               (= (length (get-elements x)) 0)))
+   (λ _ null)))
+
+
+; Applies functional workflow to content
+; ------------------------------------------------------------------------
+(define (pass page tmpd)
+  (define initial-page (replace-page/scripts-with-ids page))
+  (define apps (group-scripts! initial-page tmpd app-script?))
+  (define libs (group-scripts! initial-page tmpd lib-script?))
+
+  ; Shape workflow such that (listen) gets meaningful feedback.
+  (define steps
+    (append
+     (map (λ (path predicate)
+            (λ (page)
+              (replace-page/user-defined page
+                                         path
+                                         predicate)))
+          (map script-info-path apps)
+          (map script-info-predicate apps))
+     (list (λ (page)
+             (replace-page/remove-all
+              page
+              (map script-info-predicate (append apps libs))))
+           replace-page/no-empty-paragraphs)))
+
+  (for/fold ([before page])
+            ([step (in-list steps)])
+    (step before)))
+
+(define (run-txexpr/functional! target
+                                #:max-passes [max-passes 1000])
+  (define page (if (txexpr? target)
+                   target
+                   (make-minimal-html-page target)))
+
+  (define tmpd (make-temp-ephmod-directory))
+
   (dynamic-wind
     void
-    (λ ()
-      (proc
-        tmp-rel
-        (interlace-txexprs
-            elements
-            lib-script?
-            (λ (x)
-               (write-script x tmp-rel)
-               null))))
-    (λ ()
-       (delete-directory/files (tmp-rel)))))
+    (λ _ (let loop ([page/before page] [on-pass max-passes])
+           (when (<= on-pass 0)
+             (error "Maximum passes exceeded."))
 
-(define (run-rackdown elements [initial-layout default-layout])
-  (define expanded
-    (with-libraries elements (λ (tmp-rel elements)
-                               (apply-rackdown tmp-rel
-                                               elements
-                                               initial-layout))))
-  (car (interlace-txexprs
-        expanded
-        (λ (x) (and (tag-equal? 'p x)
-                    (= (length (get-elements x)) 0)))
-        (λ _ null))))
-
-(module+ test
-  (require rackunit markdown)
-
-  (define elements
-    '((p (script ((id "boo") (type "text/racket"))
-                 "#lang racket/base"
-                 "(provide foo)"
-                 "(define foo 1)"))
-      (p "The result is")
-      (script ((type "application/rackdown"))
-         "#lang racket"
-         "(require \"./boo.rkt\")"
-         "(provide layout)"
-         "(write `(span ,(number->string (+ foo 1))))"
-         "(define layout (λ (kids) `(body . ,kids)))")))
-
-  (test-equal? "Rackdown"
-    (with-handlers ([exn? displayln]) (run-rackdown elements))
-    '(body (p "The result is") (span "2"))))
+           (define page/after (pass page/before tmpd))
+           (if (not (equal? page/before page/after))
+               (loop page/after (sub1 on-pass))
+               page/after)))
+    (λ _ (delete-directory/files (tmpd)))))
 
 
 (define polyglot/functional%
-  (class* unlike-compiler% () (super-new)
+  (class* polyglot/base% () (super-new)
       (define/override (delegate path)
         (case (path-get-extension path)
-          [(#".md") markdown->dependent-xexpr]
-          [else copy-hashed]))
-
-      (define/override (clarify unclear)
-        (define path (build-complete-simple-path unclear (assets-rel)))
-        (unless (file-readable? path) (error (format "Cannot read ~a" unclear)))
-        path)))
-
-
-(define (run-txexpr/functional! tx-expressions [initial-layout (λ (kids) kids)])
-  (run-rackdown tx-expressions initial-layout))
-
-(define (markdown->dependent-xexpr clear compiler)
-  (define txexpr/parsed (parse-markdown clear))
-  (define txexpr/preprocessed (send compiler preprocess-txexprs txexpr/parsed))
-  (define txexpr/expanded (run-txexpr/functional! txexpr/preprocessed default-layout))
-  (define unclear-dependencies (discover-dependencies txexpr/expanded))
-
-  (define next
-    (chain build-page
-         txexpr/expanded
-         unclear-dependencies
-         clear
-         compiler))
-
-  (define (ripple . _) next)
-
-  (for ([unclear unclear-dependencies])
-    (define dep/clear (send compiler clarify unclear))
-    (if (equal? (path-get-extension dep/clear) #".md")
-        (send compiler
-              add!
-              dep/clear)
-        (send compiler
-              add!
-              dep/clear
+          [(#".md")
+           (λ (clear compiler)
+             (add-dependencies!
               clear
-              ripple)))
+              compiler
+              (run-txexpr/functional! (parse-markdown clear))))]
+          [else (super delegate path)]))))
 
-  next)
+(module+ test  
+  (require racket/function
+           rackunit)
+
+  (test-equal? "Replace element via parameter"
+    (parameterize ([current-app-element-predicate (λ (x) (tag-equal? 's x))])
+      (tx-replace-me '(root (rooter (rootest (s))))
+                     (λ (x) '((leafy) (greens)))))
+    '(root (rooter (rootest (leafy) (greens)))))
+
+  (test-case "Can group scripts (with file I/O)"
+    (define tx '(root (script ((type "a") (id "q")) "A1")
+                      (script ((type "b") (id "r")) "B1")
+                      (script ((type "a") (id "s")) "A2")
+                      (script ((type "c") (id "t")) "C1")))
+
+    (define tmp-rel (make-temp-ephmod-directory))
+    (define (group! type)
+      (group-scripts! tx
+                      tmp-rel
+                      (λ (x) (and (txexpr? x)
+                                  (equal? (attr-ref x 'type #f)
+                                          type)))))
+    
+    (define a-scripts (group! "a"))
+    (define b-scripts (group! "b"))
+
+    (define combined (append a-scripts b-scripts))
+    (check-equal? (length a-scripts) 2)
+    (check-equal? (length b-scripts) 1)
+    (check-true (andmap file-exists?
+                        (map script-info-path
+                             (append a-scripts
+                                     b-scripts))))
+    (check-true (andmap (λ (si)
+                          ((script-info-predicate si)
+                           (script-info-element si)))
+                        combined))
+    (delete-directory/files (tmp-rel))))

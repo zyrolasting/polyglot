@@ -2,10 +2,11 @@
 
 (require racket/contract)
 (provide polyglot/imperative%
-         (rename-out [polyglot/imperative% polyglot%])
+         (rename-out [polyglot/imperative% polyglot%]
+                     [run-txexpr/imperative! run-txexpr!])
          (contract-out
-          [run-txexpr! (-> (or/c (non-empty-listof txexpr?) txexpr?)
-                           (non-empty-listof txexpr?))]))
+          [run-txexpr/imperative! (-> (or/c (non-empty-listof txexpr?) txexpr?)
+                                      (non-empty-listof txexpr?))]))
 
 (require 
   racket/class
@@ -20,12 +21,10 @@
   unlike-assets/logging
   unlike-assets/policy
   [except-in markdown xexpr->string]
-  "./private/default-file-handling.rkt"
-  "./private/dependencies.rkt"
+  "./private/base-workflow.rkt"
   "./private/dynamic-modules.rkt"
   "./private/fs.rkt"
   "./private/scripts.rkt"
-  "./private/writer.rkt"
   "./paths.rkt"
   "./txexpr.rkt")
 
@@ -35,9 +34,7 @@
            rackunit))
 
 (define fallback-provided-name 'replace-element)
-
-(define (default-layout kids)
-  `(html (head (title "Untitled")) (body . ,kids)))
+(define default-layout make-minimal-html-page)
 
 (define/contract (delegate-to-asset-module clear compiler) advance/c
   (<info "Delegating to ~a's write-dist-file" clear)
@@ -112,17 +109,12 @@
 
 
 (define polyglot/imperative%
-  (class* unlike-compiler% () (super-new)
+  (class* polyglot/base% () (super-new)
       (define/override (delegate path)
         (case (path-get-extension path)
           [(#".md") markdown->dependent-xexpr]
           [(#".rkt") delegate-to-asset-module]
-          [else copy-hashed]))
-
-      (define/override (clarify unclear)
-        (define path (build-complete-simple-path unclear (assets-rel)))
-        (unless (file-readable? path) (error (format "Cannot read ~a" unclear)))
-        path)
+          [else (super delegate path)]))
 
       (define/public (preprocess-txexprs tx-expressions)
         (interlace-txexprs
@@ -200,38 +192,15 @@
     (e2e fallback-provided-name)))
 
 
-(define (run-txexpr! tx-expressions [initial-layout (λ (kids) kids)])
+(define (run-txexpr/imperative! tx-expressions [initial-layout (λ (kids) kids)])
   (run-rackdown tx-expressions initial-layout))
+
 
 (define (markdown->dependent-xexpr clear compiler)
   (define txexpr/parsed (parse-markdown clear))
   (define txexpr/preprocessed (send compiler preprocess-txexprs txexpr/parsed))
-  (define txexpr/expanded (run-txexpr! txexpr/preprocessed default-layout))
-  (define unclear-dependencies (discover-dependencies txexpr/expanded))
-
-  (define next
-    (chain build-page
-         txexpr/expanded
-         unclear-dependencies
-         clear
-         compiler))
-
-  (define (ripple . _) next)
-
-  (for ([unclear unclear-dependencies])
-    (define dep/clear (send compiler clarify unclear))
-    (if (equal? (path-get-extension dep/clear) #".md")
-        (send compiler
-              add!
-              dep/clear)
-        (send compiler
-              add!
-              dep/clear
-              clear
-              ripple)))
-
-  next)
-
+  (define txexpr/processed (run-txexpr/imperative! txexpr/preprocessed))
+  (add-dependencies! clear compiler txexpr/processed))
 
 (module+ test
   (define tmp (make-temporary-file))
@@ -263,7 +232,7 @@
 
     (test-equal?
         "Process Rackdown externally"
-        (run-txexpr! (parse-markdown rackdown)
-                     (λ (kids)
-                       `(body . ,kids)))
+        (run-txexpr/imperative! (parse-markdown rackdown)
+                                (λ (kids)
+                                  `(body . ,kids)))
         '(body (p "Hello") (p "test!")))))

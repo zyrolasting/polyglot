@@ -10,7 +10,7 @@
 (define path-builder/c (->* () #:rest (listof path-el/c) complete-path?))
 (provide path-el/c
          (contract-out
-          [path-rel (->* () #:rest (listof path-for-some-system?) path-builder/c)]
+          [path-rel (->* (complete-path?) #:rest (listof path-for-some-system?) path-builder/c)]
           [polyglot-project-directory (parameter/c (and/c complete-path? directory-exists?))]
           [polyglot-temp-directory (parameter/c (and/c complete-path? directory-exists?))]
           [project-rel path-builder/c]
@@ -28,7 +28,7 @@
              (cleanse-path (apply build-path (append head tail)))
              #f)))
 
-(define-runtime-path polyglot-runtime-path "..")
+(define-runtime-path polyglot-runtime-path ".")
 
 (define (path-builder base-rel next)
   (λ rest (apply (path-rel (base-rel) next)

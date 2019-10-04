@@ -7,7 +7,7 @@
                     racket/dict
                     racket/class]]
 
-@title[#:tag "default-workflow"]{The Imperative Workflow (Default)}
+@title[#:tag "default-workflow"]{The Imperative Workflow}
 @defmodule[polyglot/imperative]
 
 The imperative workflow has a PHP-like development experience where
@@ -23,7 +23,7 @@ cases. If you want a leaner workflow with less room for error,
 use @secref{functional-workflow}.
 
 This is the default workflow, meaning that it applies when no
-workflow is specified at the @secref{cli}.
+workflow is specified according to @secref{setup}.
 
 @section[#:tag "imperative-apps"]{Imperative App and Library Elements}
 
@@ -214,26 +214,18 @@ or attach common metadata to documents.
 }
 }
 
-@defthing[polyglot% class?]{
-An alias for @racket[polyglot/imperative%] kept for backwards compatibility.
-}
-
-@defproc[(run-txexpr! [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
-                      [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
-                                      identity])
-                      (or/c (listof txexpr?) txexpr?)]{
-Runs @racket[tx-expressions] as if they were a collection of interdependent Racket modules.
-Use this procedure to leverage the benefits of the imperative workflow without needing
-the CLI or @racket[polyglot/imperative%].
-
-Assumes that @racket[tx-expressions] contains representations of application
-and library elements according to @secref{imperative-apps}.
+@defproc[(run-txexpr/imperative! [tx-expressions (or/c txexpr? (non-empty-listof txexpr?))]
+                                 [initial-layout (-> (listof txexpr?) (or/c txexpr? (listof txexpr?)))
+                                                 identity])
+                                 (or/c (listof txexpr?) txexpr?)]{
+Dynamically evaluate the Racket modules in @racket[tx-expressions] according to
+the rules of this workflow, without using the CLI or @racket[polyglot/imperative%].
 
 Note that you do not have to use Markdown before using this function, or even
 tagged expressions that represent valid HTML. You only need to represent
 application or library @tt{<script>} elements as tagged X-expressions.
 
-This will functionally replace Racket application and library elements inside the
+This wil replace Racket application and library elements inside the
 provided tagged X-Expressions and return the expanded expressions within a layout.
 
 Remember from @secref{imperative-layouts} that the application elements within the
@@ -251,3 +243,7 @@ Note that this procedure does not do anything with dependencies.
 Use @racket[discover-dependencies] to analyze the output and
 find more assets to process.}
 
+@defthing[polyglot% class?]{
+An alias for @racket[polyglot/imperative%] kept for backwards compatibility.}
+@defthing[run-txexpr! procedure?]{
+An alias for @racket[run-txexpr/imperative!] kept for backwards compatibility.}

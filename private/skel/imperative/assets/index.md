@@ -1,4 +1,4 @@
-<script type="application/rackdown">
+<script type="application/racket">
 #lang racket
 
 ;; This is an application element. It can control the page and generate content.

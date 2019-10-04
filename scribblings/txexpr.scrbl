@@ -4,10 +4,14 @@
                     racket/contract]
          polyglot]
 
-@title[#:tag "polyglot-txexpr"]{Specialized Tagged X-Expression Procedures}
+@title[#:tag "polyglot-txexpr"]{Tagged X-Expression Tools}
 @defmodule[polyglot/txexpr]
 
-This module includes all bindings from the @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "txexpr"] (unsafe) and @seclink["top" #:doc '(lib "xml/xml.scrbl") "xml"] modules, plus curated procedures for working with tagged X-expressions. Since this module is lower-level, none of these procedures operate with any understanding of any documented workflow.
+This module includes all bindings from the @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "txexpr"] and @seclink["top" #:doc '(lib "xml/xml.scrbl") "xml"] modules, plus curated procedures for working with tagged X-expressions. Since this module is lower-level, none of these procedures operate with any understanding of any documented workflow.
+
+@defproc[(genid [tx txexpr?]) string?]{
+Returns a value for an @tt{id} attribute that is not used anywhere in @tt{tx}.
+}
 
 @defproc[(tag-equal? [tag symbol?] [tx any/c]) boolean?]{
 Returns @racket[#t] if @racket[tx] is a tagged X-expression and its tag is @racket[equal?] to @tt{tag}.

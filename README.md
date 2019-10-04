@@ -1,6 +1,5 @@
-`polyglot` is a build tool that lets you use any `#lang` language you want
-to program rich content among tagged X-expressions. Ships with a static
-website generator and publisher that accepts a Markdown/Racket mix as input.
+`polyglot` creates websites using a mix of any DSLs you want in a single source file.
+
 
 ```
 $ raco pkg install polyglot
@@ -121,4 +120,3 @@ great for, say, a technical portfolio where each page hosts an app demo.
 </script>
 
 [ua]: https://github.com/zyrolasting/unlike-assets
-

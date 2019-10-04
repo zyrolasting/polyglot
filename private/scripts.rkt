@@ -37,6 +37,10 @@
 
 (define lib-script? (curry script-of-type? "text/racket"))
 
+(define (app-or-lib-script? x)
+  (or (lib-script? x)
+      (app-script? x)))
+
 (define (pipe-port->data port)
   (reverse
     (let loop ([next (read port)] [data null])

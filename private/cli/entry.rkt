@@ -9,7 +9,6 @@
   unlike-assets
   file-watchers
   "../../main.rkt"
-  "../../paths.rkt"
   "../fs.rkt"
   "build.rkt"
   "develop.rkt"
@@ -57,12 +56,14 @@
   (command-line
     #:program (short-program+command-name)
     #:once-each
-    [("-v" "--verbose")       "Include debug-level logging in output"
-                              (show-debug? #t)]
-    [("-b" "--by-module") module-path
-                          "Use alternative polyglot% (sub)class provided as `polyglot+%`"
-                          "from module-path. Use this to change workflows."
-                          (polyglot-class (dynamic-require module-path 'polyglot+%))]
+    [("-v" "--verbose")
+     "Include debug-level logging in output"
+     (show-debug? #t)]
+
+    [("-b" "--by-module")
+     module-path
+     "Use the workflow provided as `polyglot+%` from module-path."
+     (polyglot-class/cli-asserted (dynamic-require module-path 'polyglot+%))]
     #:args (action . _)
     (parameterize ([current-command-line-arguments (get-subcommand-args action)])
       ((hash-ref action-table action (λ _ show-subcommands))))))

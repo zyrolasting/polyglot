@@ -6,26 +6,21 @@
 @defmodule[polyglot]
 
 @racketmodname[polyglot] is a collection of workflows and libraries that
-evaluate Racket modules within @seclink["top" #:doc '(lib
+evaluate Racket modules within Markdown, or @seclink["top" #:doc '(lib
 "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"]. It includes
 bindings from @racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr],
 @racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
-@racketmodname[polyglot] ships with a CLI that, by default, creates
-rich websites using a Markdown/Racket mix. All websites built with this
-workflow get cache-busting, Webpack-like dependency handling, and an S3
-upload tool for free.
-
-And if you do not agree with any workflow, there's an API to write your own.
+Websites built with @racketmodname[polyglot] get cache-busting, Webpack-like
+dependency handling, and an S3 upload tool for free.
 
 @table-of-contents[]
 @include-section["setup.scrbl"]
 @include-section["paths.scrbl"]
 @include-section["workflows.scrbl"]
-@include-section["cli.scrbl"]
 @include-section["default-workflow.scrbl"]
 @include-section["functional-workflow.scrbl"]
-@include-section["your-workflow.scrbl"]
+@include-section["txexpr.scrbl"]
 
 @section{License and contributions}
 @racket[polyglot] uses the MIT license. @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "Here's the source code."]

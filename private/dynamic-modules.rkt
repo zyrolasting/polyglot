@@ -67,10 +67,9 @@
   ;; Creates a temp directory in the temporary file system containing
   ;; a symbolic link to the project directory. This lets dynamic modules
   ;; use the project while leveraging tempfs and OS-specific cleanup jobs.
-  (define temp-dir (make-temporary-file "ephmod~a"))
-  (delete-file temp-dir)
-  (make-directory temp-dir)
-  (make-file-or-directory-link (project-rel) (build-path temp-dir "project"))
+  (define temp-dir (make-temporary-file "ephmod~a" 'directory (system-temp-rel)))
+  (make-file-or-directory-link (project-rel)
+                               (build-path temp-dir "project"))
   (path-rel temp-dir))
 
 

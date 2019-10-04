@@ -11,86 +11,142 @@
 @title[#:tag "functional-workflow"]{The Functional Workflow}
 @defmodule[polyglot/functional]
 
-The functional workflow has less room for error and
-continued flexibility as your project grows. The drawback
-is a higher learning curve.
+The functional workflow offers a lean, predictable and scalable API
+for building web pages. In it, each application element provides a
+procedure to produce a new page. A finished page comes from
+applying the composition of these procedures to the simplest
+representation of the page.
 
-@section{Page Construction}
-Given a Markdown file @tt{my-page.md}, the output content
-of the functional workflow is:
+@section{Variable-Pass Model}
 
-@racketblock[
-((compose A_N ... A_1 A_0)
- `(html (head (title "Untitled")) (body . ,(parse-markdown "my-page.md"))))]
+The functional workflow runs on a loop.
+Each pass performs the following steps:
 
-Where @tt{A@subscript{0}}, @tt{A@subscript{1}}, ..., @tt{A@subscript{N}},
-are @tt{replace-page} procedures @racket[provide]d by
-the app elements defined within @tt{my-page.md}.
+@itemlist[#:style 'ordered
+          @item{Find all app and lib elements}
+          @item{Assign unique values to the @tt{id} attributes of each element where they don't exist.}
+          @item{Write the CDATA of each element to a Racket module in @racket[system-temp-rel].}
+          @item{Run each app element's Racket module according to @secref{func-app-el}}
+          @item{If any substitutions occurred in this process, go to step 1.}]
 
-If an app element does not @racket[(provide replace-page)]
-to act as @tt{A@subscript{i}}, then @tt{A@subscript{i}} will
-be the identity function.
+This can create an infinite loop if, say, an application element
+always creates more application elements in the page. To avoid
+lockup, the workflow will always remove the exact app and lib
+elements processed before concluding a pass. However, you can
+exploit the system to create "macros", or loops using page elements.
 
-@section{Functional App Elements}
-Since any functional app element may replace the entire page,
-changing the page layout, adding new styles, or decorating
-existing elements are all a matter of find/replace.
+@section[#:tag "func-app-el"]{Functional App Elements}
+Any functional app element may replace the page.
+This means the app can change the page layout, add new styles,
+or decorate existing elements as a matter of find/replace.
 
 The following example replaces the @tt{<head>} element with a
 more usable starting point.
 
-@racketmod[#:file "<script type=\"application/racket\">...</script>"
-racket/base
-(require polyglot)
-(provide replace-page)
-
-(define (replace-page page-tx)
-  (replace-tagged page-tx
-                  'head   
-                  (λ (x) `(head (title "My Page")
-                                (link ((rel "stylesheet") ("styles.css")))))))]
-
-To elaborate on the @racket[compose] rule above, an app's
-element's @tt{replace-page} procedure always accepts
-the latest version of the page. This means the first app
-element gets the bare bones page, and the second app element
-gets the output from the first app element, and so on.
-
 @margin-note{Notice that the @racket[λ] is returning a @italic{list} containing a @tt{head} element. This is because you can replace one element with several.}
-
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
-
 (require polyglot)
 (provide replace-page)
 
 (define (replace-page page-tx)
+  (tx-replace page-tx
+              (λ (x) (tag-equal? 'head x))
+              (λ (x) `((head ((title "My Page"))
+                             (link ((rel "stylesheet") ("styles.css"))))))))]
+
+
+So what's @tt{page-tx}?
+
+Given a Markdown file @tt{my-page.md}, every page starts with this value:
+
+@racketblock[
+ `(html (head (title "Untitled")) (body . ,(parse-markdown "my-page.md")))]
+
+The @tt{replace-page} procedure provided by the @italic{first} app
+element of @tt{my-page.md} will get this value as an argument. This
+implies that the app element can "see itself" inside the page. The app
+element may remove or modify itself to produce different behaviors.
+
+If an app element does not provide a @tt{replace-page} procedure, then
+it is assumed to provide the identity function. Meaning that by default,
+app elements replace the page with itself, producing no changes.
+
+You may specify other application elements in the page, and they will
+be evaluated as they are encountered. The output of the first app element's
+@tt{replace-page} procedure will be the input to the second app element's
+@tt{replace-page} procedure, and so on.
+
+To illustrate, this outputs a page showing @racket[2].
+
+@verbatim[#:indent 2]|{
+<script type="text/racket" id="nums">
+#lang racket/base
+(require polyglot)
+(provide replace-number)
+
+; Turns <p>1</p> into <p>2</p>
+(define (inc-child x)
+  (number->string (add1 (string->number (car (get-elements x))))))
+
+(define (replace-number page-tx)
   (replace-tagged page-tx
-                  'head   
-                  (λ (x) `((head (title "My Page")
-                                (link ((rel "stylesheet") ("styles.css"))))))))]
+                  'p
+                  (λ (x) `((p ,(inc-child x))))))
+</script>
+
+<script type="application/racket" id="start">
+#lang racket/base
+(provide replace-page)
+(define (replace-page page-tx)
+  '(html (head (title "counter"))
+         (body (p "0"))))
+</script>
+
+<script type="application/racket" id="first">
+#lang racket/base
+(provide replace-page)
+(require "nums.rkt")
+(define replace-page replace-number)
+</script>
+
+<script type="application/racket" id="second">
+#lang racket/base
+(provide replace-page)
+(require "nums.rkt")
+(define replace-page replace-number)
+</script>
+}|
+
+We cover how to reduce boilerplate in the @secref{boilerplate} section.
 
 @section{In-Place Replacements}
-
 One of the benefits of the imperative workflow was how easy it is
 to make an app element replace itself with new content: Just @racket[write].
 
-In the functional workflow, you are responsible for locating and replacing
-an app element's source. To make this easier, @racketmodname[polyglot/functional]
-provides a parameter that always resolves to a matching predicate for the currently
-evaluating app element's @racket[txexpr].
+In the functional workflow, use @racket[tx-replace-me] to replace
+the element in which the procedure appears.
 
-@racket[polyglot] uses a variable-pass model where it will always
-replace app elements so long as they exist. To avoid an infinite loop,
-@racket[polyglot] will always remove the exact app elements it runs
-during a pass. You can exploit this to create procedures that behave
-similarly to macros, or element-level loops.
+@racketmod[#:file "<script type=\"application/racket\">...</script>"
+racket/base
+
+(require polyglot)
+(provide replace-page)
+
+(define (replace-page page-tx)
+  (replace-me page-tx
+              (λ (x) `((p "I'm where the app element was.")))))]
+
 
 @subsection{Example: Embed Working Code Examples}
 This example generates a new application element with its own
 source visible. The output page will have both the literal code
 available for end-user reading, and the output of that same code
 displayed right below it.
+
+The reason this works is because the functional workflow will perform
+another pass, see a new application element following a @tt{pre} element,
+and then run it as well.
 
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
@@ -102,9 +158,8 @@ racket/base
                "(provide replace-page)"
                "(require polyglot)"
                "(define (replace-page page-tx)"
-               "  (replace page-tx"
-               "           (current-app-element-predicate)"
-               "           (λ (x) '((h1 \"Hello, meta!\")))))"))
+               "  (replace-me page-tx"
+               "              (λ (x) '((h1 \"Hello, meta!\")))))"))
 
 (define (replace-page page-tx)
   (replace-me page-tx
@@ -112,11 +167,14 @@ racket/base
                        (script ((type "application/racket")) . ,code)))))]
 
 @subsection{Example: Iterative App Element}
-An app element can replace itself with a slightly different version of itself.
-That way @racket[polyglot] won't remove the new version, and the new version
-can pick up a computation in terms of the last iteration.
+The functional workflow tracks app and lib elements by their @tt{id} attribute
+values. An app element can therefore replace itself with a slightly different
+version with a new ID to avoid removal before the new pass.
 
-Obviously, this comes with a risk of non-terminating builds.
+Obviously this comes with a risk of non-terminating builds, but you can
+use this to implement iteration. The following example only modifies
+the @tt{id} attribute to illustrate the point, and is not an endorsement
+to use the @tt{id} attribute as an ordinal for loops in general.
 
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
@@ -125,13 +183,12 @@ racket/base
 (provide replace-page)
 
 (define (replace-page page-tx)
-  (replace page-tx
-           (current-app-element-predicate)
-           (λ (x)
-             (define i (string->number (attr-ref 'data-i x "0")))
-             (if (< i 10)
-                 `(,(attr-set x 'data-i (number->string (add1 i))))
-                 `((p "done"))))))]
+  (replace-me page-tx
+              (λ (x)
+                (define i (string->number (attr-ref 'id x "0")))
+                (if (< i 10)
+                    `(,(attr-set x 'id (number->string (add1 i))))
+                    `((p "done"))))))]
 
 @subsection{Example: Incorporating Output from Side-Effects}
 Another advantage of @secref{default-workflow} was that it naturally
@@ -149,83 +206,71 @@ racket/base
 (provide replace-page)
 
 (define (replace-page page-tx)
-  (replace page-tx
-           (current-app-element-predicate)
-           (λ (x)
-             (define-values (i o) (make-pipe))
-             (parameterize ([current-output-port o])
-               (dynamic-require "loud-module.rkt" #f)
-               (close-output-port o))
-             (port->list read i))))]
+  (replace-me page-tx
+              (λ (x)
+                (define-values (i o) (make-pipe))
+                (parameterize ([current-output-port o])
+                  (dynamic-require "loud-module.rkt" #f)
+                  (close-output-port o))
+                (port->list read i))))]
 
-@section{Pre- and Post-processing}
-You may notice that you are writing the same app elements over and over
-again, even when leveraging shared code. This can happen when specifying
-layouts, for example.
+@section[#:tag "boilerplate"]{Reducing Boilerplate}
+Application and library elements consist largely of
+boilerplate code when we are trying to make small
+adjustments like setting a layout and title. So
+let's assume that instead of writing this
+at the top of every page...
 
-For this reason you can install @tt{replace-page} procedures to run
-before or after @racket[polyglot] transforms a page using app elements.
+@racketmod[#:file "<script type=\"application/racket\">...</script>"
+racket/base
 
-Since @racket[(assets-rel "index.md")] is always the first page to run,
-it is the best place to install new handlers. Astute readers might
-ask how @tt{index.md} could benefit from the same handlers if they
-are not installed by the time @tt{index.md} is already being processed.
-Put simply, @tt{index.md} is the only page that has to preprocess itself.
+(require polyglot
+         "project/layouts.rkt")
+(provide replace-page)
+(define (replace-page page-tx)
+  (one-column "My Page" page-tx))]
 
-Here's an @tt{index.md} that uses a custom @tt{<page />} XML element to specify
-its own title and layout. The author wishes to use non-standard elements because
-the Markdown parser will still parse them, and it beats typing an app element
-to set up the page for every page.
+...we write this:
 
-@verbatim|{
-<page title="Home Page" layout="holy-grail" />
-<script type="application/racket" id="install-preprocessor">...</script>
+@verbatim[#:indent 2]|{
+<page title="My Page" layout="one-column" />
 }|
 
-The @tt{<page />} element doesn't mean anything yet. @tt{index.md} must
-use an app element install a pre-processor that replaces all @tt{<page />}
-elements with app elements that configure the page.
+To do this, extend the functional workflow to preprocess each page.
 
-All it needs to do is set @racket[current-page-preprocessor] and
-@racket[current-page-postprocessor]. To address the prior lack of preprocessing
-for itself, it will need to invoke its own pre-processor. The post-processor
-will still run on @tt{index.md} by the time all app elements in the page finish.
-
-@racketmod[#:file "<script id=\"install-preprocessor\">"
+@racketmod[#:file "func-ext.rkt"
 racket/base
-(provide replace-page)
+(provide polyglot+%)
 (require polyglot)
 
-(define (preprocess page-tx)
-  (replace-tagged page-tx
-                  'page
-                  (λ (x)
-                    `((script ((type "application/racket"))
-                              "#lang racket/base"
-                              "(require \"project/layouts.rkt\")"
-                              "(provide replace-page)"
-                              "(define (replace-page x)"
-                              (format "  (~a ~e x))"
-                                      (attr-ref x 'layout)
-                                      (attr-ref x 'title)))))))
+(define polyglot+%
+  (class* polyglot/functional%
+    (define/override (preprocess page-tx)
+      (replace-tagged page-tx
+                      'page
+                      (λ (x)
+                        `((script ((type "application/racket")
+                                   (id ,(genid page-tx)))
+                                  "#lang racket/base"
+                                  "(require \"project/layouts.rkt\")"
+                                  "(provide replace-page)"
+                                  "(define (replace-page x)"
+                                  (format "  (~a ~e x))"
+                                          (attr-ref x 'layout "one-column")
+                                          (attr-ref x 'title "Untitled")))))))))]
 
-(define (replace-page page-tx)
-  (current-page-preprocessor preprocess)
-  (preprocess page-tx))]
+So what about post-processing?
 
-But what about post-processing? When would that be useful?
-
-@subsection{Bundling Assets}
-Take CSS and JavaScript. As assets, both are difficult to manage
-from a delivery standpoint. Developers want to use both
-in a way that's convenient for them, and let a build system
-figure out how to optimize a soup of related files, CDATA, and remote
-references for end-users.
+@subsection{Example: Bundling Assets}
+Optimal CSS and JavaScript can be difficult to deliver. Developers
+want to use both in a way that's convenient for them, and let a build
+system figure out how to optimize a soup of related files, CDATA, and
+remote references for end-users.
 
 For an example, here's an app element that prepends page-level CSS
-to a designated element. The developer's premise is that it's painful
-to write styles in a central vanilla CSS file, and would rather toss relevant
-styles into the page using theme information and the ever-helpful @racket[css-expr].
+to a designated element. The developer's premise is that it makes sense
+to associate page styles with the page instead of editing a central
+CSS file.
 
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
@@ -256,19 +301,17 @@ On its own, this approach bloats the output HTML by
 including a @tt{<style>} element in the output.
 
 That might not be a problem initially, but its possible
-that other pages doing the same thing might grow enough
-to cause problems. End-user browsers can't cache HTML
-responses if you want them to stay up to date with styles,
-so the stylesheets may need to move to a seperate file.
+that other pages doing the same thing might grow
+too large to deliver the same way.
 
-Heading back to @tt{index.md}, we can install a post-processor
-that consumes the aggregate style elements and writes them
-to the distribution. It uses @racket[current-seconds] to
-create a basic cache-busting name.
+We can also install a post-processor that writes the
+aggregated style rules to the distribution,
+and removes them from the output HTML.
 
 @racketmod[racket/base
-(provide replace-page)
 (require polyglot)
+(provide replace-page)
+
 
 ; [...]
 
@@ -284,15 +327,7 @@ create a basic cache-busting name.
                                                        ".css")))
               null)))
 
-(define (replace-page page-tx)
-  (current-page-preprocessor preprocess)
-  (current-page-postprocessor postprocess)
-  (preprocess page-tx))
 ]
-
-Post-processors give you the ability to form an agreement with your team
-on how to use a page as a container for distributed data for later optimization
-like this.
 
 @section{Functional Workflow API}
 @defclass[polyglot/functional% unlike-compiler% ()]{
@@ -306,9 +341,9 @@ If the completed path path does not refer to a readable file, this will raise @r
 
 @defmethod[(delegate [clear clear/c]) unlike-asset/c]{
 This implements the workflow on this page by offering
-special processing for Markdown dependencies with fallback processing
-for any other file. Unlike @secref{default-workflow}, there is no added benefit
-in offering Racket module processing.
+special processing for Markdown dependencies with
+fallback processing for any other file. Unlike @secref{default-workflow},
+there is no Racket module processing.
 
 This workflow will process any referenced Markdown files
 to produce a working, linked collection of @racket[".html"] files.
