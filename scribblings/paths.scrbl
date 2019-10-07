@@ -7,9 +7,7 @@
 @title{Where Things Are}
 @defmodule[polyglot/paths]
 
-As implied in @secref{setup}, @racket[polyglot] uses several paths to work.
-They all come from the @racket[polyglot/paths] module. You'll need these
-paths to process project files and understand how files move through the system.
+As implied in @secref{setup}, @racket[polyglot] uses several paths.
 
 First and most importantly, there's the...
 
