@@ -28,6 +28,10 @@
                        [make-tag-predicate
                         (-> (non-empty-listof symbol?)
                             (-> any/c boolean?))]
+                       [tx-search-tagged
+                        (-> txexpr?
+                            symbol?
+                            (listof txexpr-element?))]
                        [substitute-many-in-txexpr
                         (-> txexpr?
                             txe-predicate/c
@@ -209,6 +213,9 @@
               (λ (x) (tag-equal? t x))
               replace))
 
+(define (tx-search-tagged tx t)
+  (or (findf*-txexpr tx (λ (x) (tag-equal? t x)))
+      '()))
 
 (define (get-dependency-ref node)
   (attr-ref node 'src
@@ -261,6 +268,24 @@
   (require rackunit racket/function)
   (define i-element? (curry tag-equal? 'i))
   (define s-element? (curry tag-equal? 's))
+
+  (test-equal? "Search for tagged element"
+               (tx-search-tagged
+                '(body (a ((i "1")))
+                       (b (a ((i "2")))
+                          (a ((i "3"))))
+                       (a ((i "4"))
+                          (a ((i "5")))))
+                'a)
+               '((a ((i "1")))
+                 (a ((i "2")))
+                 (a ((i "3")))
+                 (a ((i "4"))
+                    (a ((i "5"))))))
+
+  (test-equal? "Search produces empty list on no matches"
+               (tx-search-tagged '(body (b)) 'a)
+               '())
 
   (test-case
     "Output does not change when normalizing arguments"

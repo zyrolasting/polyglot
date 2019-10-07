@@ -44,6 +44,15 @@ Like @racket[tx-replace], except you can designate all elements of a certain tag
 e.g. @racket[(tx-replace-tagged tx 'h2 (lamdba (x) `((h3 . ,(get-elements x)))))]
 }
 
+@defproc[(tx-search-tagged [tx txexpr?]
+                           [tag symbol?])
+                           (listof txexpr?)]{
+Return all elements in @tt{tx} with the given tag. Returns an empty list
+if there are no matches.
+
+If an element matches, the search will not descend into the child elements.
+}
+
 @defproc[(substitute-many-in-txexpr [tx txexpr?]
                                     [replace? (-> txexpr-element? any/c)]
                                     [replace (-> txexpr-element? (listof txexpr-element?))])
