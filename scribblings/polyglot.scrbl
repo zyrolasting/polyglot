@@ -6,17 +6,16 @@
 @defmodule[polyglot]
 
 @racketmodname[polyglot] evaluates Racket modules within Markdown,
-or @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"].
-Websites built with @racketmodname[polyglot] get cache-busting, Webpack-like
-dependency handling, and an S3 upload tool for free.
+or @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"]
+to build production-ready websites. Websites built with @racketmodname[polyglot] get
+cache-busting, Webpack-like dependency handling, and an S3 upload tool for free.
 
 The @racketmodname[polyglot] module includes bindings from
 @racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr],
-@racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
+@racketmodname[polyglot/base], @racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
 @table-of-contents[]
 @include-section["setup.scrbl"]
-@include-section["paths.scrbl"]
 @include-section["workflows.scrbl"]
 @include-section["default-workflow.scrbl"]
 @include-section["functional-workflow.scrbl"]

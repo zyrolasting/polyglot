@@ -1,18 +1,23 @@
 #lang scribble/manual
 @require[@for-label[polyglot unlike-assets]]
 
-@title{Base Workflow: What Always Happens}
+@title[#:tag "base-workflow"]{The Base Workflow}
+@defmodule[polyglot/base]
 
-Both @secref{default-workflow} and @secref{functional-workflow}
-add on to a basic set of rules we'll cover here.
+All built-in workflows accept Racket and Markdown as input
+and produce HTML5 documents in a distribution directory
+as output. This page covers everything in between.
 
-Overall, a built-in workflow produces HTML5 documents in @racket[dist-rel]
-with correct links and references to other content. The journey to this
-state involves use of Racket modules mixed with Markdown.
+@secref{default-workflow} and @secref{functional-workflow}
+specialize the rules defined here. Therefore, you are always
+following the base workflow unless you write your own workflow
+from scratch.
+
+@include-section["paths.scrbl"]
 
 @section[#:tag "rackdown"]{Mixed-mode Racket}
 
-The workflows shipped with @racket[polyglot] target HTML @tt{<script>}
+All workflows shipped with @racketmodname[polyglot] target HTML @tt{<script>}
 elements within Markdown files. There are @defterm{library ("lib") elements}
 and @defterm{application ("app") elements}. These elements are processed in that
 order, but we will cover application elements in depth first.
@@ -23,6 +28,7 @@ elements are ignored, because they contribute complexity without added benefit i
 the context of @racketmodname[polyglot]. The @tt{src} attributes on all other script
 elements work according to a given workflow.
 
+@subsection{Relationship to the File-system}
 @tt{<script id="foo" ...>} causes @racketmodname[polyglot] to write the CDATA
 of that script element to @tt{<tmp>/foo.rkt}, where @tt{<tmp>} is a temporary
 directory created inside @racket[(system-temp-rel)]. If you do not specify a
@@ -32,18 +38,17 @@ you.
 @margin-note{On Windows, your account might not have permission to create
 links. Either run @racket[polyglot] as an Administrator, or (better yet) get
 permission to create links.}
-@margin-note{Be careful to include any Racket-level dependencies in @tt{info.rkt} or a
-setup script.}
 Since the Racket modules exist in the same
 directory when processed together, they can @racket[require] each
 other. @racketmodname[polyglot] also leaves a symlink named @tt{project}
 pointing to your project directory so that multiple pages can share code and
-data.
+data. Be careful to include any Racket-level dependencies in @tt{info.rkt} or a
+setup script.
 
 
 @subsection{Relationship to Markdown}
 Markdown supports use of HTML tags, so we can just write the @tt{<script>} elements
-we want directly among prose. This gives a nice experience where you can "drop into"
+we want directly among prose. This gives a nice experience where you can use
 any DSL to work on the underlying page model when plain language won't cut it.
 Examples in this documentation will use Markdown.
 
@@ -57,7 +62,7 @@ written for @racketmodname[polyglot].
 
 @defterm{application elements} are HTML script elements of media type
 @racket["application/racket"]. @racket[polyglot] will run them in the
-order they are encountered. The way the application elements run
+order they are encountered. The way application elements work
 depends on the workflow you use.
 
 Here's an example from @secref{default-workflow}. In this workflow, app
@@ -110,12 +115,21 @@ entire page.
 </script>
 }|
 
+In either case, application elements can modify the @racket[txexpr]
+representing the page in which you are working. The intended experience
+is that you can stop using prose and start applying more surgical changes
+by making an incision via an application element.
+
 
 @subsection{Library Elements}
 Library elements have media type @racket["text/racket"]. Library elements are saved
 to disk before application elements run. This lets you share code and data within
 the page. Unlike app elements, library elements can provide any identifiers they
 wish just like any other Racket module.
+
+Library elements are unopinionated, meaning that they do not operate differently
+across workflows. Application elements, however, @italic{are} opinionated
+and may use library elements differently.
 
 @verbatim[#:indent 2]|{
 # Available Packages
@@ -174,7 +188,7 @@ to access them.
 </script>
 }|
 
-@section{Dependency Discovery and Processing}
+@section[#:tag "discovery-proc"]{Dependency Discovery and Processing}
 
 Once there are no more app or lib elements to process in
 a Markdown file, a workflow will check all @racket[href]
@@ -189,7 +203,99 @@ a built-in workflow will try to process that file from @racket[(assets-rel "cont
 For each dependency, your chosen workflow will react according
 to that dependency's type.
 
-@section{Gotcha: XML in HTML5}
+@subsection{Markdown Handling (@racket[".md"])}
+You may link to other Markdown files in your pages.
+
+@verbatim[#:indent 2]|{
+* [Contact me](contact.md)
+...
+<nav><a href="about.md">About</a></nav>
+}|
+
+Each workflow will discover other Markdown files and
+will process them to produce a working, linked collection
+of @racket[".html"] files.
+
+@subsection[#:tag "handle-rkt"]{Racket Module Handling (@racket[".rkt"])}
+Assume you want to create a stylesheet using Racket.
+You can write Racket code to generate optimized styles and
+list the module that does it as a dependency.
+
+This allows you to turn this...
+
+@verbatim[#:indent 2]{
+<link rel="stylesheet" href="compute-stylesheet.rkt" />
+}
+
+...into this...
+
+@verbatim[#:indent 2]{
+<link rel="stylesheet" href="5f9bb103.css" />
+}
+
+...using this:
+
+@racketmod[
+#:file "compute-stylesheet.rkt"
+racket
+
+(provide write-dist-file)
+(require file/sha1 polyglot)
+
+(define (write-dist-file clear compiler)
+  (define css "body { font-size: 20px }\n")
+  (define port (open-input-string css))
+  (define file-name
+    (path-replace-extension
+      (substring (sha1 port) 0 8) (code:comment "For cache busting")
+      #".css"))
+
+  (define path (dist-rel file-name))
+  (close-input-port port)
+  (display-to-file #:mode 'text #:exists 'replace
+                   css path)
+  path)
+]
+
+First, it must @racket[provide] @racket[write-dist-file] as an
+@racket[advance/c] procedure that eventually returns a @racket[complete-path?]
+to the processed file as a fulfilled @racket[unlike-asset/c].
+That file must exist in @racket[(dist-rel)]. @racket[polyglot] will
+replace the value of the @racket[src] or @racket[href] attribute based on the path you return.
+
+The difference between this approach and writing equivalent Racket
+code in an application element is @italic{when} the code runs. This
+code runs after finding dependencies in a page, but before writing
+HTML to disk.
+
+You can use this technique to take full responsibility for how
+an asset is used in a distribution within a built-in workflow.
+
+@subsection{Default File Handling}
+Any other files you reference are copied to @racket[(dist-rel)],
+such that the file name is the first eight characters of the SHA1 hash of the
+file content for cache busting.
+
+@section{Base Workflow API Reference}
+@defclass[polyglot/base% unlike-compiler% ()]{
+Implements the common workflow concerns on this page.
+
+In the terminology of @racketmodname[unlike-assets], @racket[polyglot/base%] uses complete paths as @racket[clear/c] names.
+
+@defmethod[(clarify [unclear unclear/c]) clear/c]{
+If the string looks like a readable path on your system, returns a complete path.
+
+Relative paths are completed using @racket[(assets-rel)]. Complete paths are used as-is.
+
+If the completed path path does not refer to a readable file, this will raise @racket[exn:fail].
+}
+
+@defmethod[(delegate [clear clear/c]) unlike-asset/c]{
+Implements the rules shown in @secref{discovery-proc}.
+}
+}
+
+@section{Addendum: Avoid Leaving XML in HTML5}
 @racketmodname[polyglot]'s Markdown parser happens to include
 XML elements embedded in your page for processing. As you learn
 more about your workflow, you'll find you can generate content in terms of
@@ -201,7 +307,7 @@ those elements. This lets you write things like this:
       keywords="pizza, skateboards, cowabunga">
 }|
 
-But if you build this, it will not appear as input because you
+But if you build this, the @tt{page} element will not appear as input because you
 forgot to close the elements, XHTML style. If you add the
 missing @tt{/}s, it will work. You may safely omit the @tt{/}
 for HTML5 void elements, however.

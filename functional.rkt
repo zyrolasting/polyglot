@@ -22,10 +22,10 @@
          unlike-assets
          unlike-assets/logging
          [except-in markdown xexpr->string]
-         "./private/base-workflow.rkt"
          "./private/dynamic-modules.rkt"
          "./private/fs.rkt"
          "./private/scripts.rkt"
+         "./base.rkt"
          "./paths.rkt"
          "./txexpr.rkt")
 

@@ -7,7 +7,8 @@
       (provide (all-from-out spec)))
     ...))
 
-(r+p "./txexpr.rkt"
+(r+p "./base.rkt"
+     "./txexpr.rkt"
      "./paths.rkt"
      "./imperative.rkt"
      "./functional.rkt")

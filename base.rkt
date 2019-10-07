@@ -1,20 +1,27 @@
 #lang racket/base
 
-(provide (all-defined-out))
+(require racket/contract)
+(provide polyglot/base%
+         add-dependencies!
+         (contract-out
+          [make-minimal-html-page (-> (listof txexpr-element?)
+                                      txexpr?)]))
 
+        
 (require racket/class
          racket/dict
          racket/file
          racket/path
+         racket/rerequire
          racket/sequence
          racket/string
          file/sha1
          unlike-assets
          unlike-assets/logging
          unlike-assets/policy
-         "../txexpr.rkt"
-         "../paths.rkt"
-         "./fs.rkt")
+         "./txexpr.rkt"
+         "./paths.rkt"
+         "./private/fs.rkt")
 
 (define (make-minimal-html-page body)
   `(html (head (title "Untitled")) (body . ,body)))
@@ -29,6 +36,10 @@
     (make-immutable-hash)
     unclear-deps))
 
+(define/contract (delegate-to-asset-module clear compiler) advance/c
+  (<info "Delegating to ~a's write-dist-file" clear)
+  (dynamic-rerequire clear)
+  (dynamic-require clear 'write-dist-file))
 
 ; Translate resolved dependencies and prior X-expression to fulfilled document
 (define (resolve-dependencies txexpr/expanded unclear-deps clear compiler)
@@ -98,8 +109,11 @@
 
 (define polyglot/base%
   (class* unlike-compiler% () (super-new)
-    (define/override (delegate clear)
-      copy-hashed)
+    (define/override (delegate path)
+      (case (path-get-extension path)
+        [(#".rkt") delegate-to-asset-module]
+        [else copy-hashed]))
+
     (define/override (clarify unclear)
       (define path (build-complete-simple-path unclear (assets-rel)))
       (unless (file-readable? path) (error (format "Cannot read ~a" unclear)))

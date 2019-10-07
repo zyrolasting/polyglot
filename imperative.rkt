@@ -8,25 +8,24 @@
           [run-txexpr/imperative! (-> (or/c (non-empty-listof txexpr?) txexpr?)
                                       (non-empty-listof txexpr?))]))
 
-(require 
-  racket/class
-  racket/dict
-  racket/file
-  racket/function
-  racket/list
-  racket/path
-  racket/rerequire
-  racket/string
-  unlike-assets
-  unlike-assets/logging
-  unlike-assets/policy
-  [except-in markdown xexpr->string]
-  "./private/base-workflow.rkt"
-  "./private/dynamic-modules.rkt"
-  "./private/fs.rkt"
-  "./private/scripts.rkt"
-  "./paths.rkt"
-  "./txexpr.rkt")
+(require racket/class
+         racket/dict
+         racket/file
+         racket/function
+         racket/list
+         racket/path
+         racket/rerequire
+         racket/string
+         unlike-assets
+         unlike-assets/logging
+         unlike-assets/policy
+         [except-in markdown xexpr->string]
+         "./private/dynamic-modules.rkt"
+         "./private/fs.rkt"
+         "./private/scripts.rkt"
+         "./base.rkt"
+         "./paths.rkt"
+         "./txexpr.rkt")
 
 (module+ test
   (require racket/file
@@ -35,11 +34,6 @@
 
 (define fallback-provided-name 'replace-element)
 (define default-layout make-minimal-html-page)
-
-(define/contract (delegate-to-asset-module clear compiler) advance/c
-  (<info "Delegating to ~a's write-dist-file" clear)
-  (dynamic-rerequire clear)
-  (dynamic-require clear 'write-dist-file))
 
 (define (apply-rackdown tmp-rel elements [initial-layout default-layout])
   (define layout initial-layout)
@@ -113,7 +107,6 @@
       (define/override (delegate path)
         (case (path-get-extension path)
           [(#".md") markdown->dependent-xexpr]
-          [(#".rkt") delegate-to-asset-module]
           [else (super delegate path)]))
 
       (define/public (preprocess-txexprs tx-expressions)
@@ -194,7 +187,6 @@
 
 (define (run-txexpr/imperative! tx-expressions [initial-layout (λ (kids) kids)])
   (run-rackdown tx-expressions initial-layout))
-
 
 (define (markdown->dependent-xexpr clear compiler)
   (define txexpr/parsed (parse-markdown clear))

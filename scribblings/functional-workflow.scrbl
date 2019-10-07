@@ -257,9 +257,9 @@ racket/base
                                      "(require \"project/layouts.rkt\")"
                                      "(provide replace-page)"
                                      "(define (replace-page x)"
-                                     (format "  (~a ~e x))"
-                                             (attr-ref x 'layout "one-column")
-                                             (attr-ref x 'title "Untitled")))))))))]
+                                     ,(format "  (~a ~e x))"
+                                              (attr-ref x 'layout "one-column")
+                                              (attr-ref x 'title "Untitled")))))))))]
 
 So what about post-processing?
 
@@ -326,9 +326,9 @@ racket/base
                                     "(require \"project/layouts.rkt\")"
                                     "(provide replace-page)"
                                     "(define (replace-page x)"
-                                    (format "  (~a ~e x))"
-                                            (attr-ref x 'layout "one-column")
-                                            (attr-ref x 'title "Untitled")))))))
+                                    ,(format "  (~a ~e x))"
+                                             (attr-ref x 'layout "one-column")
+                                             (attr-ref x 'title "Untitled")))))))
 
     (define/override (postprocess-page page-tx)
       (tx-replace page-tx
@@ -345,7 +345,8 @@ racket/base
 
 @section{Functional Workflow API}
 @defclass[polyglot/functional% unlike-compiler% ()]{
-In the terminology of @racketmodname[unlike-assets], @racket[polyglot/functional%] uses complete paths as @racket[clear/c] names.
+In the terminology of @racketmodname[unlike-assets],
+@racket[polyglot/functional%] uses complete paths as @racket[clear/c] names.
 
 @defmethod[(clarify [unclear unclear/c]) clear/c]{
 If the string looks like a readable path on your system, returns a complete path.
