@@ -10,6 +10,7 @@
          racket/string
          file/sha1
          unlike-assets
+         unlike-assets/logging
          unlike-assets/policy
          "../txexpr.rkt"
          "../paths.rkt"
@@ -50,6 +51,8 @@
     (λ ()
       (displayln "<!DOCTYPE html>")
       (displayln (xexpr->html txexpr/final))))
+
+  (<info "Wrote ~a" path)
 
   path)
 

@@ -3,10 +3,11 @@
                     txexpr
                     [except-in markdown xexpr->string]
                     unlike-assets
-		    racket/rerequire
                     racket/base
+                    racket/class
                     racket/dict
-                    racket/class]]
+                    racket/file
+		    racket/rerequire]]
 
 @title[#:tag "functional-workflow"]{The Functional Workflow}
 @defmodule[polyglot/functional]
@@ -43,7 +44,7 @@ or decorate existing elements as a matter of find/replace.
 The following example replaces the @tt{<head>} element with a
 more usable starting point.
 
-@margin-note{Notice that the @racket[λ] is returning a @italic{list} containing a @tt{head} element. This is because you can replace one element with several.}
+@margin-note{Notice that the replacement is a @italic{list} containing a @tt{head} element. This is because you can replace one element with several.}
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
 (require polyglot)
@@ -72,7 +73,7 @@ If an app element does not provide a @tt{replace-page} procedure, then
 it is assumed to provide the identity function. Meaning that by default,
 app elements replace the page with itself, producing no changes.
 
-You may specify other application elements in the page, and they will
+You may write other application elements in the page, and they will
 be evaluated as they are encountered. The output of the first app element's
 @tt{replace-page} procedure will be the input to the second app element's
 @tt{replace-page} procedure, and so on.
@@ -90,9 +91,9 @@ To illustrate, this outputs a page showing @racket[2].
   (number->string (add1 (string->number (car (get-elements x))))))
 
 (define (replace-number page-tx)
-  (replace-tagged page-tx
-                  'p
-                  (λ (x) `((p ,(inc-child x))))))
+  (tx-replace-tagged page-tx
+                    'p
+                    (λ (x) `((p ,(inc-child x))))))
 </script>
 
 <script type="application/racket" id="start">
@@ -134,8 +135,8 @@ racket/base
 (provide replace-page)
 
 (define (replace-page page-tx)
-  (replace-me page-tx
-              (λ (x) `((p "I'm where the app element was.")))))]
+  (tx-replace-me page-tx
+                 (λ (x) `((p "I'm where the app element was.")))))]
 
 
 @subsection{Example: Embed Working Code Examples}
@@ -158,13 +159,13 @@ racket/base
                "(provide replace-page)"
                "(require polyglot)"
                "(define (replace-page page-tx)"
-               "  (replace-me page-tx"
+               "  (tx-replace-me page-tx"
                "              (λ (x) '((h1 \"Hello, meta!\")))))"))
 
 (define (replace-page page-tx)
-  (replace-me page-tx
-              (λ (x) `((pre . ,code)
-                       (script ((type "application/racket")) . ,code)))))]
+  (tx-replace-me page-tx
+                 (λ (x) `((pre . ,code)
+                          (script ((type "application/racket")) . ,code)))))]
 
 @subsection{Example: Iterative App Element}
 The functional workflow tracks app and lib elements by their @tt{id} attribute
@@ -183,12 +184,12 @@ racket/base
 (provide replace-page)
 
 (define (replace-page page-tx)
-  (replace-me page-tx
-              (λ (x)
-                (define i (string->number (attr-ref 'id x "0")))
-                (if (< i 10)
-                    `(,(attr-set x 'id (number->string (add1 i))))
-                    `((p "done"))))))]
+  (tx-replace-me page-tx
+                 (λ (x)
+                   (define i (string->number (attr-ref 'id x "0")))
+                   (if (< i 10)
+                       `(,(attr-set x 'id (number->string (add1 i))))
+                       `((p "done"))))))]
 
 @subsection{Example: Incorporating Output from Side-Effects}
 Another advantage of @secref{default-workflow} was that it naturally
@@ -206,13 +207,13 @@ racket/base
 (provide replace-page)
 
 (define (replace-page page-tx)
-  (replace-me page-tx
-              (λ (x)
-                (define-values (i o) (make-pipe))
-                (parameterize ([current-output-port o])
-                  (dynamic-require "loud-module.rkt" #f)
-                  (close-output-port o))
-                (port->list read i))))]
+  (tx-replace-me page-tx
+                 (λ (x)
+                   (define-values (i o) (make-pipe))
+                   (parameterize ([current-output-port o])
+                     (dynamic-require "loud-module.rkt" #f)
+                     (close-output-port o))
+                   (port->list read i))))]
 
 @section[#:tag "boilerplate"]{Reducing Boilerplate}
 Application and library elements consist largely of
@@ -236,28 +237,29 @@ racket/base
 <page title="My Page" layout="one-column" />
 }|
 
-To do this, extend the functional workflow to preprocess each page.
+To do this, extend the functional workflow in @tt{.polyglotrc.rkt}
+to preprocess each page.
 
-@racketmod[#:file "func-ext.rkt"
+@racketmod[#:file ".polyglotrc.rkt"
 racket/base
 (provide polyglot+%)
 (require polyglot)
 
 (define polyglot+%
   (class* polyglot/functional%
-    (define/override (preprocess page-tx)
-      (replace-tagged page-tx
-                      'page
-                      (λ (x)
-                        `((script ((type "application/racket")
-                                   (id ,(genid page-tx)))
-                                  "#lang racket/base"
-                                  "(require \"project/layouts.rkt\")"
-                                  "(provide replace-page)"
-                                  "(define (replace-page x)"
-                                  (format "  (~a ~e x))"
-                                          (attr-ref x 'layout "one-column")
-                                          (attr-ref x 'title "Untitled")))))))))]
+    (define/override (preprocess-page page-tx)
+      (tx-replace-tagged page-tx
+                         'page
+                         (λ (x)
+                           `((script ((type "application/racket")
+                                      (id ,(genid page-tx)))
+                                     "#lang racket/base"
+                                     "(require \"project/layouts.rkt\")"
+                                     "(provide replace-page)"
+                                     "(define (replace-page x)"
+                                     (format "  (~a ~e x))"
+                                             (attr-ref x 'layout "one-column")
+                                             (attr-ref x 'title "Untitled")))))))))]
 
 So what about post-processing?
 
@@ -288,7 +290,7 @@ racket/base
            #:color ,(palette 'light)])))
 
 (define (replace-page page-tx)
-  (replace
+  (tx-replace
    page-tx
    (λ (x) (and (txexpr? x)
                (equal? (attr-ref x 'id #f)
@@ -300,38 +302,50 @@ racket/base
 On its own, this approach bloats the output HTML by
 including a @tt{<style>} element in the output.
 
-That might not be a problem initially, but its possible
-that other pages doing the same thing might grow
-too large to deliver the same way.
+That might not be a problem initially, but its possible that other
+pages doing the same thing might grow too large to deliver the same
+way.
 
-We can also install a post-processor that writes the
-aggregated style rules to the distribution,
-and removes them from the output HTML.
+We can also install a post-processor that writes the aggregated style
+rules to the distribution, and removes them from the output HTML.
 
-@racketmod[racket/base
+@racketmod[#:file ".polyglotrc.rkt"
+racket/base
+(provide polyglot+%)
 (require polyglot)
-(provide replace-page)
 
+(define polyglot+%
+  (class* polyglot/functional%
+    (define/override (preprocess-page page-tx)
+      (tx-replace-tagged page-tx
+                        'page
+                        (λ (x)
+                          `((script ((type "application/racket")
+                                     (id ,(genid page-tx)))
+                                    "#lang racket/base"
+                                    "(require \"project/layouts.rkt\")"
+                                    "(provide replace-page)"
+                                    "(define (replace-page x)"
+                                    (format "  (~a ~e x))"
+                                            (attr-ref x 'layout "one-column")
+                                            (attr-ref x 'title "Untitled")))))))
 
-; [...]
+    (define/override (postprocess-page page-tx)
+      (tx-replace page-tx
+                  (λ (x) (and (txexpr? x)
+                              (equal? (attr-ref x 'id)
+                                      "style-pile")))
+                  (λ (x)
+                    (display-to-file #:exists 'replace
+                                     (string-join (get-elements x))
+                                     (dist-rel (string-append (number->string (current-seconds))
+                                                              ".css")))
+                    null)))))]
 
-(define (postprocess page-tx)
-  (replace page-tx
-           (λ (x) (and (txexpr? x)
-                       (equal? (attr-ref x 'id)
-                               "style-pile")))
-           (λ (x)
-             (display-to-file #:exists 'replace
-                              (string-join (get-elements x))
-                              (dist-rel (string-append (number->string (current-seconds))
-                                                       ".css")))
-              null)))
-
-]
 
 @section{Functional Workflow API}
 @defclass[polyglot/functional% unlike-compiler% ()]{
-In the terminology of unlike-assets, @racket[polyglot/functional%] uses complete paths as @racket[clear/c] names.
+In the terminology of @racketmodname[unlike-assets], @racket[polyglot/functional%] uses complete paths as @racket[clear/c] names.
 
 @defmethod[(clarify [unclear unclear/c]) clear/c]{
 If the string looks like a readable path on your system, returns a complete path.
@@ -352,4 +366,52 @@ Any other files you reference are copied to @racket[(dist-rel)],
 such that the file name is the first eight characters of the SHA1 hash of the
 file content for cache busting.
 }
+
+@defmethod[(preprocess-page [page-tx txexpr?]) txexpr?]{
+A page-replacing method that runs before any app element's @tt{replace-page} procedure.
+
+By default, this is the identity function.
+}
+
+@defmethod[(postprocess-page [page-tx txexpr?]) txexpr?]{
+A page-replacing method that runs after every app element's @tt{replace-page} procedure.
+
+By default, this is the identity function.
+}
+}
+
+@defproc[(run-txexpr/functional! [target (or/c (listof txexpr?)
+                                               txexpr?)]
+                                 [#:max-passes max-passes exact-integer? 1000])
+                                 txexpr?]{
+Applies the functional workflow to the tagged X-expression fragment or element.
+Use if you want to benefit from the functional workflow without use of
+the CLI or @racket[polyglot/functional%].
+
+If the process would exceed @tt{max-passes}, it will raise @racket[exn:fail].
+Returns a completed page produced by the Racket modules inside @tt{target}.
+If no procedures apply to the @tt{target} and @tt{target} is a list of elements,
+then it will be wrapped in a minimal HTML5 document structure like so:
+
+@racketblock[`(html (head (title "Untitled")) (body . ,target))]
+
+This procedure has the following side-effects (in addition to all side-effects
+produced by app or library elements):
+
+@itemlist[
+@item{Unique and short-lived directories and Racket modules will appear in @racket[(system-temp-rel)] according to @secref{rackdown}. They are deleted by the time control leaves this procedure.}
+@item{Events will appear on @racket[unlike-assets-logger].}
+]
+}
+
+@defthing[current-replace-element-predicate (parameter/c (-> txexpr-element? any/c)) #:value (λ _ #f)]{
+A parameter used to set the target for @racket[tx-replace-me]. The functional
+workflow will set this parameter to a predicate that matches the application
+element in which a @tt{replace-page} procedure is evaluating.
+}
+
+@defproc[(tx-replace-me [tx txexpr?]
+                        [replace (-> txexpr? (listof txexpr?))])
+                        txexpr?]{
+Like @racket[tx-replace], except the predicate is @racket[(current-replace-element-predicate)].
 }

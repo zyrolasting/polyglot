@@ -7,7 +7,11 @@
 @title[#:tag "polyglot-txexpr"]{Tagged X-Expression Tools}
 @defmodule[polyglot/txexpr]
 
-This module includes all bindings from the @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "txexpr"] and @seclink["top" #:doc '(lib "xml/xml.scrbl") "xml"] modules, plus curated procedures for working with tagged X-expressions. Since this module is lower-level, none of these procedures operate with any understanding of any documented workflow.
+This module includes all bindings from the @seclink["top" #:doc '(lib
+"txexpr/scribblings/txexpr.scrbl") "txexpr"] and @seclink["top" #:doc '(lib
+"xml/xml.scrbl") "xml"] modules, plus procedures you can use to build advanced
+workflows around tagged X-expressions. None of these procedures are dependent
+on any built-in workflow.
 
 @defproc[(genid [tx txexpr?]) string?]{
 Returns a value for an @tt{id} attribute that is not used anywhere in @tt{tx}.
@@ -20,6 +24,24 @@ Returns @racket[#t] if @racket[tx] is a tagged X-expression and its tag is @rack
 @defproc[(make-tag-predicate [tags (non-empty-listof symbol?)]) (-> any/c boolean?)]{
 Returns a procedure that checks if a value causes @racket[tag-equal?] to return
 @racket[#t] for any of the given @tt{tags}.
+}
+
+@defproc[(tx-replace [tx txexpr?]
+                     [predicate (-> txexpr-element? any/c)]
+                     [replace (-> txexpr-element? (listof txexpr?))])
+                     txexpr?]{
+Replaces each element @tt{E} matching a predicate with the list of elements
+returned from @tt{(replace E)}. Note that this can create empty parent elements
+and is only meant to replace descendent elements of @tt{tx}.
+}
+
+@defproc[(tx-replace-tagged [tx txexpr?]
+                            [tag symbol?]
+                            [replace (-> txexpr? (listof txexpr?))])
+                            txexpr?]{
+Like @racket[tx-replace], except you can designate all elements of a certain tag.
+
+e.g. @racket[(tx-replace-tagged tx 'h2 (lamdba (x) `((h3 . ,(get-elements x)))))]
 }
 
 @defproc[(substitute-many-in-txexpr [tx txexpr?]

@@ -186,7 +186,7 @@ file content for cache busting.
 @defclass[polyglot/imperative% unlike-compiler% ()]{
 Implements the workflow documented on this page.
 
-In the terminology of unlike-assets, @racket[polyglot/imperative%] uses complete paths as @racket[clear/c] names.
+In the terminology of @racketmodname[unlike-assets], @racket[polyglot/imperative%] uses complete paths as @racket[clear/c] names.
 
 @defmethod[(clarify [unclear unclear/c]) clear/c]{
 If the string looks like a readable path on your system, returns a complete path.

@@ -18,7 +18,7 @@ built from the @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/R
 
 @section{Pick A Workflow}
 A @defterm{workflow} sets the rules for how to process content using
-@racketmodname[polyglot]. Each built-in workflow exists as a class in code:
+@racketmodname[polyglot].
 
 @itemlist[
 @item{@secref{default-workflow}: Offers a PHP-like development experience where
@@ -68,8 +68,11 @@ racket/base
 ]
 
 This configuration module provides @tt{polyglot+%}, a class that implements
-your chosen workflow. This example provides @racket[polyglot/imperative%],
-which guides the commands you have been running.
+your chosen workflow.
+
+@itemlist[
+@item{@racket[polyglot/imperative%] implements @secref{default-workflow}.}
+@item{@racket[polyglot/functional%] implements @secref{functional-workflow}.}]
 
 When you run commands targeting a project, @racketmodname[polyglot] will look
 for @tt{.polyglotrc.rkt} and use the provided class to process content. If you

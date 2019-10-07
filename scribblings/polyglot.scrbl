@@ -5,10 +5,11 @@
 @author{Sage Gerard}
 @defmodule[polyglot]
 
-@racketmodname[polyglot] is a collection of workflows and libraries that
-evaluate Racket modules within Markdown, or @seclink["top" #:doc '(lib
-"txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"]. It includes
-bindings from @racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr],
+@racketmodname[polyglot] evaluates Racket modules within Markdown,
+or @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"].
+
+The @racketmodname[polyglot] module includes bindings from
+@racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr],
 @racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
 Websites built with @racketmodname[polyglot] get cache-busting, Webpack-like

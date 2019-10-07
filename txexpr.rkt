@@ -47,7 +47,7 @@
                        [tx-replace-tagged
                         (-> txexpr?
                             symbol?
-                            (-> txexpr-element? (listof txexpr?))
+                            (-> txexpr? (listof txexpr?))
                             txexpr?)]
                        [interlace-txexprs
                         (->* ((or/c txexpr?

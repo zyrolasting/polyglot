@@ -3,9 +3,10 @@
 (require racket/contract)
 (provide polyglot/functional%
          (contract-out
+          [current-replace-element-predicate (parameter/c (-> txexpr? any/c))]
           [run-txexpr/functional! (-> (or/c (non-empty-listof txexpr?))
                                       (non-empty-listof txexpr?))]
-          
+
           [tx-replace-me (-> txexpr?
                              (-> txexpr?
                                  (listof txexpr-element?))
@@ -42,14 +43,14 @@
                                      (equal? (attr-ref other 'id #f)
                                              (attr-ref x 'id))))))
       '()))
-    
+
 
 ; Allow user to replace the same script elements in which their code runs.
 ; ------------------------------------------------------------------------
-(define current-app-element-predicate (make-parameter (λ _ #f)))
+(define current-replace-element-predicate (make-parameter (λ _ #f)))
 (define (tx-replace-me page-tx replacer)
   (tx-replace page-tx
-              (current-app-element-predicate)
+              (current-replace-element-predicate)
               replacer))
 
 
@@ -73,7 +74,7 @@
           longest)))
 
   (<debug "Longest ID to be used as prefix: ~a" longest-id)
-  
+
   (tx-replace
    page
    (λ (x) (and (or (app-script? x)
@@ -88,7 +89,7 @@
 ; Allow user to replace page using an app element.
 ; ------------------------------------------------------------------------
 (define (replace-page/user-defined page path predicate)
-  (parameterize ([current-app-element-predicate predicate])
+  (parameterize ([current-replace-element-predicate predicate])
     (<info "Applying replace-page in ~a" path)
     ((dynamic-require path
                       'replace-page
@@ -152,6 +153,8 @@
            (when (<= on-pass 0)
              (error "Maximum passes exceeded."))
 
+           (<debug "Pass ~a" on-pass)
+
            (define page/after (pass page/before tmpd))
            (if (not (equal? page/before page/after))
                (loop page/after (sub1 on-pass))
@@ -161,22 +164,27 @@
 
 (define polyglot/functional%
   (class* polyglot/base% () (super-new)
-      (define/override (delegate path)
-        (case (path-get-extension path)
-          [(#".md")
-           (λ (clear compiler)
-             (add-dependencies!
-              clear
-              compiler
-              (run-txexpr/functional! (parse-markdown clear))))]
-          [else (super delegate path)]))))
+    (define/public (preprocess-page page-tx) page-tx)
+    (define/public (postprocess-page page-tx) page-tx)
+    (define/override (delegate path)
+      (case (path-get-extension path)
+        [(#".md")
+         (λ (clear compiler)
+           (define fragment (parse-markdown clear))
+           (define base-page (make-minimal-html-page fragment))
+           (define preprocessed (preprocess-page base-page))
+           (add-dependencies!
+            clear
+            compiler
+            (postprocess-page (run-txexpr/functional! preprocessed))))]
+        [else (super delegate path)]))))
 
-(module+ test  
+(module+ test
   (require racket/function
            rackunit)
 
   (test-equal? "Replace element via parameter"
-    (parameterize ([current-app-element-predicate (λ (x) (tag-equal? 's x))])
+    (parameterize ([current-replace-element-predicate (λ (x) (tag-equal? 's x))])
       (tx-replace-me '(root (rooter (rootest (s))))
                      (λ (x) '((leafy) (greens)))))
     '(root (rooter (rootest (leafy) (greens)))))
@@ -194,7 +202,7 @@
                       (λ (x) (and (txexpr? x)
                                   (equal? (attr-ref x 'type #f)
                                           type)))))
-    
+
     (define a-scripts (group! "a"))
     (define b-scripts (group! "b"))
 
