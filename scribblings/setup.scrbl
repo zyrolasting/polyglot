@@ -82,6 +82,14 @@ your content using @secref{default-workflow}.
 If you want to provide your own workflow, you can always @racket[provide] a
 subclass of @racket[polyglot/functional%] or @racket[polyglot/imperative%].
 
+If you want to specify a different config file, use the @tt{-b} or @tt{--by-module}
+option at the command line before your chosen subcommand:
+
+@verbatim[#:indent 2]|{
+$ raco polyglot -b /etc/polyglot.d/team-config.rkt build my-website
+}|
+
+
 @section{Publish to S3}
 @racketmodname[polyglot] can push content to S3.
 
