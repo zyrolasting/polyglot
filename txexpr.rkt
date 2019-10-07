@@ -236,7 +236,7 @@
         (lambda (node)
           (and (txexpr? node)
                (let ([ref (get-dependency-ref node)])
-                 (and (not (equal? ref "/")) 
+                 (and (not (equal? ref "/"))
                       (local-asset-url? (get-dependency-ref node)))))))
       null)))
 
