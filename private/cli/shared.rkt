@@ -37,9 +37,12 @@
   (empty-directory (dist-rel)))
 
 (define (make-compiler)
+  (define rcfile (project-rel ".polyglotrc.rkt"))
   (new (or (polyglot-class/cli-asserted)
-           (let ([rcfile (project-rel ".polyglotrc.rkt")])
-             (dynamic-rerequire rcfile)
-             (dynamic-require rcfile
-                              'polyglot+%
-                              (λ _ polyglot/imperative%))))))
+           (if (file-exists? rcfile)
+             (begin
+               (dynamic-rerequire rcfile)
+               (dynamic-require rcfile
+                                'polyglot+%
+                                (λ _ polyglot/imperative%)))
+             polyglot/imperative%))))
