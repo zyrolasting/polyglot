@@ -212,8 +212,8 @@ You may link to other Markdown files in your pages.
 <nav><a href="about.md">About</a></nav>
 }|
 
-Each workflow will discover other Markdown files and
-will process them to produce a working, linked collection
+Each workflow discovers other Markdown files and
+processes them to produce a working, linked collection
 of @racket[".html"] files.
 
 @subsection[#:tag "handle-rkt"]{Racket Module Handling (@racket[".rkt"])}
