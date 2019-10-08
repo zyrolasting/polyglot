@@ -1,14 +1,18 @@
 #lang racket/base
 
 (provide start)
-(require
-  racket/cmdline
-  racket/file
-  "../fs.rkt"
-  "../paths.rkt")
+(require racket/cmdline
+         "../../main.rkt"
+         "../fs.rkt"
+         "./shared.rkt")
 
 (define (start)
+  (define skel (make-parameter "imperative"))
   (command-line
-    #:program "start"
-    #:args (dir)
-    (copy-directory/files (polyglot-rel "skel") dir)))
+   #:program "start"
+   #:once-each
+   [("-f" "--functional")
+    "Set up project to use the functional workflow"
+    (skel "functional")]
+   #:args (dir)
+    (copy-skeleton (skel) dir)))

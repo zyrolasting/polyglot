@@ -2,18 +2,22 @@
 
 (provide (all-defined-out))
 
-(require racket/dict
+(require racket/class
+         racket/dict
+         racket/file
+         racket/rerequire
          unlike-assets/logging
-         "../../main.rkt")
+         "../../main.rkt"
+         "../fs.rkt")
 
-(define polyglot-class (make-parameter polyglot%))
+(define polyglot-class/cli-asserted (make-parameter #f))
 
 (define (log-exn e)
   (define string-port (open-output-string))
   (parameterize ([current-error-port string-port])
     ((error-display-handler) (exn-message e) e))
-
   (<error (get-output-string string-port)))
+
 
 (define (report+summary proc)
   (define counts (with-report/counts proc))
@@ -26,3 +30,19 @@
       (<info "# errors:   ~a" nerrors)))
 
   (exit (if (> nerrors 0) 1 0)))
+
+
+(define (clear-distribution!)
+  (make-directory* (dist-rel))
+  (empty-directory (dist-rel)))
+
+(define (make-compiler)
+  (define rcfile (project-rel ".polyglotrc.rkt"))
+  (new (or (polyglot-class/cli-asserted)
+           (if (file-exists? rcfile)
+             (begin
+               (dynamic-rerequire rcfile)
+               (dynamic-require rcfile
+                                'polyglot+%
+                                (λ _ polyglot/imperative%)))
+             polyglot/imperative%))))

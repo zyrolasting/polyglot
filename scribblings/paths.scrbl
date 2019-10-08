@@ -5,10 +5,9 @@
                     racket/path]]
 
 @title{Where Things Are}
+@defmodule[polyglot/paths]
 
-As implied in @secref{setup}, @racket[polyglot] uses several paths to work.
-You'll need them to process project files and understand how files
-move through the system.
+As implied in @secref{setup}, @racket[polyglot] uses several paths.
 
 First and most importantly, there's the...
 
@@ -31,11 +30,11 @@ filesystem).
 @deftogether[(
 @defthing[path-el/c (and/c (or/c path-for-some-system? path-string?)
                            (not/c complete-path?))]
-@defproc[(project-rel [path-element path-el/c] ...) path?]
-@defproc[(assets-rel [path-element path-el/c] ...) path?]
-@defproc[(dist-rel [path-element path-el/c] ...) path?]
-@defproc[(polyglot-rel [path-element path-el/c] ...) path?]
-@defproc[(system-temp-rel [path-element path-el/c] ...) path?]
+@defproc[(project-rel [path-element path-el/c] ...) complete-path?]
+@defproc[(assets-rel [path-element path-el/c] ...) complete-path?]
+@defproc[(dist-rel [path-element path-el/c] ...) complete-path?]
+@defproc[(polyglot-rel [path-element path-el/c] ...) complete-path?]
+@defproc[(system-temp-rel [path-element path-el/c] ...) complete-path?]
 )]{
 These procedures behave like @racket[build-path], except each returns a path
 relative to a different directory:

@@ -11,8 +11,8 @@
   unlike-assets
   file-watchers
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "shared.rkt")
 
 (define (develop)
@@ -24,7 +24,9 @@
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
     #:args (dir)
-    (define compiler (new (polyglot-class)))
+    (polyglot-project-directory (path->complete-path (simplify-path dir)))
+    (clear-distribution!)
+    (define compiler (make-compiler))
 
     (define (changed? activity)
       (equal? (second activity) 'change))
@@ -53,9 +55,6 @@
     (define (on-break e)
       (displayln "Shutting down"))
 
-    (polyglot-project-directory (path->complete-path (simplify-path dir)))
-    (make-directory* (dist-rel))
-    (empty-directory (dist-rel))
     (send compiler add! (send compiler clarify "index.md"))
     (build null null)
 

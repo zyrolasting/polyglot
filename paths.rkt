@@ -3,7 +3,21 @@
 (require racket/contract
          racket/runtime-path
          unlike-assets)
-(provide (all-defined-out))
+
+(define path-el/c (and/c (or/c path-for-some-system?
+                               path-string?)
+                         (not/c complete-path?)))
+(define path-builder/c (->* () #:rest (listof path-el/c) complete-path?))
+(provide path-el/c
+         (contract-out
+          [path-rel (->* (complete-path?) #:rest (listof path-for-some-system?) path-builder/c)]
+          [polyglot-project-directory (parameter/c (and/c complete-path? directory-exists?))]
+          [polyglot-temp-directory (parameter/c (and/c complete-path? directory-exists?))]
+          [project-rel path-builder/c]
+          [assets-rel path-builder/c]
+          [dist-rel path-builder/c]
+          [polyglot-rel path-builder/c]
+          [system-temp-rel path-builder/c]))
 
 (define polyglot-project-directory (make-parameter (current-directory)))
 (define polyglot-temp-directory (make-parameter (find-system-path 'temp-dir)))
@@ -14,7 +28,7 @@
              (cleanse-path (apply build-path (append head tail)))
              #f)))
 
-(define-runtime-path polyglot-runtime-path "..")
+(define-runtime-path polyglot-runtime-path ".")
 
 (define (path-builder base-rel next)
   (λ rest (apply (path-rel (base-rel) next)
@@ -24,12 +38,6 @@
   (path-builder polyglot-project-directory next))
 (define (temp-path-builder next)
   (path-builder polyglot-temp-directory next))
-
-; No enforcement here since that already comes with build-path
-; Provide for convenience in documentation and user-authored contracts.
-(define path-el/c (and/c (or/c path-for-some-system?
-                               path-string?)
-                         (not/c complete-path?)))
 
 (define project-rel     (project-path-builder "."))
 (define assets-rel      (project-path-builder "assets"))

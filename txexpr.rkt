@@ -3,7 +3,14 @@
 ;;; Provides operations used in this project for tagged X-expressions
 
 (require racket/contract
+         racket/dict
+         racket/function
+         racket/list
+         racket/sequence
+         racket/string
+         net/url
          txexpr
+         unlike-assets/policy
          xml)
 
 (define txe-predicate/c (-> txexpr-element? any/c))
@@ -12,13 +19,19 @@
 (define replaced/c (listof txexpr?))
 
 (provide (all-from-out txexpr xml)
-         (contract-out [tag-equal?
+         (contract-out [genid (-> txexpr?
+                                  string?)]
+                       [tag-equal?
                         (-> symbol?
                             any/c
                             boolean?)]
                        [make-tag-predicate
                         (-> (non-empty-listof symbol?)
                             (-> any/c boolean?))]
+                       [tx-search-tagged
+                        (-> txexpr?
+                            symbol?
+                            (listof txexpr-element?))]
                        [substitute-many-in-txexpr
                         (-> txexpr?
                             txe-predicate/c
@@ -30,6 +43,16 @@
                               replacer/c)
                              (#:max-replacements exact-integer?)
                              (values transformed/c replaced/c))]
+                       [tx-replace
+                        (-> txexpr?
+                            txe-predicate/c
+                            (-> txexpr-element? (listof txexpr?))
+                            txexpr?)]
+                       [tx-replace-tagged
+                        (-> txexpr?
+                            symbol?
+                            (-> txexpr? (listof txexpr?))
+                            txexpr?)]
                        [interlace-txexprs
                         (->* ((or/c txexpr?
                                     (non-empty-listof txexpr?))
@@ -39,7 +62,33 @@
                                     (non-empty-listof replacer/c)))
                              (#:max-replacements exact-integer?
                               #:max-passes exact-integer?)
-                             (non-empty-listof txexpr?))]))
+                             (non-empty-listof txexpr?))]
+                       [discover-dependencies (-> txexpr?
+                                                  (listof string?))]
+                       [apply-manifest (-> txexpr?
+                                           dict?
+                                           txexpr?)]))
+
+(define (genid tx)
+  (define all-ids
+    (map (λ (with-id) (attr-ref with-id 'id))
+         (or (findf*-txexpr tx
+                            (λ (x) (and (txexpr? x)
+                                        (attrs-have-key? x 'id)
+                                        (attr-ref x 'id #f))))
+             '())))
+
+  (define longest-id
+    (for/fold ([longest ""])
+              ([id (in-list all-ids)])
+      (if (> (string-length id)
+             (string-length longest))
+          id
+          longest)))
+
+  ; TODO: Use as few characters as possible.
+  ; Consider probabalistic approach.
+  (string-append longest-id (symbol->string (gensym))))
 
 (define (tag-equal? t tx)
   (and (txexpr? tx)
@@ -152,11 +201,91 @@
                          #:max-passes (sub1 max-passes))
       transformed))
 
+(define (tx-replace tx replace? replace)
+  (let-values ([(next _)
+                (substitute-many-in-txexpr/loop tx
+                                                replace?
+                                                replace)])
+    next))
+
+(define (tx-replace-tagged tx t replace)
+  (tx-replace tx
+              (λ (x) (tag-equal? t x))
+              replace))
+
+(define (tx-search-tagged tx t)
+  (or (findf*-txexpr tx (λ (x) (tag-equal? t x)))
+      '()))
+
+(define (get-dependency-ref node)
+  (attr-ref node 'src
+            (lambda _
+              (attr-ref node 'href
+                        (lambda _ #f)))))
+
+(define (get-dependency-key x)
+  (or (and (attrs-have-key? x 'src) 'src)
+      (and (attrs-have-key? x 'href) 'href)
+      #f))
+
+(define (discover-dependencies x)
+  (map
+    get-dependency-ref
+    (or
+      (findf*-txexpr x
+        (lambda (node)
+          (and (txexpr? node)
+               (let ([ref (get-dependency-ref node)])
+                 (and (not (equal? ref "/"))
+                      (local-asset-url? (get-dependency-ref node)))))))
+      null)))
+
+(define (apply-manifest content manifest)
+  (define (asset-basename path)
+    (define-values (base name must-be-dir?)
+      (split-path path))
+    name)
+
+  (sequence-fold
+    (λ (result k v)
+      (let-values ([(next _)
+                    (splitf-txexpr
+                      result
+                      (λ (node)
+                        (with-handlers ([exn:fail? (thunk* #f)])
+                          (equal? (attr-ref node (get-dependency-key node))
+                                  k)))
+                      (λ (node)
+                        (attr-set node
+                                  (get-dependency-key node)
+                                  (asset-basename v))))])
+        next))
+    content
+    (in-dict manifest)))
+
 
 (module+ test
   (require rackunit racket/function)
   (define i-element? (curry tag-equal? 'i))
   (define s-element? (curry tag-equal? 's))
+
+  (test-equal? "Search for tagged element"
+               (tx-search-tagged
+                '(body (a ((i "1")))
+                       (b (a ((i "2")))
+                          (a ((i "3"))))
+                       (a ((i "4"))
+                          (a ((i "5")))))
+                'a)
+               '((a ((i "1")))
+                 (a ((i "2")))
+                 (a ((i "3")))
+                 (a ((i "4"))
+                    (a ((i "5"))))))
+
+  (test-equal? "Search produces empty list on no matches"
+               (tx-search-tagged '(body (b)) 'a)
+               '())
 
   (test-case
     "Output does not change when normalizing arguments"
@@ -197,4 +326,40 @@
             s-element?)
       (list (λ _ '((b) (b)))
             (λ _ '((x) (x) (x)))))
-    '((b) (b) (p (b) (b) (b) (b)) (b) (x) (x) (x) (b (b) (b)) (b) (b))))
+    '((b) (b) (p (b) (b) (b) (b)) (b) (x) (x) (x) (b (b) (b)) (b) (b)))
+
+  (test-equal? "Manifest can replace `src` and `href` attributes"
+    (apply-manifest '(html
+                      (head
+                       (link ((href "a.css"))))
+                      (body
+                       (img ((src "b.png")))))
+                    '(("a.css" . "123.css")
+                      ("b.png" . "456.png")))
+    '(html
+      (head
+       (link ((href "123.css"))))
+      (body
+       (img ((src "456.png"))))))
+
+  (test-equal? "Discover dependencies within a txexpr"
+    (discover-dependencies
+     '(html
+       (head
+        (link ((href "blah.css"))))
+       (body ((id "top"))
+             (main
+              (article
+               (section
+                (h1 "Heading")
+                (a ((href "https://example.com"))
+                   (img ((src "mark.png")))))
+               (section
+                (h1 "Heading")
+                (a ((href "/path/to/image.svg")) "Click to view")))
+              (a ((href "#top")) "Back to top"))
+             (script ((type "text/javascript") (src "main.js"))))))
+    '("blah.css"
+      "mark.png"
+      "/path/to/image.svg"
+      "main.js")))

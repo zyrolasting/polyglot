@@ -8,20 +8,19 @@
   unlike-assets/logging
   unlike-assets
   "../../main.rkt"
+  "../../paths.rkt"
   "../fs.rkt"
-  "../paths.rkt"
   "shared.rkt")
 
 
 (define (build)
-  (define compiler (new (polyglot-class)))
   (command-line
     #:program "build"
     #:args (dir)
     (polyglot-project-directory (path->complete-path (simplify-path dir)))
+    (define compiler (make-compiler))
     (report+summary (λ _
-      (make-directory* (dist-rel))
-      (empty-directory (dist-rel))
+      (clear-distribution!)
       (send compiler add! (send compiler clarify "index.md"))
       (with-handlers ([exn:fail? log-exn])
         (send compiler compile!))))))

@@ -1,6 +1,5 @@
-`polyglot` is a static website generator that lets you use any `#lang` language you want
-to author rich content among Markdown. And if you'd rather use a different language
-than Markdown for prose, you can.
+`polyglot` creates websites using a mix of any DSLs you want in a single source file.
+
 
 ```
 $ raco pkg install polyglot
@@ -121,4 +120,3 @@ great for, say, a technical portfolio where each page hosts an app demo.
 </script>
 
 [ua]: https://github.com/zyrolasting/unlike-assets
-

@@ -14,8 +14,9 @@
   racket/string
   racket/function
   racket/file
-  "../dynamic-modules.rkt"
-  "../../txexpr.rkt")
+  unlike-assets/logging
+  "./dynamic-modules.rkt"
+  "../txexpr.rkt")
 
 (define get-script-cdata (curry filter string?))
 
@@ -37,6 +38,10 @@
 
 (define lib-script? (curry script-of-type? "text/racket"))
 
+(define (app-or-lib-script? x)
+  (or (lib-script? x)
+      (app-script? x)))
+
 (define (pipe-port->data port)
   (reverse
     (let loop ([next (read port)] [data null])
@@ -53,6 +58,7 @@
 (define (write-script script rel)
   (let ([path (script->path script rel)])
     (lines->file/clobber path (get-script-cdata script))
+    (<info "Wrote script: ~a" path)
     path))
 
 (module+ test
