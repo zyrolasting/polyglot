@@ -14,6 +14,7 @@
   racket/string
   racket/function
   racket/file
+  unlike-assets/logging
   "./dynamic-modules.rkt"
   "../txexpr.rkt")
 
@@ -57,6 +58,7 @@
 (define (write-script script rel)
   (let ([path (script->path script rel)])
     (lines->file/clobber path (get-script-cdata script))
+    (<info "Wrote script: ~a" path)
     path))
 
 (module+ test

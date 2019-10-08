@@ -73,7 +73,7 @@
           id
           longest)))
 
-  (<debug "Longest ID to be used as prefix: ~a" longest-id)
+  (<debug "Longest ID to be used as prefix: '~a'" longest-id)
 
   (tx-replace
    page
@@ -153,7 +153,7 @@
            (when (<= on-pass 0)
              (error "Maximum passes exceeded."))
 
-           (<debug "Pass ~a" on-pass)
+           (<debug "Passes left: ~a" on-pass)
 
            (define page/after (pass page/before tmpd))
            (if (not (equal? page/before page/after))
