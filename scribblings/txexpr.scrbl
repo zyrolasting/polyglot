@@ -13,8 +13,14 @@ This module includes all bindings from the @seclink["top" #:doc '(lib
 workflows around tagged X-expressions. None of these procedures are dependent
 on any built-in workflow.
 
-@defproc[(genid [tx txexpr?]) string?]{
-Returns a value for an @tt{id} attribute that is not used anywhere in @tt{tx}.
+@section{Analysis}
+@defproc[(tx-search-tagged [tx txexpr?]
+                           [tag symbol?])
+                           (listof txexpr?)]{
+Return all elements in @tt{tx} with the given tag. Returns an empty list
+if there are no matches.
+
+If an element matches, the search will not descend into the child elements.
 }
 
 @defproc[(tag-equal? [tag symbol?] [tx any/c]) boolean?]{
@@ -26,13 +32,63 @@ Returns a procedure that checks if a value causes @racket[tag-equal?] to return
 @racket[#t] for any of the given @tt{tags}.
 }
 
+@defproc[(discover-dependencies [tx txexpr?]) (listof string?)]{
+Returns the values of @racket[href] or @racket[src] attributes in
+@racket[tx] that appear to refer to assets on a local file system.
+This will check for complete paths, relative paths, and URLs with
+the @racket["file://"] scheme.
+
+Relative paths will not be made complete. It's up to you to decide a base directory.
+This frees you from needing to use @racket[(assets-rel)].
+}
+
+@section{Replacing Elements}
+
+The following procedures find and replace elements using callbacks. The callback
+that defines replacements elements is called @tt{replace} for the sake of this
+documentation.
+
+The procedures are either @italic{passive} or @italic{aggressive}. The aggressive
+procedures will replace all matching elements, including the ones that appear in
+the replacements it already made. The passive procedures will replace all matching elements,
+but if the replacement produces more matching elements, they will simply leave them in
+the output.
+
+Consider the following replacement rules:
+
+@verbatim|{
+<p title="Hi">...</p> --> <section><h1>Hi</h1><p>...</p></section>
+           <p>...</p> --> <section><p>...</p></section>
+}|
+
+In this case you want a passive procedure, because it will replace all
+@tt{<p>} elements in a document with @tt{<section>} elements, but will leave
+the @tt{<p>} elements from the replacement as part of the intended output.
+
+An aggressive procedure would not terminate because the substitution rules
+would disallow any @tt{<p>} elements, even in the replacement.
+
+@verbatim|{
+<p title="Hi">...</p>
+ --> <section><h1>Hi</h1><p>...</p></section
+ --> <section><h1>Hi</h1><section><p>...</p></section></section>
+ --> <section><h1>Hi</h1><section><section><p>...</p></section></section></section>
+ ...
+}|
+
+This is not to say that aggressive procedures are generally unhelpful. They are
+meant for use cases where replacements may vary and eventually stop producing
+matching elements.
+
+@subsection{Passive Replacement}
+
 @defproc[(tx-replace [tx txexpr?]
                      [predicate (-> txexpr-element? any/c)]
                      [replace (-> txexpr-element? (listof txexpr?))])
                      txexpr?]{
 Replaces each element @tt{E} matching a predicate with the list of elements
-returned from @tt{(replace E)}. Note that this can create empty parent elements
-and is only meant to replace descendent elements of @tt{tx}.
+returned from @tt{(replace E)}. Note that this can create empty parent elements.
+Acts as a shorthand for @racket[substitute-many-in-txexpr].
 }
 
 @defproc[(tx-replace-tagged [tx txexpr?]
@@ -42,15 +98,6 @@ and is only meant to replace descendent elements of @tt{tx}.
 Like @racket[tx-replace], except you can designate all elements of a certain tag.
 
 e.g. @racket[(tx-replace-tagged tx 'h2 (lamdba (x) `((h3 . ,(get-elements x)))))]
-}
-
-@defproc[(tx-search-tagged [tx txexpr?]
-                           [tag symbol?])
-                           (listof txexpr?)]{
-Return all elements in @tt{tx} with the given tag. Returns an empty list
-if there are no matches.
-
-If an element matches, the search will not descend into the child elements.
 }
 
 @defproc[(substitute-many-in-txexpr [tx txexpr?]
@@ -125,6 +172,51 @@ To guarentee full replacement of elements, use @racket[substitute-many-in-txexpr
 '(p "new" (p "old") "new")
 '((p "old" (p "old") "old"))
 ]
+}
+
+@defproc[(apply-manifest [tx txexpr?]
+			 [manifest dict?])
+			 txexpr?]{
+Returns a new @racket[txexpr] such that all @racket[href] and
+@racket[src] attribute values that appear as keys in @racket[manifest]
+are replaced with the values in @racket[manifest]. Pair this with
+@racket[discover-dependencies] to set up a workflow where discovered
+build-time assets are replaced with production-ready assets.
+
+@racketblock[
+(define page (run-txexpr! (parse-markdown md-file) layout))
+
+(define optimized (foldl (λ (dep res)
+                           (dict-set res dep (write-optimized-to-disk! dep)))
+			 #hash()
+			 (discover-dependencies page)))
+
+(code:comment "Replace things like <img src=\"logo.png\" /> with <img src=\"809a2d.png\" />")
+(define production-ready (apply-manifest page optimized))
+
+(with-output-to-file "page.html"
+  #:exists 'truncate
+  (λ ()
+    (displayln "<!DOCTYPE html>")
+    (displayln (xexpr->html page))))
+]
+}
+
+
+@subsection{Aggressive Replacement}
+
+@deftogether[(
+@defproc[(tx-replace/aggressive [tx txexpr?]
+                                [predicate (-> txexpr-element? any/c)]
+                                [replace (-> txexpr-element? (listof txexpr?))])
+                                txexpr?]
+@defproc[(tx-replace-tagged/aggressive [tx txexpr?]
+                                [tag symbol?]
+                                [replace (-> txexpr? (listof txexpr?))])
+                                txexpr?])]{
+Aggressive variants of @racket[tx-replace] and @racket[tx-replace-tagged].
+
+Acts as a shorthand for @racket[substitute-many-in-txexpr/loop].
 }
 
 @defproc[(substitute-many-in-txexpr/loop [tx txexpr?]
@@ -212,41 +304,7 @@ only the heading will remain.
 ]
 }
 
-@defproc[(discover-dependencies [tx txexpr?]) (listof string?)]{
-Returns the values of @racket[href] or @racket[src] attributes in
-@racket[tx] that appear to refer to assets on a local file system.
-This will check for complete paths, relative paths, and URLs with
-the @racket["file://"] scheme.
-
-Relative paths will not be made complete. It's up to you to decide a base directory.
-This frees you from needing to use @racket[(assets-rel)].
+@section{Content Generation}
+@defproc[(genid [tx txexpr?]) string?]{
+Returns a value for an @tt{id} attribute that is not used anywhere in @tt{tx}.
 }
-
-@defproc[(apply-manifest [tx txexpr?]
-			 [manifest dict?])
-			 txexpr?]{
-Returns a new @racket[txexpr] such that all @racket[href] and
-@racket[src] attribute values that appear as keys in @racket[manifest]
-are replaced with the values in @racket[manifest]. Pair this with
-@racket[discover-dependencies] to set up a workflow where discovered
-build-time assets are replaced with production-ready assets.
-
-@racketblock[
-(define page (run-txexpr! (parse-markdown md-file) layout))
-
-(define optimized (foldl (λ (dep res)
-                           (dict-set res dep (write-optimized-to-disk! dep)))
-			 #hash()
-			 (discover-dependencies page)))
-
-(code:comment "Replace things like <img src=\"logo.png\" /> with <img src=\"809a2d.png\" />")
-(define production-ready (apply-manifest page optimized))
-
-(with-output-to-file "page.html"
-  #:exists 'truncate
-  (λ ()
-    (displayln "<!DOCTYPE html>")
-    (displayln (xexpr->html page))))
-]
-}
-
