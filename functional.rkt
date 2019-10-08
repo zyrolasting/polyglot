@@ -140,7 +140,7 @@
     (step before)))
 
 (define (run-txexpr/functional! target
-                                #:max-passes [max-passes 1000])
+                                #:max-passes [max-passes 100])
   (define page (if (txexpr? target)
                    target
                    (make-minimal-html-page target)))
