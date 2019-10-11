@@ -82,7 +82,7 @@ your content using @secref{default-workflow}.
 If you want to provide your own workflow, you can always @racket[provide] a
 subclass of @racket[polyglot/functional%] or @racket[polyglot/imperative%].
 
-If you want to specify a different config file, use the @tt{-b} or @tt{--by-module}
+If you want to specify a different config file, use the @tt{-b} or @racket[--by-module]
 option at the command line before your chosen subcommand:
 
 @verbatim[#:indent 2]|{
@@ -98,7 +98,7 @@ $ raco polyglot publish my-website my-bucket us-east-2
 }|
 
 Before you use it, @bold{read this entire section.} If you do not agree
-with ANY of it, then use the AWS CLI or the @racket[aws/s3] library to
+with ANY of it, then use the AWS CLI or the @racketmodname[aws/s3] library to
 publish your website.
 
 
@@ -116,7 +116,7 @@ publish your website.
 @item{Authenticate against AWS with @racket[read-keys/aws-cli].}
 @item{Read all keys in the bucket and compare them to the local contents of the dist directory. Remember the elements that are remote but not local.}
 @item{Uploads the contents of the dist directory to the root of the bucket, overwriting any objects that already exist.}
-@item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 1.}]
+@item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 2.}]
 
 Why delete anything? Because if you want to save space, you'll notice
 that @racket[polyglot] will not emit any file unless it was marked as
