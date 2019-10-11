@@ -53,6 +53,16 @@
                             symbol?
                             (-> txexpr? (listof txexpr?))
                             txexpr?)]
+                       [tx-replace/aggressive
+                        (-> txexpr?
+                            txe-predicate/c
+                            (-> txexpr-element? (listof txexpr?))
+                            txexpr?)]
+                       [tx-replace-tagged/aggressive
+                        (-> txexpr?
+                            symbol?
+                            (-> txexpr? (listof txexpr?))
+                            txexpr?)]
                        [interlace-txexprs
                         (->* ((or/c txexpr?
                                     (non-empty-listof txexpr?))
@@ -203,6 +213,11 @@
 
 (define (tx-replace tx replace? replace)
   (let-values ([(next _)
+                (substitute-many-in-txexpr tx replace? replace)])
+    next))
+
+(define (tx-replace/aggressive tx replace? replace)
+  (let-values ([(next _)
                 (substitute-many-in-txexpr/loop tx
                                                 replace?
                                                 replace)])
@@ -212,6 +227,11 @@
   (tx-replace tx
               (λ (x) (tag-equal? t x))
               replace))
+
+(define (tx-replace-tagged/aggressive tx t replace)
+  (tx-replace/aggressive tx
+                         (λ (x) (tag-equal? t x))
+                         replace))
 
 (define (tx-search-tagged tx t)
   (or (findf*-txexpr tx (λ (x) (tag-equal? t x)))
