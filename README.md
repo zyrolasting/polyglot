@@ -8,7 +8,7 @@ $ raco docs polyglot
 
 [Documentation](https://docs.racket-lang.org/polyglot/index.html)
 
-If this project helps you, please [show your support with a donation! :heart:](https://www.paypal.com/paypalme2/sagegerard)
+For guaranteed support on short notice, consider [purchasing a subscription](https://sagegerard.com/subscribe.html).
 
 ## I don't know how you managed it, but your README is broken.
 
