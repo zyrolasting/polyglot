@@ -116,7 +116,7 @@ publish your website.
 @item{Authenticate against AWS with @racket[read-keys/aws-cli].}
 @item{Read all keys in the bucket and compare them to the local contents of the dist directory. Remember the elements that are remote but not local.}
 @item{Uploads the contents of the dist directory to the root of the bucket, overwriting any objects that already exist.}
-@item{If @tt{--delete-diff} is set on the command, delete from the bucket the objects marked in Step 2.}]
+@item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 2.}]
 
 Why delete anything? Because if you want to save space, you'll notice
 that @racket[polyglot] will not emit any file unless it was marked as
