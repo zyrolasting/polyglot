@@ -1,5 +1,5 @@
 #lang scribble/manual
-@require[@for-label[polyglot unlike-assets]]
+@require[@for-label[polyglot unlike-assets racket/base racket/class]]
 
 @title[#:tag "base-workflow"]{The Base Workflow}
 @defmodule[polyglot/base]
@@ -275,6 +275,29 @@ an asset is used in a distribution within a built-in workflow.
 Any other files you reference are copied to @racket[(dist-rel)],
 such that the file name is the first eight characters of the SHA1 hash of the
 file content for cache busting.
+
+@section{Hooking Before and After Builds}
+
+@racketmodname[polyglot] workflows are just classes that
+all inherit from @racket[unlike-compiler%]. @racket[unlike-compiler%]
+is a class that encapsulates processing dependent assets with custom
+integrations, like Webpack.
+
+The @method[unlike-compiler% compile!] method actually executes the
+given workflow and the underlying build. This method is synchronous,
+so if you want to add code to occur before or after a build, simply
+override it.
+
+Here's an example that overrides the class that implements
+@secref{functional-workflow}.
+
+@racketblock[
+(class polyglot/functional%
+  (define/override (compile! #:changed c #:removed r)
+    (displayln "before build")
+    (define output (super compile! #:changed c #:removed r))
+    (displayln "after build")
+    output))]
 
 @section{Base Workflow API Reference}
 @defclass[polyglot/base% unlike-compiler% ()]{
