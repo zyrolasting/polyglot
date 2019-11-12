@@ -181,7 +181,7 @@ in your project directory and use the @tt{project} symlink
 to access them.
 
 @verbatim[#:indent 2]|{
-<script type="text/racket" id="main">
+<script type="application/racket" id="main">
 #lang racket/base
 (require "project/components.rkt")
 (provide (rename-out [two-column layout]))
