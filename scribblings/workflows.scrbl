@@ -271,6 +271,45 @@ HTML to disk.
 You can use this technique to take full responsibility for how
 an asset is used in a distribution within a built-in workflow.
 
+@subsection{CSS Handling (@racket[".css"])}
+In CSS, the values in @litchar{url()} expressions are treated just
+like the @tt{href} and @tt{src} attribute values in
+@secref["discovery-proc" #:doc '(lib "polyglot/scribblings/polyglot.scrbl")].
+
+You can leverage this along with Racket module dependencies to generate
+assets for presentation.
+
+Consider this stylesheet:
+
+@verbatim|{
+@font-face {
+  font-family: 'UberFont';
+  src: url('uberfont.ttf');
+}
+
+body {
+  background-image: url(generate-background.rkt);
+  font-family: UberFont;
+}
+}|
+
+By the rules discussed, it may become:
+
+@verbatim|{
+@font-face {
+  font-family: 'UberFont';
+  src: url('82e2ab1f.ttf');
+}
+
+body {
+  background-image: url(b7ee41cd.png);
+  font-family: UberFont;
+}
+}|
+
+The output CSS is not minified. This process does not alter
+@litchar{@"@"import} at-rules.
+
 @subsection{Default File Handling}
 Any other files you reference are copied to @racket[(dist-rel)],
 such that the file name is the first eight characters of the SHA1 hash of the

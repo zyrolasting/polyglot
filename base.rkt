@@ -21,7 +21,8 @@
          unlike-assets/policy
          "./txexpr.rkt"
          "./paths.rkt"
-         "./private/fs.rkt")
+         "./private/fs.rkt"
+         "./private/css.rkt")
 
 (define (make-minimal-html-page body)
   `(html (head (title "Untitled")) (body . ,body)))
@@ -111,6 +112,7 @@
   (class* unlike-compiler% () (super-new)
     (define/override (delegate path)
       (case (path-get-extension path)
+        [(#".css") process-css]
         [(#".rkt") delegate-to-asset-module]
         [else copy-hashed]))
 
