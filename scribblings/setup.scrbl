@@ -6,10 +6,10 @@
 @title[#:tag "setup"]{Setup and Usage}
 
 First, install the package and make sure it works.
-
+@margin-note{You can also use @tt{raco polyglot}. It works the same way and is available for backwards compatibility.}
 @verbatim[#:indent 2]|{
 $ raco pkg install polyglot
-$ raco polyglot demo
+$ polyglot demo
 }|
 
 You will see a @tt{dist} folder appear in your working directory
@@ -33,8 +33,8 @@ more initial effort.}
 Pick a workflow, and create a new website using one of these commands:
 
 @verbatim[#:indent 2]|{
-$ raco polyglot start my-website # For imperative workflow
-$ raco polyglot start -f my-website # For functional workflow
+$ polyglot start my-website # For imperative workflow
+$ polyglot start -f my-website # For functional workflow
 }|
 
 This creates a new @italic{project directory} called @tt{my-website}
@@ -44,7 +44,7 @@ Markdown file acting as the entry point for your website.
 You can build the content right away.
 
 @verbatim[#:indent 2]|{
-$ raco polyglot build my-website
+$ polyglot build my-website
 }|
 
 The @tt{build} command reads @tt{/path/to/my-website/assets/index.md} and
@@ -55,7 +55,7 @@ The @tt{develop} command rebuilds your website in response to changes in assets.
 Let it run in another terminal while you work.
 
 @verbatim[#:indent 2]|{
-$ raco polyglot develop my-website
+$ polyglot develop my-website
 }|
 
 @section{Tailoring your Workflow}
@@ -86,7 +86,7 @@ If you want to specify a different config file, use the @tt{-b} or @racket[--by-
 option at the command line before your chosen subcommand:
 
 @verbatim[#:indent 2]|{
-$ raco polyglot -b /etc/polyglot.d/team-config.rkt build my-website
+$ polyglot -b /etc/polyglot.d/team-config.rkt build my-website
 }|
 
 
@@ -94,7 +94,7 @@ $ raco polyglot -b /etc/polyglot.d/team-config.rkt build my-website
 @racketmodname[polyglot] can push content to S3.
 
 @verbatim[#:indent 2]|{
-$ raco polyglot publish my-website my-bucket us-east-2
+$ polyglot publish my-website my-bucket us-east-2
 }|
 
 Before you use it, @bold{read this entire section.} If you do not agree
