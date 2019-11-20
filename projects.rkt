@@ -16,6 +16,7 @@
 ; -----------------
 
 (require racket/class
+         racket/file
          racket/string
          racket/rerequire
          "paths.rkt")
@@ -100,7 +101,12 @@
       (when live? (dynamic-rerequire rcfile))
       (if fail-thunk
           (dynamic-require rcfile 'polyglot+% fail-thunk)
-          (dynamic-require rcfile 'polyglot+%)))))
+          (dynamic-require rcfile 'polyglot+%)))
+
+    (define/public (ensure-empty-distribution!)
+      (parameterize ([polyglot-project-directory directory])
+        (delete-directory/files (dist-rel))
+        (make-directory* (dist-rel))))))
 
 
 (module+ test
@@ -118,4 +124,15 @@
 
     (test-true "Skeleton rcfiles load without issue"
                (and (class-provided? dirA)
-                    (class-provided? dirB)))))
+                    (class-provided? dirB)))
+
+    (test-case "ensure-empty-distribution!"
+      (define obj (new polyglot-project% [directory dirA]))
+      (parameterize ([polyglot-project-directory dirA])
+        (make-directory* (dist-rel))
+        (display-to-file #:exists 'replace "" (dist-rel "blah"))
+        (test-true "Dist directory has a file"
+                   (> (length (directory-list (dist-rel))) 0))
+        (send obj ensure-empty-distribution!)
+        (test-true "Dist directory exists" (directory-exists? (dist-rel)))
+        (test-true "Dist directory is empty" (= 0 (length (directory-list (dist-rel)))))))))

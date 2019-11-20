@@ -15,8 +15,12 @@ to projects, and manage workflows for a custom build process.
 @defclass[polyglot-project% object% (equal<%>)]{
 @defconstructor[([directory useable-polyglot-directory?])]{
 This class encapsulates file I/O and validation for @tt{polyglot}
-projects within a directory. Two instances are @racket[equal?] if their
-@racket[directory] fields are @racket[equal?].
+projects within a directory.
+
+Two instances are @racket[equal?] if their @racket[directory] fields are @racket[equal?].
+
+When relevant, methods use @racket[parameterize] to set @racket[polyglot-project-directory]
+to @racket[directory].
 }
 
 @defmethod[(asset-path? [complete-path complete-path?]) boolean?]{
@@ -36,6 +40,11 @@ Setting @racket[fail-thunk] to @racket[#f] is the same as not providing a @racke
 to @racket[dynamic-require].
 
 If @racket[live?] is a true value, then this method will lead with a @racket[dynamic-rerequire].
+}
+
+@defmethod[(ensure-empty-distribution!) void?]{
+Deletes @racket[(dist-rel)] if it already exists, then creates an empty directory
+in its place.
 }
 }
 
