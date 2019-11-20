@@ -4,14 +4,10 @@
 @title[#:tag "base-workflow"]{The Base Workflow}
 @defmodule[polyglot/base]
 
-All built-in workflows accept Racket and Markdown as input
-and produce HTML5 documents in a distribution directory
-as output. This page covers everything in between.
-
-@secref{default-workflow} and @secref{functional-workflow}
-specialize the rules defined here. Therefore, you are always
-following the base workflow unless you write your own workflow
-from scratch.
+All built-in workflows accept Racket and Markdown as input and produce
+HTML5 documents in a distribution directory as output. This page
+covers behaviors that apply by default, and common tasks specialized
+by both @secref{default-workflow} and @secref{functional-workflow}.
 
 @include-section["paths.scrbl"]
 
@@ -60,9 +56,9 @@ written for @racketmodname[polyglot].
 @subsection{Application Elements}
 @margin-note{@racket["application/rackdown"] is also accepted for backwards compatibility.}
 
-@defterm{application elements} are HTML script elements of media type
-@racket["application/racket"]. @racket[polyglot] will run them in the
-order they are encountered. The way application elements work
+@defterm{Application elements} are HTML script elements of media type
+@racket["application/racket"]. @racket[polyglot] will evaluate app
+elements in the order they are encountered. How app elements work
 depends on the workflow you use.
 
 Here's an example from @secref{default-workflow}. In this workflow, app
@@ -95,9 +91,8 @@ This would produce something like:
 </html>
 }|
 
-Here's an equivalent example from @secref{functional-workflow},
-where an app element can provide a procedure to replace the
-entire page.
+Here's an equivalent example in @secref{functional-workflow},
+where an app element can replace the entire page without side-effects.
 
 @verbatim[#:indent 2]|{
 # Hello, world
@@ -127,9 +122,10 @@ to disk before application elements run. This lets you share code and data withi
 the page. Unlike app elements, library elements can provide any identifiers they
 wish just like any other Racket module.
 
-Library elements are unopinionated, meaning that they do not operate differently
-across workflows. Application elements, however, @italic{are} opinionated
-and may use library elements differently.
+Library elements do not operate differently across workflows.
+
+Here's a library element that provides a custom element as a
+procedure. It can sit among prose just like any other element.
 
 @verbatim[#:indent 2]|{
 # Available Packages
@@ -145,10 +141,13 @@ and may use library elements differently.
     (h4 ,price)
     (ul ,(map (lambda (v) `(li ,v)) features))))
 </script>
+}|
 
+The @tt{id} is important. When a workflow writes a library element to
+disk, it will appear in the same directory as other application or
+library elements. This makes it easy to @racket[require] the library.
 
-## Personal use
-
+@verbatim[#:indent 2]|{
 <script type="application/racket">
 #lang racket/base
 (require "components.rkt")
@@ -157,24 +156,11 @@ and may use library elements differently.
 (write (offering "Plus" "$10/month"))
 (write (offering "Pro" "$20/month"))
 </script>
-
-
-## Enterprise
-
-<script type="application/racket">
-#lang racket/base
-(require "components.rkt")
-
-(write (offering "Basic" "$100/month"))
-(write (offering "Plus" "$500/month"))
-(write (offering "Pro" "$1,000/month"))
-</script>
 }|
 
-It's especially important to name your libraries with an @racket[id] attribute, or else
-you will not know what name it has on disk in an application element.
 
 @subsection{Accessing Shared Content}
+
 Library elements provide shared content @italic{within} a page.
 To share code and data @italic{across} pages, place related files
 in your project directory and use the @tt{project} symlink
@@ -190,50 +176,73 @@ to access them.
 
 @section[#:tag "discovery-proc"]{Dependency Discovery and Processing}
 
-Once there are no more app or lib elements to process in
-a Markdown file, a workflow will check all @racket[href]
-and @racket[src] attribute values on a page and keeps the ones that look
-like assets on your disk (including @racket["file:"] URLs).
+Once there are no more app or lib elements to process among prose,
+each workflow will start a @defterm{dependency discovery} phase where
+it searches for paths that look like assets on disk (including
+@racket["file:"] URLs).
 
-These values are @bold{either absolute paths on your filesystem, or
+These paths are @bold{either absolute paths on your filesystem, or
 paths relative to your assets directory} (See @racket[assets-rel]).
 So if there is a link to @tt{contact.md} somewhere on your page,
 a built-in workflow will try to process that file from @racket[(assets-rel "contact.md")].
 
-For each dependency, your chosen workflow will react according
-to that dependency's type.
+The base workflow supports dependency discovery in tagged
+X-expressions and CSS files. Discovery occurs after some processing in
+a handful of known asset types, as detailed below. Custom workflows
+must implement their own discovery phase when supporting new assets,
+or when changing how existing assets are processed.
 
 @subsection{Markdown Handling (@racket[".md"])}
-You may link to other Markdown files in your pages.
+When you start building a website, @tt{polyglot} will look
+for an @tt{index.md} file in that website's assets by default.
+
+All Markdown files are parsed using @racket[parse-markdown].
+All app and lib elements in the resulting Tagged X-Expressions
+are evaluated according to the workflow loaded from the project's
+@tt{.polyglotrc.rkt}.
+
+You may link to other assets in your pages.
 
 @verbatim[#:indent 2]|{
 * [Contact me](contact.md)
 ...
+<img src="make-image.rkt" />
 <nav><a href="about.md">About</a></nav>
 }|
 
-Each workflow discovers other Markdown files and
-processes them to produce a working, linked collection
-of @racket[".html"] files.
+During the dependency discovery phase, each built-in workflow will check
+all @racket[href] and @racket[src] attribute values for applicable paths.
+They will be processed according to the rules of their associated
+workflow.
+
+This process will repeat for all Markdown files discovered. The result is
+a working, linked collection of HTML5 documents, complete with production-ready
+assets.
 
 @subsection[#:tag "handle-rkt"]{Racket Module Handling (@racket[".rkt"])}
-Assume you want to create a stylesheet using Racket.
-You can write Racket code to generate optimized styles and
-list the module that does it as a dependency.
+You may depend on a Racket module to take full responsibility for
+generating an asset.
 
-This allows you to turn this...
+This method requires knowledge of @racketmodname[unlike-assets].
+Specifically, you need to know how @racket[advance/c] procedures
+work. This gives you a way to produce unique and tailored assets
+without needing to write a new workflow.
+
+The Racket module must produce a path to a file in a distribution.
+The workflow will trust that path is correct and useful in a complete
+website.
+
+For example, say you want to create a stylesheet using Racket. You can write
+Racket code to generate optimized styles and list the module that does
+it as a dependency.
+
+To do this, write an element to depend on a Racket module.
 
 @verbatim[#:indent 2]{
 <link rel="stylesheet" href="compute-stylesheet.rkt" />
 }
 
-...into this...
-
-@verbatim[#:indent 2]{
-<link rel="stylesheet" href="5f9bb103.css" />
-}
-
-...using this:
+The module generates a simple style sheet.
 
 @racketmod[
 #:file "compute-stylesheet.rkt"
@@ -257,31 +266,34 @@ racket
   path)
 ]
 
-First, it must @racket[provide] @racket[write-dist-file] as an
-@racket[advance/c] procedure that eventually returns a @racket[complete-path?]
-to the processed file as a fulfilled @racket[unlike-asset/c].
-That file must exist in @racket[(dist-rel)]. @racket[polyglot] will
-replace the value of the @racket[src] or @racket[href] attribute based on the path you return.
+To integrate with the base workflow, the module must @racket[provide]
+@racket[write-dist-file] as an @racket[advance/c] procedure. Notice
+that it returns a complete path in @racket[(dist-rel)]. The procedure
+writes the stylesheet in the distribution as a side-effect.
+
+In terms of @racketmodname[unlike-assets], the path to the stylesheet
+is a fulfilled @racket[unlike-asset/c]. The base workflow will accept
+this path and use it to replace the original reference to the module.
+
+@verbatim[#:indent 2]|{
+<link rel="stylesheet" href="5f9bb103.css" />
+}|
 
 The difference between this approach and writing equivalent Racket
 code in an application element is @italic{when} the code runs. This
 code runs after finding dependencies in a page, but before writing
-HTML to disk.
-
-You can use this technique to take full responsibility for how
-an asset is used in a distribution within a built-in workflow.
+HTML5 documents to disk.
 
 @subsection{CSS Handling (@racket[".css"])}
 In CSS, the values in @litchar{url()} expressions are treated just
-like the @tt{href} and @tt{src} attribute values in
-@secref["discovery-proc" #:doc '(lib "polyglot/scribblings/polyglot.scrbl")].
+like the @tt{href} and @tt{src} attribute values in Markdown files.
 
 You can leverage this along with Racket module dependencies to generate
 assets for presentation.
 
 Consider this stylesheet:
 
-@verbatim|{
+@verbatim[#:indent 2]|{
 @font-face {
   font-family: 'UberFont';
   src: url('uberfont.ttf');
@@ -307,13 +319,17 @@ body {
 }
 }|
 
-The output CSS is not minified. This process does not alter
-@litchar{@"@"import} at-rules.
+Notice that unlike the Racket module example above that
+wrote a stylesheet to disk, this CSS is @italic{not}
+minified. Additionally, this process does not alter
+or interpret @litchar{@"@"import} at-rules.
+
 
 @subsection{Default File Handling}
 Any other files you reference are copied to @racket[(dist-rel)],
 such that the file name is the first eight characters of the SHA1 hash of the
 file content for cache busting.
+
 
 @section{Hooking Before and After Builds}
 
