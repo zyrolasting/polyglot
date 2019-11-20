@@ -3,8 +3,7 @@
 (require racket/contract)
 (provide (contract-out
           [polyglot-project% (class/c [asset-path? (->m path? boolean?)]
-                                      [get-workflow-class (->m (or/c (-> any) boolean?)
-                                                               class?)]
+                                      [get-workflow-class (->m (-> any) class?)]
                                       (field [directory useable-polyglot-directory?]))]
           [useable-polyglot-directory? (-> path? boolean?)]
           [find-closest-project (-> path? (or/c boolean? path?))]))
@@ -47,12 +46,14 @@
   (with-handlers ([exn:fail? (λ _ #f)])
     (parameterize ([polyglot-project-directory directory])
       (let ([dperms (file-or-directory-permissions directory)]
-            [aperms (file-or-directory-permissions (assets-rel))]
-            [rperms (file-or-directory-permissions (build-path directory polyglot-rcfile-name))])
+            [aperms (file-or-directory-permissions (assets-rel))])
         (and (member 'read dperms)
              (member 'write dperms)
              (member 'read aperms)
-             (member 'read rperms)
+             ; The rcfile doesn't have to exist, but if it does, it must be readable.
+             (let ([rcpath (build-path directory polyglot-rcfile-name)])
+               (or (not (file-exists? rcpath))
+                   (member 'read (file-or-directory-permissions rcpath))))
              #t)))))
 
 (module+ test
@@ -96,12 +97,15 @@
         (string-prefix? (path->string (path->complete-path path))
                         (path->string (assets-rel)))))
 
-    (define/public (get-workflow-class [fail-thunk #f] #:live? [live? #f])
+    (define/public (get-workflow-class [fail-thunk (λ _ (error 'polyglot
+                                                               "Failed to load ~a"
+                                                               polyglot-rcfile-name))]
+                                       #:live? [live? #f])
       (define rcfile (build-path directory polyglot-rcfile-name))
       (when live? (dynamic-rerequire rcfile))
-      (if fail-thunk
+      (if (file-exists? rcfile)
           (dynamic-require rcfile 'polyglot+% fail-thunk)
-          (dynamic-require rcfile 'polyglot+%)))
+          (fail-thunk)))
 
     (define/public (ensure-empty-distribution!)
       (parameterize ([polyglot-project-directory directory])

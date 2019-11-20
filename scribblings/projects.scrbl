@@ -29,17 +29,18 @@ path for the project. This method does not consult the
 filesystem.
 }
 
-@defmethod[(get-workflow-class [fail-thunk (or/c #f (-> any)) #f] [#:live? live? any/c #f]) class?]{
-Equivalent to:
+@defmethod[(get-workflow-class [fail-thunk (-> any) (lambda () ...)] [#:live? live? any/c #f]) (or/c class? #f)]{
+If @tt{.polyglotrc.rkt} does not exist in the project, this returns the result of @racket[fail-thunk].
+By default, @racket[fail-thunk] raises @racket[exn:fail].
+
+If @tt{.polyglotrc.rkt} exists in the project, this is equivalent to:
 
 @racketblock[
 (dynamic-require (build-path directory ".polyglotrc.rkt") 'polyglot+% fail-thunk)
 ]
 
-Setting @racket[fail-thunk] to @racket[#f] is the same as not providing a @racket[fail-thunk]
-to @racket[dynamic-require].
-
-If @racket[live?] is a true value, then this method will lead with a @racket[dynamic-rerequire].
+If @racket[live?] is a true value, then this method will lead with a
+@racket[dynamic-rerequire].
 }
 
 @defmethod[(ensure-empty-distribution!) void?]{
