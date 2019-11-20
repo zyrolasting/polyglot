@@ -11,7 +11,7 @@ to build production-ready websites. Websites built with @racketmodname[polyglot]
 cache-busting, Webpack-like dependency handling, and an S3 upload tool for free.
 
 The @racketmodname[polyglot] module includes bindings from
-@racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr],
+@racketmodname[polyglot/paths], @racketmodname[polyglot/txexpr], @racketmodname[polyglot/projects],
 @racketmodname[polyglot/base], @racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
 @table-of-contents[]
@@ -20,6 +20,7 @@ The @racketmodname[polyglot] module includes bindings from
 @include-section["default-workflow.scrbl"]
 @include-section["functional-workflow.scrbl"]
 @include-section["txexpr.scrbl"]
+@include-section["projects.scrbl"]
 
 @section{License and contributions}
 @racket[polyglot] uses the MIT license. @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "Here's the source code."]

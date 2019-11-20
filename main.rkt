@@ -11,4 +11,5 @@
      "./txexpr.rkt"
      "./paths.rkt"
      "./imperative.rkt"
-     "./functional.rkt")
+     "./functional.rkt"
+     "./projects.rkt")
