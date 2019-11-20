@@ -24,7 +24,8 @@
   (require racket/runtime-path
            racket/list
            rackunit
-           unlike-assets)
+           unlike-assets
+           "private/fs.rkt")
   ; Testing against the project templates is dogfooding.
   (define-runtime-path skels "./private/skel")
 
@@ -109,7 +110,7 @@
 
     (define/public (ensure-empty-distribution!)
       (parameterize ([polyglot-project-directory directory])
-        (delete-directory/files (dist-rel))
+        (delete-directory/files (dist-rel) #:must-exist? #f)
         (make-directory* (dist-rel))))))
 
 
@@ -140,3 +141,17 @@
         (send obj ensure-empty-distribution!)
         (test-true "Dist directory exists" (directory-exists? (dist-rel)))
         (test-true "Dist directory is empty" (= 0 (length (directory-list (dist-rel)))))))))
+
+(module+ test
+  (for ([path skel-paths])
+    (define-values (base name _) (split-path path))
+    (test-case (format "Can build ~a" name)
+      (parameterize ([polyglot-project-directory path])
+        (define project (new polyglot-project% [directory path]))
+        (define compiler (new (send project get-workflow-class)))
+        (send project ensure-empty-distribution!)
+        (send compiler add! (assets-rel "index.md"))
+        (send compiler compile!)
+        (check-equal? (length (directory-list (assets-rel)))
+                      (length (directory-list (dist-rel))))
+        (delete-directory/files (dist-rel))))))
