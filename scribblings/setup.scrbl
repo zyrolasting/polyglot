@@ -55,6 +55,14 @@ $ polyglot build my-website
 The @tt{build} command reads @tt{/path/to/my-website/assets/index.md} and
 writes content to the @tt{/path/to/my-website/dist} directory.
 
+You can specify @tt{index.md} for the same effect. If you want to
+work on a different part of your site, feel free to pass it the
+relevant file later.
+
+@verbatim[#:indent 2]|{
+$ polyglot build my-website/assets/index.md
+}|
+
 @section[#:tag "live"]{Live Builds}
 The @tt{develop} command rebuilds your website in response to changes in assets.
 Let it run in another terminal while you work.

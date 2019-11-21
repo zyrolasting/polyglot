@@ -12,15 +12,14 @@
   "../fs.rkt"
   "shared.rkt")
 
-
 (define (build)
   (command-line
     #:program "build"
-    #:args (dir)
-    (polyglot-project-directory (path->complete-path (simplify-path dir)))
-    (define compiler (make-compiler))
-    (report+summary (λ _
-      (clear-distribution!)
-      (send compiler add! (send compiler clarify "index.md"))
-      (with-handlers ([exn:fail? log-exn])
-        (send compiler compile!))))))
+    #:args (path)
+    (report+summary
+     (λ _
+       (define-values (project compiler entry)
+         (init-by-user-path! path))
+       (send compiler add! entry)
+       (with-handlers ([exn:fail? log-exn])
+         (send compiler compile!))))))

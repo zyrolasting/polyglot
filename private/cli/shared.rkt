@@ -32,17 +32,29 @@
   (exit (if (> nerrors 0) 1 0)))
 
 
-(define (clear-distribution!)
-  (make-directory* (dist-rel))
-  (empty-directory (dist-rel)))
-
-(define (make-compiler)
-  (define rcfile (project-rel ".polyglotrc.rkt"))
+(define (make-compiler project)
   (new (or (polyglot-class/cli-asserted)
-           (if (file-exists? rcfile)
-             (begin
-               (dynamic-rerequire rcfile)
-               (dynamic-require rcfile
-                                'polyglot+%
-                                (λ _ polyglot/imperative%)))
-             polyglot/imperative%))))
+           (send project
+                 get-workflow-class
+                 (λ _ polyglot/imperative%)
+                 #:live? #t))))
+
+(define (get-entry-asset project compiler path)
+  (if (send project asset-path? path)
+      path
+      (send compiler clarify "index.md")))
+
+(define (init-by-user-path! path)
+  (define normalized (path->complete-path (resolve-path path)))
+  (define project (find-closest-project normalized))
+  (unless project
+    (displayln (format "Cannot find project from path:~n  path: ~a" path)
+               (current-error-port))
+    (exit 1))
+
+  (polyglot-project-directory (get-field directory project))
+  (send project ensure-empty-distribution!)
+  (define compiler (make-compiler project))
+  (values project
+          compiler
+          (get-entry-asset project compiler normalized)))

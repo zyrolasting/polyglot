@@ -23,10 +23,9 @@
     #:once-each
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
-    #:args (dir)
-    (polyglot-project-directory (path->complete-path (simplify-path dir)))
-    (clear-distribution!)
-    (define compiler (make-compiler))
+    #:args (path)
+    (define-values (project compiler entry)
+      (init-by-user-path! path))
 
     (define (changed? activity)
       (equal? (second activity) 'change))
@@ -55,7 +54,7 @@
     (define (on-break e)
       (displayln "Shutting down"))
 
-    (send compiler add! (send compiler clarify "index.md"))
+    (send compiler add! entry)
     (build null null)
 
     (define watcher (robust-watch (assets-rel)))
