@@ -108,15 +108,21 @@
     (copy-file src dst))
   dst)
 
+(define (strip-extension clear compiler)
+  (path-replace-extension clear #""))
+
 (define polyglot/base%
   (class* unlike-compiler% () (super-new)
     (define/override (delegate path)
       (case (path-get-extension path)
+        [(#".literal") strip-extension]
         [(#".css") process-css]
         [(#".rkt") delegate-to-asset-module]
         [else copy-hashed]))
 
     (define/override (clarify unclear)
-      (define path (build-complete-simple-path unclear (assets-rel)))
-      (unless (file-readable? path) (error (format "Cannot read ~a" unclear)))
+      (define path (resolve-path (build-complete-simple-path unclear (assets-rel))))
+      (unless (or (equal? (path-get-extension path) #".literal")
+                  (file-readable? path))
+        (error (format "Cannot read ~a" unclear)))
       path)))

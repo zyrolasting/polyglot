@@ -324,6 +324,17 @@ wrote a stylesheet to disk, this CSS is @italic{not}
 minified. Additionally, this process does not alter
 or interpret @litchar{@"@"import} at-rules.
 
+@subsection{Literal Path Handling (@racket[".literal"])}
+
+Any dependency paths with extension @tt{.literal} are placed as-is
+in the distribution, ironically without the @tt{.literal}
+extension.
+
+This means that @litchar{[Link](doc.html.literal)} becomes
+@litchar{<a href="doc.html">Link</a>}.
+
+If you need @tt{.literal} to appear in the output,
+use the extension twice (e.g. @tt{doc.literal.literal}).
 
 @subsection{Default File Handling}
 Any other files you reference are copied to @racket[(dist-rel)],
