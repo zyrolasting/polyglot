@@ -17,8 +17,11 @@ containing a @tt{README.html} file. This is a @italic{distribution}
 built from the @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "README in the source code"].
 
 @section{Pick A Workflow}
-A @defterm{workflow} sets the rules for how to process content using
-@racketmodname[polyglot].
+On its own, @tt{polyglot} has no idea what to do with any file you
+give it. It needs a @defterm{workflow} to define how to process
+content.
+
+@tt{polyglot} offers two built-in workflows that extend @secref{base-workflow}.
 
 @itemlist[
 @item{@secref{default-workflow}: Offers a PHP-like development experience where
@@ -30,14 +33,16 @@ a composition of pure procedures. Powerful and scalable, but requires
 more initial effort.}
 ]
 
-Pick a workflow, and create a new website using one of these commands:
+Don't dwell too much on the choice. It won't be difficult to change
+later. Pick a workflow that speaks to your soul, and create a new
+project using one of these commands:
 
 @verbatim[#:indent 2]|{
 $ polyglot start my-website # For imperative workflow
 $ polyglot start -f my-website # For functional workflow
 }|
 
-This creates a new @italic{project directory} called @tt{my-website}
+This creates a new @defterm{project directory} called @tt{my-website}
 with example content, namely an @tt{assets} directory with an @tt{index.md}
 Markdown file acting as the entry point for your website.
 
