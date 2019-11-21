@@ -6,7 +6,7 @@
                                       [get-workflow-class (->m (-> any) class?)]
                                       (field [directory useable-polyglot-directory?]))]
           [useable-polyglot-directory? (-> path? boolean?)]
-          [find-closest-project (-> path? (or/c boolean? path?))]))
+          [find-closest-project (-> path? (or/c #f (is-a?/c polyglot-project%)))]))
 
 ; Named to protect against typos.
 (define polyglot-rcfile-name ".polyglotrc.rkt")
