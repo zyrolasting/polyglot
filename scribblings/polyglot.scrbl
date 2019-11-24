@@ -15,6 +15,7 @@ The @racketmodname[polyglot] module includes bindings from
 @racketmodname[polyglot/base], @racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
 @table-of-contents[]
+@include-section["motivation.scrbl"]
 @include-section["setup.scrbl"]
 @include-section["workflows.scrbl"]
 @include-section["default-workflow.scrbl"]
