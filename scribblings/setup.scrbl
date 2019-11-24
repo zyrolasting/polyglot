@@ -5,7 +5,10 @@
 
 @title[#:tag "setup"]{Setup and Usage}
 
-First, install the package and make sure it works.
+@tt{polyglot} requires symbolic links to function (See
+@racket[make-file-or-directory-link]). To confirm that everything
+works, install the package and run the @tt{demo} command.
+
 @margin-note{You can also use @tt{raco polyglot}. It works the same way and is available for backwards compatibility.}
 @verbatim[#:indent 2]|{
 $ raco pkg install polyglot
