@@ -344,10 +344,13 @@ file content for cache busting.
 
 @section{Hooking Before and After Builds}
 
-@racketmodname[polyglot] workflows are just classes that
-all inherit from @racket[unlike-compiler%]. @racket[unlike-compiler%]
-is a class that encapsulates processing dependent assets with custom
-integrations, like Webpack.
+Under the hood, polyglot workflows are classes. Each one is a subclass
+of @racket[unlike-compiler%]. An instance of @racket[unlike-compiler%]
+models relationships between files that otherwise don't fit
+together. You can use it to make a PNG depend on an XML file, if you
+know a way to have that make sense. Knowing the basics of the
+@racketmodname[unlike-assets] collection can help you customize
+@racketmodname[polyglot] later.
 
 The @method[unlike-compiler% compile!] method actually executes the
 given workflow and the underlying build. This method is synchronous,
