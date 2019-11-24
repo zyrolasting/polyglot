@@ -15,9 +15,11 @@ $ raco pkg install polyglot
 $ polyglot demo
 }|
 
-You will see a @tt{dist} folder appear in your working directory
-containing a @tt{README.html} file. This is a @italic{distribution}
-built from the @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "README in the source code"].
+If the command succeeds, then you will see a @tt{dist} folder appear
+in your working directory containing a @tt{README.html} file. This is
+a @italic{distribution} built from the
+@hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md"
+"README in the source code"].
 
 @section{Pick A Workflow}
 On its own, @tt{polyglot} has no idea what to do with any file you
