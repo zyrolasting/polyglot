@@ -3,7 +3,7 @@
 (require racket/contract)
 (provide (contract-out
           [polyglot-project% (class/c [asset-path? (->m path? boolean?)]
-                                      [get-workflow-class (->*m () ((-> any)) class?)]
+                                      [get-workflow-class (->*m () ((-> any) #:live? boolean?) class?)]
                                       (field [directory useable-polyglot-directory?]))]
           [useable-polyglot-directory? (-> path? boolean?)]
           [find-closest-project (-> path? (or/c #f (is-a?/c polyglot-project%)))]))
