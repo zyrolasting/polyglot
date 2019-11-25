@@ -51,9 +51,6 @@
     (partition (λ (s) (equal? (path-get-extension s) #".literal"))
                unclear-deps))
 
-  (printf "LITERALS: ~e~n" literal-refs)
-  (printf "NONLITS: ~e~n" non-literal-refs)
-
   (define manifest (create-manifest non-literal-refs compiler))
   (define num-dist-path-elements (length (explode-path (dist-rel))))
 
