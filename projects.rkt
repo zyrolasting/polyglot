@@ -27,6 +27,7 @@
          "paths.rkt")
 
 (module+ test
+  (provide skel-paths)
   (require racket/runtime-path
            racket/list
            rackunit
