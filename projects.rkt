@@ -93,6 +93,10 @@
     (define/public (equal-secondary-hash-code-of hash-code)
       (hash-code (path->string (simplify-path directory))))
 
+    (define/public (get-directory-name)
+      (define-values (base name _) (split-path directory))
+      name)
+
     (define/public (asset-path? path)
       (parameterize ([polyglot-project-directory directory])
         (string-prefix? (path->string (path->complete-path path))

@@ -47,6 +47,17 @@ If @racket[live?] is a true value, then this method will lead with a
 Deletes @racket[(dist-rel)] if it already exists, then creates an empty directory
 in its place.
 }
+
+@defmethod[(get-directory-name) string?]{
+Returns the name of the project directory. Equivalent to:
+
+@racketblock[
+(let-values ([(base name must-be-dir?)
+              (split-path (get-field directory project))])
+  name)
+]
+
+}
 }
 
 @defproc[(useable-polyglot-directory? [directory path?]) boolean?]{
