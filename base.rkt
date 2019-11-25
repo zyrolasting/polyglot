@@ -57,7 +57,8 @@
                     v))))
 
   (define txexpr/final (apply-manifest txexpr/expanded
-                                       manifest/patched))
+                                       manifest/patched
+                                       rewrite))
 
   (with-output-to-file path #:exists 'replace
     (λ ()

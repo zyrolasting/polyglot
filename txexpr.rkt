@@ -75,9 +75,10 @@
                              (non-empty-listof txexpr?))]
                        [discover-dependencies (-> txexpr?
                                                   (listof string?))]
-                       [apply-manifest (-> txexpr?
-                                           dict?
-                                           txexpr?)]))
+                       [apply-manifest (->* (txexpr?
+                                             dict?)
+                                            ((-> string? string?))
+                                            txexpr?)]))
 
 (define (genid tx)
   (define all-ids
@@ -260,12 +261,12 @@
                       (local-asset-url? (get-dependency-ref node)))))))
       null)))
 
-(define (apply-manifest content manifest)
-  (define (asset-basename path)
-    (define-values (base name must-be-dir?)
-      (split-path path))
-    name)
+(define (asset-basename path)
+  (define-values (base name must-be-dir?)
+    (split-path path))
+  name)
 
+(define (apply-manifest content manifest [rewrite asset-basename])
   (sequence-fold
     (λ (result k v)
       (let-values ([(next _)
@@ -278,7 +279,7 @@
                       (λ (node)
                         (attr-set node
                                   (get-dependency-key node)
-                                  (asset-basename v))))])
+                                  (rewrite v))))])
         next))
     content
     (in-dict manifest)))
@@ -361,6 +362,21 @@
        (link ((href "123.css"))))
       (body
        (img ((src "456.png"))))))
+
+  (test-equal? "apply-manifest allows custom rewrites"
+    (apply-manifest '(html
+                      (head
+                       (link ((href "a.css"))))
+                      (body
+                       (img ((src "b.png")))))
+                    '(("a.css" . "123.css")
+                      ("b.png" . "456.png"))
+                    string-upcase)
+    '(html
+      (head
+       (link ((href "123.CSS"))))
+      (body
+       (img ((src "456.PNG"))))))
 
   (test-equal? "Discover dependencies within a txexpr"
     (discover-dependencies

@@ -175,13 +175,16 @@ To guarentee full replacement of elements, use @racket[substitute-many-in-txexpr
 }
 
 @defproc[(apply-manifest [tx txexpr?]
-			 [manifest dict?])
+			 [manifest dict?]
+                         [rewrite (-> string? string?) (lambda ...)])
 			 txexpr?]{
-Returns a new @racket[txexpr] such that all @racket[href] and
-@racket[src] attribute values that appear as keys in @racket[manifest]
-are replaced with the values in @racket[manifest]. Pair this with
-@racket[discover-dependencies] to set up a workflow where discovered
-build-time assets are replaced with production-ready assets.
+Returns a new @racket[txexpr] such that each @racket[href] and @racket[src]
+attribute value that appears as a key @tt[K] in @racket[manifest] is replaced
+with @racket[(rewrite (dict-ref manifest K))]. By default, @racket[rewrite]
+returns only the @racket[name] value returned from @racket[split-path].
+
+Pair this with @racket[discover-dependencies] to set up a workflow where
+discovered build-time assets are replaced with production-ready assets.
 
 @racketblock[
 (define page (run-txexpr! (parse-markdown md-file) layout))
