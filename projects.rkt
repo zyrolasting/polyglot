@@ -5,6 +5,12 @@
           [polyglot-project% (class/c [asset-path? (->m path? boolean?)]
                                       [get-workflow-class (->*m () ((-> any) #:live? boolean?) class?)]
                                       (field [directory useable-polyglot-directory?]))]
+          [copy-polyglot-skeleton-project!
+           (->* ((or/c "functional" "imperative"))
+                ((or/c path-string?
+                       path?)
+                 #:force? any/c)
+               (is-a?/c polyglot-project%))]
           [useable-polyglot-directory? (-> path? boolean?)]
           [find-closest-project (-> path? (or/c #f (is-a?/c polyglot-project%)))]))
 
@@ -79,6 +85,40 @@
         (define obj (find-closest-project (assets-rel "index.md")))
         (check-true (is-a? obj polyglot-project%))
         (check-equal? fn (get-directory obj))))))
+
+
+(define (copy-polyglot-skeleton-project! name
+                                         #:force? [force? #f]
+                                         [dest (make-temporary-file "polyglot~a"
+                                                                    'directory)])
+  (when force?
+    (delete-directory/files dest))
+  (copy-directory/files (polyglot-rel "private" "skel" name)
+                        dest)
+  (new polyglot-project% [directory dest]))
+
+(module+ test
+  (test-case "copy-polyglot-skeleton-project!"
+    (test-case "can create useable projects as a result of the copy"
+      (for ([path skel-paths])
+        (define-values (base name _) (split-path path))
+        (define project
+          (copy-polyglot-skeleton-project! #:force? #t
+                                           name
+                                           (make-temporary-file (format "~a~~a" name)
+                                                              'directory)))
+        (define dir (get-field directory project))
+        (check-pred useable-polyglot-directory? dir)
+        (delete-directory/files dir)))
+    (test-case "will raise exn:fail:filesystem on existing directory when #:force? is #f"
+      (define dir (make-temporary-file "polyglot~a" 'directory))
+      (check-exn exn:fail:filesystem?
+                 (λ _
+                   (copy-polyglot-skeleton-project! #:force? #t "functional" dir)
+                   (copy-polyglot-skeleton-project! #:force? #f "functional" dir)))
+      (delete-directory/files dir))))
+
+
 
 (define polyglot-project%
   (class* object% (equal<%>)

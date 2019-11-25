@@ -60,6 +60,18 @@ Returns the name of the project directory. Equivalent to:
 }
 }
 
+@defproc[(copy-polyglot-skeleton-project! [name (or/c "functional" "imperative")]
+                                          [destination (or/c path-string? path?)
+                                                       (make-temporary-file "polyglot~a" 'directory)]
+                                          [#:force? force? any/c #f])
+                                          (is-a?/c polyglot-project%)]{
+Copies a polyglot project template by @racket[name] to @racket[destination],
+and returns a project object pointing to @racket[destination]. If
+@racket[force] is a true value, @racket[destination] is deleted in advance.
+
+The @tt{polyglot start} command uses this procedure.
+}
+
 @defproc[(useable-polyglot-directory? [directory path?]) boolean?]{
 Assuming @racket[polyglot-project-directory] was set to @racket[directory],
 returns @racket[#t] if all of the following are true:
