@@ -130,7 +130,7 @@ Nothing yet.
 * Remove `rash` depenency from demo.
 * Ripple all non-Markdown changes to dependent assets, not just CSS.
 
-# [0.0] - 2019-08-24
+## [0.0] - 2019-08-24
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
