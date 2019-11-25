@@ -1,3 +1,7 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/polyglot/index.html)
+[![](https://tokei.rs/b1/github/zyrolasting/racket-vulkan)](https://github.com/zyrolasting/polyglot)
+
 `polyglot` creates websites using a mix of any DSLs you want in a single source file.
 
 
@@ -5,8 +9,6 @@
 $ raco pkg install polyglot
 $ raco docs polyglot
 ```
-
-[Documentation](https://docs.racket-lang.org/polyglot/index.html)
 
 For guaranteed support on short notice, consider [purchasing a subscription](https://sagegerard.com/subscribe.html).
 
