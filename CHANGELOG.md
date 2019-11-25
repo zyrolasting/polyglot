@@ -3,41 +3,118 @@
 This file summarizes changes to the project over time.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-Each version is in the format `major.minor`, and conforms to the following rules:
+Each version is in the format `major.minor` and conforms to loose rules:
 
-* `minor` increments cover feature additions and bugfixes.
-* `major` increments cover breaking changes and "large" changes, where "large" is contextual.
+* `minor` and `major` increments cover "small" and "large" changes,
+where the meaning of each word is contextual and subject to author
+interpretation.
+* _Breaking changes have no relationship to version numbers._ By
+policy, any breaking change is simply avoided unless there's a good
+reason to introduce one. It's [too difficult to draw a reliable
+relationship][jash]. since some breaking changes are meant to prepare
+intended functionality (e.g. fixing incorrect module level contracts,
+see v1.6).
+
+## [Unreleased]
+
+Nothing yet.
 
 ## [1.9] - 2019-11-25
-* Support multiple workflows
-* Support build API
+* Document use of multiple workflows
+* Add `rewrite` formal to `apply-manifest`
+* Resolve `..`, etc. in `asset-path?`
+* Fix `.literal` link rewrite in aggregate projects
 
 ## [1.8] - 2019-11-25
+* Publish `polyglot/builds`
+* Edit motivation document
+* Fix loading error in `get-workflow-class`
+
 ## [1.7] - 2019-11-25
+* Expose `copy-polyglot-skeleton-project!`
+
 ## [1.6] - 2019-11-25
+* Add motivation document
+* Add `get-directory-name` method
+* Add note for symlink support in Setup documentation
+* Edit paragraphs for clarity
+* Fix module contract for `get-workflow-class`
 
 ## [1.5] - 2019-11-20
 * Support asset file entry point in CLI
+* Add `.literal` support.
+* Relax `polyglot/projects` to allow optional rcfiles*
+* Default to thrown exception in thunk when rcfile is not found
+* Fix `ensure-empty-distribution!` exception when dist directory does not exist
+* Some refactoring
+* Edit documentation to match
 
 ## [1.4] - 2019-11-20
 * Add `ensure-empty-distribution!`
+* Document `equal?` behavior for `polyglot-project%' objects
 
 ## [1.3] - 2019-11-20
 * Add `polyglot` racket launcher
+* Edit documentation for readability
 
 ## [1.2] - 2019-09-19
-* Publish project API
+* Publish `polyglot/projects`
 
 ## [1.1] - 2019-11-12
+* Switch CTA from personal donation link to business subscription page
+* Add CSS support with dependency discovery
+* Add documentation for hooking before and after builds.
+
 ## [1.0] - 2019-10-08
+* Promote Racket module dependency processing to base workflow.
+* Add reload support for runtime config.
+* Expose functional workflow to clients with documentation.
+* Edit documentation to reflect code movement
+* Add some log events
+* Reformat code
+
 ## [0.9] - 2019-10-07
+* Upgrade workflows
+  - Add base workflow
+  - Add the functional workflow
+  - Rename default workflow to the imperative workflow (It stays the default for backwards compatibility)
+* Use plainer language in README
+* Explicitly define provided bindings and contracts for `polyglot/paths`
+* Move package-relative runtime path
+* Add tests that build functional and imperative projects
+* Add more shared procedures to CLI handlers
+* Refactor for readability
+
 ## [0.8] - 2019-10-02
+* Expose and document `polyglot/txexpr`
+* Rename `expand-forest` to `interlace-txexprs`
+* Use `error-display-handler` correctly so that its output appears in logs.
+
 ## [0.7] - 2019-09-30
+* Support exception logging
+* Fix critical bug where Markdown files formed circular dependencies.
+* Document `-b`/`--by-module` as part of the default workflow.
+
 ## [0.6] - 2019-09-29
+* Support `-b`/`--by-module` CLI option to allow use of new Polyglot class.
+
 ## [0.5] - 2019-09-29
+* Support replacing one element with many using `data-macro`.
+
 ## [0.4] - 2019-09-29
+* Add contract to `run-txexpr!` and allow more flexible applications of it.
+* Add `polyglot-temp-directory`
+
 ## [0.3] - 2019-09-27
+* Add `preprocess-txexprs` to default workflow
+* Add support for `data-macro`
+* Minor typos and test fixes
+
 ## [0.2] - 2019-09-20
+* Use multi-page Scribble documentation
+* Support `application/racket` as app element media type.
+* Introduce custom workflows
+* Fix tests and contracts
 
 ## [0.1] - 2019-09-19
 * Add support for Racket module dependencies for advancing assets
@@ -77,3 +154,5 @@ Each version is in the format `major.minor`, and conforms to the following rules
 [0.2]: https://github.com/zyrolasting/polyglot/compare/v0.1...v0.2
 [0.1]: https://github.com/zyrolasting/polyglot/compare/v0.0...v1.1
 [0.0]: https://github.com/zyrolasting/polyglot/releases/tag/v0.0
+
+[jash]: https://gist.github.com/jashkenas/cbd2b088e20279ae2c8e
