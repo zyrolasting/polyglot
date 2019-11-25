@@ -140,7 +140,7 @@
 
     (define/public (asset-path? path)
       (parameterize ([polyglot-project-directory directory])
-        (string-prefix? (path->string (path->complete-path path))
+        (string-prefix? (path->string (path->complete-path (simplify-path path)))
                         (path->string (assets-rel)))))
 
     (define/public (get-workflow-class [fail-thunk (λ _ (error 'polyglot
