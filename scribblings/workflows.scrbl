@@ -186,6 +186,11 @@ paths relative to your assets directory} (See @racket[assets-rel]).
 So if there is a link to @tt{contact.md} somewhere on your page,
 a built-in workflow will try to process that file from @racket[(assets-rel "contact.md")].
 
+For each dependency, @tt{polyglot} selects the workflow needed to
+process the asset. In simple cases, you are only using one workflow
+and that workflow will process the asset. For advanced cases, see
+@secref{multiple-workflows}.
+
 The base workflow supports dependency discovery in tagged
 X-expressions and CSS files. Discovery occurs after some processing in
 a handful of known asset types, as detailed below. Custom workflows

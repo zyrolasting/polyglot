@@ -77,7 +77,7 @@
                                                   (listof string?))]
                        [apply-manifest (->* (txexpr?
                                              dict?)
-                                            ((-> string? string?))
+                                            ((-> path-string? string?))
                                             txexpr?)]))
 
 (define (genid tx)

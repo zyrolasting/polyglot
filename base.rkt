@@ -7,10 +7,11 @@
           [make-minimal-html-page (-> (listof txexpr-element?)
                                       txexpr?)]))
 
-        
+
 (require racket/class
          racket/dict
          racket/file
+         racket/list
          racket/path
          racket/rerequire
          racket/sequence
@@ -42,23 +43,40 @@
   (dynamic-rerequire clear)
   (dynamic-require clear 'write-dist-file))
 
+
 ; Translate resolved dependencies and prior X-expression to fulfilled document
 (define (resolve-dependencies txexpr/expanded unclear-deps clear compiler)
   (define path (dist-rel (path-replace-extension (basename clear) #".html")))
-  (define manifest (create-manifest unclear-deps compiler))
+  (define-values (literal-refs non-literal-refs)
+    (partition (λ (s) (equal? (path-get-extension s) #".literal"))
+               unclear-deps))
 
-  ; Accounts for the fact we do not mark .md files as dependencies of one another.
-  (define manifest/patched
-    (for/fold ([modified #hash()])
-              ([(k v) (in-dict manifest)])
-      (dict-set modified k
-                (if (string-suffix? k ".md")
-                    (dist-rel (regexp-replace #rx"\\.md$" k ".html"))
-                    v))))
+  (printf "LITERALS: ~e~n" literal-refs)
+  (printf "NONLITS: ~e~n" non-literal-refs)
 
-  (define txexpr/final (apply-manifest txexpr/expanded
-                                       manifest/patched
-                                       rewrite))
+  (define manifest (create-manifest non-literal-refs compiler))
+  (define num-dist-path-elements (length (explode-path (dist-rel))))
+
+  (define txexpr/literals-replaced
+    (apply-manifest txexpr/expanded
+                    (make-immutable-hash (map (λ (x) (cons x x))
+                                              literal-refs))
+                    (λ (path) (path->string (path-replace-extension path #"")))))
+
+  (define txexpr/final
+    (apply-manifest txexpr/literals-replaced
+                    manifest
+                    (λ (manifest-path)
+                      ; Accounts for the fact we do not mark .md files as dependencies of one another.
+                      (define md-corrected
+                        (if (equal? (path-get-extension manifest-path) #".md")
+                            (path-replace-extension manifest-path #".html")
+                            manifest-path))
+                      (define exploded (explode-path md-corrected))
+                      (define without-prefix (drop exploded num-dist-path-elements))
+                      (if (empty? without-prefix)
+                          "/"
+                          (path->string (apply build-path without-prefix))))))
 
   (with-output-to-file path #:exists 'replace
     (λ ()
@@ -109,14 +127,14 @@
     (copy-file src dst))
   dst)
 
-(define (strip-extension clear compiler)
-  (path-replace-extension clear #""))
+(define (preserve-path clear compiler)
+  clear)
 
 (define polyglot/base%
   (class* unlike-compiler% () (super-new)
     (define/override (delegate path)
       (case (path-get-extension path)
-        [(#".literal") strip-extension]
+        [(#".literal") preserve-path]
         [(#".css") process-css]
         [(#".rkt") delegate-to-asset-module]
         [else copy-hashed]))

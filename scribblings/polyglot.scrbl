@@ -22,6 +22,7 @@ and @racketmodname[polyglot/functional].
 @include-section["workflows.scrbl"]
 @include-section["default-workflow.scrbl"]
 @include-section["functional-workflow.scrbl"]
+@include-section["multiple-workflows.scrbl"]
 @include-section["txexpr.scrbl"]
 @include-section["projects.scrbl"]
 @include-section["builds.scrbl"]
