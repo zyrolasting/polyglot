@@ -148,9 +148,10 @@
                                                                polyglot-rcfile-name))]
                                        #:live? [live? #f])
       (define rcfile (build-path directory polyglot-rcfile-name))
-      (when live? (dynamic-rerequire rcfile))
       (if (file-exists? rcfile)
-          (dynamic-require rcfile 'polyglot+% fail-thunk)
+          (begin
+            (when live? (dynamic-rerequire rcfile))
+            (dynamic-require rcfile 'polyglot+% fail-thunk))
           (fail-thunk)))
 
     (define/public (ensure-empty-distribution!)
