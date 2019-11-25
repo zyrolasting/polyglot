@@ -1,9 +1,9 @@
 #lang racket/base
 
 (provide start)
-(require racket/cmdline
+(require racket/class
+         racket/cmdline
          "../../main.rkt"
-         "../fs.rkt"
          "./shared.rkt")
 
 (define (start)
@@ -15,4 +15,4 @@
     "Set up project to use the functional workflow"
     (skel "functional")]
    #:args (dir)
-    (copy-skeleton (skel) dir)))
+    (get-field directory (copy-polyglot-skeleton-project! (skel) dir))))
