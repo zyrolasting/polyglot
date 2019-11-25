@@ -179,7 +179,7 @@ To guarentee full replacement of elements, use @racket[substitute-many-in-txexpr
                          [rewrite (-> string? string?) (lambda ...)])
 			 txexpr?]{
 Returns a new @racket[txexpr] such that each @racket[href] and @racket[src]
-attribute value that appears as a key @tt[K] in @racket[manifest] is replaced
+attribute value that appears as a key @tt{K} in @racket[manifest] is replaced
 with @racket[(rewrite (dict-ref manifest K))]. By default, @racket[rewrite]
 returns only the @racket[name] value returned from @racket[split-path].
 
