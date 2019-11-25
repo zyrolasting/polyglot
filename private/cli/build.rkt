@@ -1,16 +1,10 @@
 #lang racket/base
 
 (provide build)
-(require
-  racket/cmdline
-  racket/file
-  racket/class
-  unlike-assets/logging
-  unlike-assets
-  "../../main.rkt"
-  "../../paths.rkt"
-  "../fs.rkt"
-  "shared.rkt")
+(require racket/cmdline
+         "../../main.rkt"
+         "../fs.rkt"
+         "shared.rkt")
 
 (define (build)
   (command-line
@@ -18,8 +12,6 @@
     #:args (path)
     (report+summary
      (λ _
-       (define-values (project compiler entry)
-         (init-by-user-path! path))
-       (send compiler add! entry)
+       (define-values (directory project build!) (init-from-user-path path))
        (with-handlers ([exn:fail? log-exn])
-         (send compiler compile!))))))
+         (build!))))))

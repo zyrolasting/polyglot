@@ -31,30 +31,29 @@
 
   (exit (if (> nerrors 0) 1 0)))
 
-
 (define (make-compiler project)
-  (new (or (polyglot-class/cli-asserted)
-           (send project
-                 get-workflow-class
-                 (λ _ polyglot/imperative%)
-                 #:live? #t))))
+  (make-polyglot-workflow-object project
+                                 #:live? #t
+                                 #:force-workflow (polyglot-class/cli-asserted)
+                                 #:fallback-workflow polyglot/imperative%))
 
-(define (get-entry-asset project compiler path)
+(define (get-entry-asset project path)
   (if (send project asset-path? path)
-      path
-      (send compiler clarify "index.md")))
+      (path->string (simplify-path path))
+      "index.md"))
 
-(define (init-by-user-path! path)
+(define (init-from-user-path path)
   (define normalized (path->complete-path (resolve-path path)))
   (define project (find-closest-project normalized))
+  (define directory (get-field directory project))
   (unless project
     (displayln (format "Cannot find project from path:~n  path: ~a" path)
                (current-error-port))
     (exit 1))
 
-  (polyglot-project-directory (get-field directory project))
-  (send project ensure-empty-distribution!)
-  (define compiler (make-compiler project))
-  (values project
-          compiler
-          (get-entry-asset project compiler normalized)))
+  (values
+   directory
+   project
+   (make-polyglot-builder
+    directory
+    #:entry-assets (list (get-entry-asset project normalized)))))

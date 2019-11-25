@@ -24,8 +24,7 @@
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
     #:args (path)
-    (define-values (project compiler entry)
-      (init-by-user-path! path))
+    (define-values (directory project build!) (init-from-user-path path))
 
     (define (changed? activity)
       (equal? (second activity) 'change))
@@ -34,9 +33,7 @@
       (equal? (second activity) 'removed))
 
     (define (filter-activity pred activity-log)
-      (filter
-       (λ (ref) (send compiler has? ref))
-       (map third (filter pred activity-log))))
+      (map third (filter pred activity-log)))
 
     (define (get-changed activity-log)
       (filter-activity changed? activity-log))
@@ -44,18 +41,19 @@
     (define (get-removed activity-log)
       (filter-activity removed? activity-log))
 
-    (define (build changed removed)
+    (define (build-with-report changed removed)
       (with-report/counts
         (λ _ (with-handlers ([exn:fail? log-exn])
-               (send compiler compile!
-                     #:changed changed
-                     #:removed removed)))))
+               (build!
+                #:changed changed
+                #:removed removed)))))
 
     (define (on-break e)
       (displayln "Shutting down"))
 
-    (send compiler add! entry)
-    (build null null)
+    (polyglot-project-directory directory)
+    (send project ensure-empty-distribution!)
+    (build-with-report null null)
 
     (define watcher (robust-watch (assets-rel)))
     (define (aggregate-changes evt-maker)
@@ -76,7 +74,7 @@
         (define changed (get-changed activity-log))
         (define removed (get-removed activity-log))
         (when (> (+ (length changed) (length removed)) 0)
-          (build changed removed))
+          (build-with-report changed removed))
         (loop)))))
 
     (with-handlers ([exn:break? (λ _
