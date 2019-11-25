@@ -2,21 +2,21 @@
 
 @title{Why @italic{Another} Web Development... Thing?!}
 
-I designed Polyglot after many years of switching platforms,
-frameworks, or libraries to develop websites. Each switch made me
-re-learn basic things, all the way back to writing a web page. I can't
-make a new tool without being a part of that problem, so why should
-you use anything I make in an already saturated space?
+I designed Polyglot to address my own common pains after many years of
+switching platforms, frameworks, or libraries to develop websites. Each switch
+often made me learn the next trendy rephrasal of basic concepts and tasks. I
+can't make a new tool without being a part of that problem, so why should you
+use anything I make in an already saturated space?
 
-For one thing, if you want to change how you work on a website when
-neck deep with Polyglot, you can do so without rewriting all of your
-code. You can also use any @litchar{#lang} you want to express content
-for in-place expansion of a web page. In Racket you get one
-@litchar{#lang} per source file to work against an assumed
-workflow. Polyglot multiplies this effect by letting you write entire
-Racket modules of any @litchar{#lang} @italic{within} one source file,
-among prose. How those languages expand as content in a page is up to
-your workflow.
+For one thing, you control the subjective parts that are normally decided for
+you. if you want to change how you work on a website when neck deep with
+Polyglot, you can do so without rewriting all of your code. To enable this
+flexibility, you can use any @litchar{#lang} you want to express content for
+in-place expansion of a web page. In Racket you get one @litchar{#lang} per
+source file to work against an assumed workflow. Polyglot multiplies this
+effect by letting you write entire Racket modules of any @litchar{#lang}
+@italic{within} one source file, among prose. How those languages expand as
+content in a page is up to your workflow.
 
 Polyglot is not for everybody. It gives you freedom, which means more
 work. It won't give you staple featues you think every website should
