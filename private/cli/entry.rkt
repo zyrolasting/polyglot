@@ -52,8 +52,9 @@
   (define args (current-command-line-arguments))
   (vector-drop args (+ 1 (vector-member action args))))
 
-(void
-  (command-line
+(module+ main
+  (void
+   (command-line
     #:program (short-program+command-name)
     #:once-each
     [("-v" "--verbose")
@@ -66,4 +67,4 @@
      (polyglot-class/cli-asserted (dynamic-require module-path 'polyglot+%))]
     #:args (action . _)
     (parameterize ([current-command-line-arguments (get-subcommand-args action)])
-      ((hash-ref action-table action (λ _ show-subcommands))))))
+      ((hash-ref action-table action (λ _ show-subcommands)))))))

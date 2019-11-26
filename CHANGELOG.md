@@ -20,6 +20,9 @@ with this project, you should use the latest version.
 
 Nothing yet.
 
+## [1.10] - 2019-11-26
+* Fix non-empty stderr for `entry.rkt` tests
+
 ## [1.9] - 2019-11-25
 * Document use of multiple workflows
 * Add `rewrite` formal to `apply-manifest`
@@ -134,7 +137,8 @@ Nothing yet.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v1.9...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v1.10...HEAD
+[1.10]: https://github.com/zyrolasting/polyglot/compare/v1.9...v1.10
 [1.9]: https://github.com/zyrolasting/polyglot/compare/v1.8...v1.9
 [1.8]: https://github.com/zyrolasting/polyglot/compare/v1.7...v1.8
 [1.7]: https://github.com/zyrolasting/polyglot/compare/v1.6...v1.7
