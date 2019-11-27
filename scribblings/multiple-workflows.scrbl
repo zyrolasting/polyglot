@@ -104,7 +104,7 @@ racket
 (provide polyglot+%)
 
 (define polyglot+%
-  (class polyglot% (super-new)
+  (class polyglot/functional% (super-new)
     (define design-path (assets-rel "design"))
     (define legacy-path (assets-rel "legacy"))
     (define build-legacy! (make-polyglot-builder legacy-path))

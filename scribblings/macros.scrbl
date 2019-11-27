@@ -112,14 +112,14 @@ a default identifier to seek if none is specified.
 
 If you don't want to use @tt{data-macro}, you'll need your own matching procedure.
 
-Subclass @racket[polyglot%] and override
+Subclass @racket[polyglot/imperative%] and override
 @method[polyglot/imperative% preprocess-txexprs].
 
 @racketblock[
 (require polyglot txexpr)
 
 (define polyglot+preprocessor%
-  (class* polyglot% ()
+  (class* polyglot/imperative% ()
     (super-new)
     (define/override (preprocess-txexprs txexprs)
       (for/list ([tx (in-list txexprs)])
