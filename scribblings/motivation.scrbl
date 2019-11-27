@@ -18,11 +18,11 @@ effect by letting you write entire Racket modules of any @litchar{#lang}
 @italic{within} one source file, among prose. How those languages expand as
 content in a page is up to your workflow.
 
-Polyglot is not for everybody. It gives you freedom, which means more
+Polyglot is not for everybody. It gives you freedom, which means
 work. It won't give you staple featues you think every website should
 have. Its core job is to give you flexibility and
 backwards-compatibility when you inevitably end up with code that you
-for some reason wish would like to leave behind.
+want to use, yet leave behind.
 
 Naturally I want you to use Polyglot, but I prefer you use what fits
 the job. So unless you identify with everything I said up until now,
