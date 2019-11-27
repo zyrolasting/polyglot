@@ -30,11 +30,12 @@
       (string-replace css
                       (car rx-match)
                       (format "url('~a')"
-                              (send compiler
-                                    lookup
-                                    (send compiler
-                                          clarify
-                                          (cadr rx-match)))))))
+                              (make-dist-path-string
+                               (send compiler
+                                     lookup
+                                     (send compiler
+                                           clarify
+                                           (cadr rx-match))))))))
   (define dst
     (call-with-input-string
       css-text

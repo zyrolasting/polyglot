@@ -47,3 +47,13 @@ relative to a different directory:
 @item{@racket[system-temp-rel] is relative to @racket[(polyglot-temp-directory)]. Polyglot uses this to prepare temporary files according to @secref{rackdown}}
 ]
 }
+
+@defproc[(make-dist-path-string [base complete-path?] [relative-to complete-path? (dist-rel)]) path-string?]{
+Given two complete paths, returns a relative path string that can be
+used in HTML, CSS, etc. to request an asset relative to the code's
+enclosing file.
+
+Behaves like @racket[find-relative-path], except if the simple forms
+of @racket[base] and @racket[relative-to] are equal, this will return
+@racket["/"] (meaning "webroot").
+}
