@@ -1,5 +1,6 @@
 #lang scribble/manual
 @require[@for-label[polyglot
+                    @only-in[markdown parse-markdown]
                     racket/base
                     racket/contract]
          polyglot]

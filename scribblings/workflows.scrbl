@@ -1,5 +1,9 @@
 #lang scribble/manual
-@require[@for-label[polyglot unlike-assets racket/base racket/class]]
+@require[@for-label[polyglot
+                    unlike-assets
+                    @only-in[markdown parse-markdown]
+                    racket/base
+                    racket/class]]
 
 @title[#:tag "base-workflow"]{The Base Workflow}
 @defmodule[polyglot/base]
