@@ -41,9 +41,8 @@ eating up bytes and your precious writing time.
 </script>
 }
 
-To get around this, @racket[polyglot] can
-match and replace elements before processing
-script elements.
+To get around this, the imperative workflow can match and replace
+elements before processing script elements.
 
 @section{Replace elements using @tt{data-macro}}
 
@@ -63,7 +62,7 @@ with a @tt{data-macro} attribute.
 @item{@tt{meta} is a void element, so you don't have to type a closing tag.}]}
 
 I use a @tt{<meta itemprop>} pattern here, but the element does not matter.
-@racket[polyglot] responds by trying to load the module at
+The imperative workflow responds by trying to load the module at
 @racket[(assets-rel "set-layout.rkt")] and running a provided
 @racket[replace-element] procedure. We'll assume this implementation
 is handy.
@@ -135,10 +134,10 @@ Subclass @racket[polyglot/imperative%] and override
         new-content))))
 ]
 
-This makes @racket[polyglot] replace all application elements
+This makes the imperative workflow replace all application elements
 with new application elements under a prescribed limited
 language. This can be help with untrusted code.
 
-If you want to specialize @racket[polyglot]'s preprocessing
+If you want to specialize the imperative workflow's preprocessing
 and still leverage @tt{data-macro}, call @racket[(super preprocess-txexprs txexprs)]
 in your overriding method.
