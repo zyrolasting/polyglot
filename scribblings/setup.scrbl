@@ -136,8 +136,7 @@ publish your website.
 @item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 2.}]
 
 @bold{If you want to ensure no broken links, then do not ever use
-@racket[--delete-diff]. You'll only want to use that option if the
+@racket[--delete-diff]}. You'll only want to use that option if the
 space savings and hygiene are actually worth it, and if
 @italic{everything} in the bucket that you need for your website is
 produced by a Polyglot build.
-}
