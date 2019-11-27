@@ -25,7 +25,7 @@ backwards-compatibility when you inevitably end up with code that you
 for some reason wish would like to leave behind.
 
 Naturally I want you to use Polyglot, but I prefer you use what fits
-the job. So unless you identify everything I said up until now, then
-you might prefer another tool. If you want something that protects
-what you already made while keeping you ready to prototype anything
-new, then consider trying Polyglot.
+the job. So unless you identify with everything I said up until now,
+then you might prefer another tool. If you want something that
+protects what you already made while keeping you ready to prototype
+anything new, then consider trying Polyglot.
