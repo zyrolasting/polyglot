@@ -14,7 +14,7 @@ to projects, and manage workflows for a custom build process.
 
 @defclass[polyglot-project% object% (equal<%>)]{
 @defconstructor[([directory useable-polyglot-directory?])]{
-This class encapsulates file I/O and validation for @tt{polyglot}
+This class encapsulates file I/O and validation for Polyglot
 projects within a directory.
 
 Two instances are @racket[equal?] if their @racket[directory] fields are @racket[equal?].

@@ -42,7 +42,7 @@ It's not fun awkwardly squeezing in a @tt{<script>} or custom element
 in an otherwise concise notation.
 
 @section{(Sloppily) Merging Distributions}
-Let's create two @tt{polyglot} projects in a directory.
+Let's create two Polyglot projects in a directory.
 One follows @secref{default-workflow}, one follows @secref{functional-workflow}.
 
 @verbatim[#:indent 4]|{

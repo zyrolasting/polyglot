@@ -86,7 +86,7 @@ This produces:
 }|
 
 If multiple application elements in a page each provide a layout,
-@racket[polyglot] will use the last layout specified.
+the imperative workflow will use the last layout specified.
 
 @subsection[#:tag "gen-app-elements"]{Generating Imperative App Elements}
 The imperative workflow will continue processing content until no

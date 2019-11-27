@@ -5,10 +5,11 @@
 @author{Sage Gerard}
 @defmodule[polyglot]
 
-@racketmodname[polyglot] evaluates Racket modules within Markdown,
-or @seclink["top" #:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"]
-to build production-ready websites. Websites built with @racketmodname[polyglot] get
-cache-busting, Webpack-like dependency handling, and an S3 upload tool for free.
+Polyglot evaluates Racket modules within Markdown, or @seclink["top"
+#:doc '(lib "txexpr/scribblings/txexpr.scrbl") "tagged X-expressions"]
+to build production-ready websites. Websites built with Polyglot get
+cache-busting, Webpack-like dependency handling, and an S3 upload tool
+for free.
 
 The @racketmodname[polyglot] module includes bindings from
 @racketmodname[polyglot/builds], @racketmodname[polyglot/paths],
@@ -28,7 +29,7 @@ and @racketmodname[polyglot/functional].
 @include-section["builds.scrbl"]
 
 @section{License and contributions}
-@racket[polyglot] uses the MIT license. @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "Here's the source code."]
+Polyglot uses the MIT license. @hyperlink["https://github.com/zyrolasting/polyglot/blob/master/README.md" "Here's the source code."]
 
 I always welcome contributions and feedback. If for any reason there is a
 problem with the name or license, reach out to me and the matter will be

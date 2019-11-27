@@ -5,7 +5,7 @@
 
 @title[#:tag "setup"]{Setup and Usage}
 
-@tt{polyglot} requires symbolic links to function (See
+Polyglot requires symbolic links to function (See
 @racket[make-file-or-directory-link]). To confirm that everything
 works, install the package and run the @tt{demo} command.
 
@@ -22,11 +22,11 @@ a @italic{distribution} built from the
 "README in the source code"].
 
 @section{Pick A Workflow}
-On its own, @tt{polyglot} has no idea what to do with any file you
+On its own, Polyglot has no idea what to do with any file you
 give it. It needs a @defterm{workflow} to define how to process
 content.
 
-@tt{polyglot} offers two built-in workflows that extend @secref{base-workflow}.
+Polyglot offers two built-in workflows that extend @secref{base-workflow}.
 
 @itemlist[
 @item{@secref{default-workflow}: Offers a PHP-like development experience where
@@ -92,9 +92,9 @@ your chosen workflow.
 @item{@racket[polyglot/imperative%] implements @secref{default-workflow}.}
 @item{@racket[polyglot/functional%] implements @secref{functional-workflow}.}]
 
-When you run commands targeting a project, @racketmodname[polyglot] will look
+When you run commands targeting a project, Polyglot will look
 for @tt{.polyglotrc.rkt} and use the provided class to process content. If you
-do not have a config file at all, @racketmodname[polyglot] will try processing
+do not have a config file at all, Polyglot will try processing
 your content using @secref{default-workflow}.
 
 If you want to provide your own workflow, you can always @racket[provide] a
@@ -109,7 +109,7 @@ $ polyglot -b /etc/polyglot.d/team-config.rkt build my-website
 
 
 @section{Publish to S3}
-@racketmodname[polyglot] can push content to S3.
+@tt{polyglot publish} can push content to S3.
 
 @verbatim[#:indent 2]|{
 $ polyglot publish my-website my-bucket us-east-2
@@ -123,7 +123,7 @@ publish your website.
 @subsection{Assumptions}
 @itemlist[
 @item{The bucket is configured for static web hosting.}
-@item{The bucket will contain only what @racket[polyglot] built.}
+@item{The bucket will contain only what Polyglot built.}
 @item{HTML files should never be cached.}
 @item{All other files should be cached forever.}
 ]
@@ -137,8 +137,8 @@ publish your website.
 @item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 2.}]
 
 Why delete anything? Because if you want to save space, you'll notice
-that @racket[polyglot] will not emit any file unless it was marked as
-a dependency. If S3 holds a file that @racket[polyglot] did not emit,
+that Polyglot will not emit any file unless it was marked as
+a dependency. If S3 holds a file that Polyglot did not emit,
 it's either an old version of a file or it was never a
 dependency. Your own pages won't have broken links internally, but
 changing the name of a Markdown file or removing an existing HTML file

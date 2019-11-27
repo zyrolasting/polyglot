@@ -13,30 +13,31 @@ by both @secref{default-workflow} and @secref{functional-workflow}.
 
 @section[#:tag "rackdown"]{Mixed-mode Racket}
 
-All workflows shipped with @racketmodname[polyglot] target HTML @tt{<script>}
-elements within Markdown files. There are @defterm{library ("lib") elements}
-and @defterm{application ("app") elements}. These elements are processed in that
-order, but we will cover application elements in depth first.
+All workflows shipped with Polyglot target HTML @tt{<script>} elements
+within Markdown files. There are @defterm{library ("lib") elements}
+and @defterm{application ("app") elements}. These elements are
+processed in that order, but we will cover application elements in
+depth first.
 
 Each app or lib element holds the source code for a Racket module as CDATA,
 including the @tt{#lang} line. The @tt{src} attribute on these @tt{<script>}
 elements are ignored, because they contribute complexity without added benefit in
-the context of @racketmodname[polyglot]. The @tt{src} attributes on all other script
+the context of Polyglot. The @tt{src} attributes on all other script
 elements work according to a given workflow.
 
 @subsection{Relationship to the File-system}
-@tt{<script id="foo" ...>} causes @racketmodname[polyglot] to write the CDATA
+@tt{<script id="foo" ...>} causes Polyglot to write the CDATA
 of that script element to @tt{<tmp>/foo.rkt}, where @tt{<tmp>} is a temporary
 directory created inside @racket[(system-temp-rel)]. If you do not specify a
-value for an @tt{id} attribute, @racketmodname[polyglot] will generate one for
+value for an @tt{id} attribute, Polyglot will generate one for
 you.
 
 @margin-note{On Windows, your account might not have permission to create
-links. Either run @racket[polyglot] as an Administrator, or (better yet) get
+links. Either run @tt{polyglot} commands as an Administrator, or (better yet) get
 permission to create links.}
 Since the Racket modules exist in the same
 directory when processed together, they can @racket[require] each
-other. @racketmodname[polyglot] also leaves a symlink named @tt{project}
+other. Polyglot also leaves a symlink named @tt{project}
 pointing to your project directory so that multiple pages can share code and
 data. Be careful to include any Racket-level dependencies in @tt{info.rkt} or a
 setup script.
@@ -51,15 +52,14 @@ Examples in this documentation will use Markdown.
 Clearly out of a fit of inspiration and unrestrained genius, we'll call the
 mix of Racket and Markdown @defterm{Rackdown}. To be clear, Rackdown isn't special
 and does not presume on a particular workflow. Any Markdown parser can parse pages
-written for @racketmodname[polyglot].
+written for Polyglot.
 
 @subsection{Application Elements}
 @margin-note{@racket["application/rackdown"] is also accepted for backwards compatibility.}
 
 @defterm{Application elements} are HTML script elements of media type
-@racket["application/racket"]. @racket[polyglot] will evaluate app
-elements in the order they are encountered. How app elements work
-depends on the workflow you use.
+@racket["application/racket"]. How app elements work depends on the
+workflow you use.
 
 Here's an example from @secref{default-workflow}. In this workflow, app
 elements @racket[write] tagged X-expressions to replace the surrounding
@@ -186,7 +186,7 @@ paths relative to your assets directory} (See @racket[assets-rel]).
 So if there is a link to @tt{contact.md} somewhere on your page,
 a built-in workflow will try to process that file from @racket[(assets-rel "contact.md")].
 
-For each dependency, @tt{polyglot} selects the workflow needed to
+For each dependency, Polyglot selects the workflow needed to
 process the asset. In simple cases, you are only using one workflow
 and that workflow will process the asset. For advanced cases, see
 @secref{multiple-workflows}.
@@ -198,7 +198,7 @@ must implement their own discovery phase when supporting new assets,
 or when changing how existing assets are processed.
 
 @subsection{Markdown Handling (@racket[".md"])}
-When you start building a website, @tt{polyglot} will look
+When you start building a website, Polyglot will look
 for an @tt{index.md} file in that website's assets by default.
 
 All Markdown files are parsed using @racket[parse-markdown].
@@ -355,7 +355,7 @@ models relationships between files that otherwise don't fit
 together. You can use it to make a PNG depend on an XML file, if you
 know a way to have that make sense. Knowing the basics of the
 @racketmodname[unlike-assets] collection can help you customize
-@racketmodname[polyglot] later.
+Polyglot later.
 
 The @method[unlike-compiler% compile!] method actually executes the
 given workflow and the underlying build. This method is synchronous,
@@ -393,7 +393,7 @@ Implements the rules shown in @secref{discovery-proc}.
 }
 
 @section{Addendum: Avoid Leaving XML in HTML5}
-@racketmodname[polyglot]'s Markdown parser happens to include
+Polyglot's Markdown parser happens to include
 XML elements embedded in your page for processing. As you learn
 more about your workflow, you'll find you can generate content in terms of
 those elements. This lets you write things like this:
