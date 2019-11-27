@@ -123,7 +123,6 @@ publish your website.
 @subsection{Assumptions}
 @itemlist[
 @item{The bucket is configured for static web hosting.}
-@item{The bucket will contain only what Polyglot built.}
 @item{HTML files should never be cached.}
 @item{All other files should be cached forever.}
 ]
@@ -136,12 +135,9 @@ publish your website.
 @item{Uploads the contents of the dist directory to the root of the bucket, overwriting any objects that already exist.}
 @item{If @racket[--delete-diff] is set on the command, delete from the bucket the objects marked in Step 2.}]
 
-Why delete anything? Because if you want to save space, you'll notice
-that Polyglot will not emit any file unless it was marked as
-a dependency. If S3 holds a file that Polyglot did not emit,
-it's either an old version of a file or it was never a
-dependency. Your own pages won't have broken links internally, but
-changing the name of a Markdown file or removing an existing HTML file
-will break external links unless you have a system set up to issue
-HTTP 301 codes. @bold{If you want to ensure no broken links, then do not
-ever use @racket[--delete-diff].}
+@bold{If you want to ensure no broken links, then do not ever use
+@racket[--delete-diff]. You'll only want to use that option if the
+space savings and hygiene are actually worth it, and if
+@italic{everything} in the bucket that you need for your website is
+produced by a Polyglot build.
+}
