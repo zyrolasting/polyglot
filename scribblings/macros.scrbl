@@ -41,7 +41,7 @@ eating up bytes and your precious writing time.
 </script>
 }
 
-To get around this, @racket[polyglot] can 
+To get around this, @racket[polyglot] can
 match and replace elements before processing
 script elements.
 
