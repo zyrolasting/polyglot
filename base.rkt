@@ -69,12 +69,7 @@
   (define txexpr/final
     (apply-manifest txexpr/literals-replaced
                     manifest
-                    (λ (manifest-path)
-                      (define exploded (explode-path manifest-path))
-                      (define without-prefix (drop exploded num-dist-path-elements))
-                      (if (empty? without-prefix)
-                          "/"
-                          (path->string (apply build-path without-prefix))))))
+                    make-dist-path-string))
 
   (with-output-to-file path #:exists 'replace
     (λ ()

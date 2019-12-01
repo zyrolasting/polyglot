@@ -2,6 +2,7 @@
 
 (require racket/contract
          racket/runtime-path
+         racket/path
          unlike-assets)
 
 (define path-el/c (and/c (or/c path-for-some-system?
@@ -17,7 +18,10 @@
           [assets-rel path-builder/c]
           [dist-rel path-builder/c]
           [polyglot-rel path-builder/c]
-          [system-temp-rel path-builder/c]))
+          [system-temp-rel path-builder/c]
+          [make-dist-path-string (->* (complete-path?)
+                                      (complete-path?)
+                                      path-string?)]))
 
 (define polyglot-project-directory (make-parameter (current-directory)))
 (define polyglot-temp-directory (make-parameter (find-system-path 'temp-dir)))
@@ -44,3 +48,22 @@
 (define dist-rel        (project-path-builder "dist"))
 (define polyglot-rel    (path-rel polyglot-runtime-path))
 (define system-temp-rel (temp-path-builder "."))
+
+(define (make-dist-path-string complete-path [relative-to (dist-rel)])
+  (define rel/simple (simple-form-path complete-path))
+  (define base/simple (simple-form-path relative-to))
+  (if (equal? base/simple rel/simple)
+      "/"
+      (path->string (find-relative-path base/simple rel/simple))))
+
+(module+ test
+  (require rackunit)
+  (test-case "make-dist-path-string"
+    (test-equal? "Produce relative paths as strings given two complete paths"
+                 (make-dist-path-string (current-directory)
+                                        (build-path (current-directory) "some/where.rkt"))
+                 "some/where.rkt")
+    (test-equal? "Return webroot path if paths are the same"
+                 (make-dist-path-string (current-directory)
+                                        (simplify-path (build-path (current-directory) 'same)))
+                 "/")))
