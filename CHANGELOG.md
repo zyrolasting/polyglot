@@ -20,6 +20,15 @@ with this project, you should use the latest version.
 
 Nothing yet.
 
+## [1.11] - 2019-12-02
+* Fix relative path writes in CSS `url()` expressions (#33, #34)
+* Add FUNDING.yml for GitHub Sponsors
+* Add `make-dist-path-string` to `polyglot/paths`
+* Documentation improvements
+    - Use the term "Polyglot" when referring to the project, and variants like `polyglot` only when it makes sense.
+    - Rephrase several paragraphs for clarity
+    - Fix broken links in code
+
 ## [1.10] - 2019-11-26
 * Fix non-empty stderr for `entry.rkt` tests
 
@@ -138,6 +147,7 @@ Nothing yet.
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
 [Unreleased]: https://github.com/zyrolasting/polyglot/compare/v1.10...HEAD
+[1.10]: https://github.com/zyrolasting/polyglot/compare/v1.10...v1.11
 [1.10]: https://github.com/zyrolasting/polyglot/compare/v1.9...v1.10
 [1.9]: https://github.com/zyrolasting/polyglot/compare/v1.8...v1.9
 [1.8]: https://github.com/zyrolasting/polyglot/compare/v1.7...v1.8
