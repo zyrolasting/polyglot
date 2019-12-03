@@ -7,16 +7,10 @@
                     polyglot
                     unlike-assets]]
 
-@title{Scripting Your Own Builds}
-
+@title{@tt{polyglot/builds}}
 @defmodule[polyglot/builds]
 
-You can run Polyglot builds once, or on an ongoing basis. You do not need to
-read this section to use Polyglot, but you will find
-@racketmodname[polyglot/builds] useful when applying
-@secref{multiple-workflows} or when writing your own build processes. You
-should know how @racketmodname[unlike-assets] works at a high level before
-using the below procedures.
+The following procedures apply @tech{workflows} to @tech{projects}.
 
 @defproc[(make-polyglot-workflow-object [project (is-a?/c polyglot-project%)]
                                         [#:live? live? boolean? #t]

@@ -1,16 +1,31 @@
 #lang scribble/manual
 
-@require[@for-label[racket/base
-                    racket/class
-                    racket/contract
+@require[@for-label[racket
                     racket/rerequire
-                    polyglot/projects]]
+                    polyglot
+                    unlike-assets]]
 
-@title{Managing Projects Programatically}
+@title{@tt{polyglot/projects}}
 @defmodule[polyglot/projects]
 
-Use this module to verify project structure, associate paths
-to projects, and manage workflows for a custom build process.
+@racketmodname[polyglot/projects] defines Polyglot project structure
+and common project-level operations.
+
+A @deftech{project} is defined as a directory in a file system that
+contains, at minimum, an @deftech{assets directory} named
+@tt{assets}. The directory containing the assets directory is called
+the @deftech{project directory}. When a project is constructed, a new
+@deftech{distribution directory} named @tt{dist} will appear in the
+project directory.
+
+A project directory may contain a @tt{.polyglotrc.rkt} runtime
+configuration file. If it exists, it must @racket[(provide
+polyglot+%)], where @racket[polyglot+%] is a workflow class like
+@racket[polyglot/functional%], @racket[polyglot/imperative%], or a
+subclass of @racket[polyglot/base%] or @racket[unlike-assets%] for
+lower-level workflows. If @tt{.polyglotrc.rkt} does not exist or fails
+to provide a workflow class, this module does not define how to
+respond.
 
 @defclass[polyglot-project% object% (equal<%>)]{
 @defconstructor[([directory useable-polyglot-directory?])]{
@@ -77,16 +92,16 @@ Assuming @racket[polyglot-project-directory] was set to @racket[directory],
 returns @racket[#t] if all of the following are true:
 
 @itemlist[
-@item{The project exists and is both readable and writeable.}
+@item{@racket[directory] exists and is both readable and writeable.}
 @item{The asset directory exists and is readable.}
-@item{The @tt{.polyglotrc.rkt} runtime configuration file exists and is readable.}
+@item{The @tt{.polyglotrc.rkt} does not exist, OR it does exist and is readable.}
 ]
 
-This method does not attempt to load or instantiate @tt{.polyglotrc.rkt}.
+This method does not attempt to load or instantiate @tt{.polyglotrc.rkt} if it exists.
 }
 
 @defproc[(find-closest-project [start directory-exists?]) (or/c (is-a?/c polyglot-project%) boolean?)]{
-Returns a project object for the first directory in (@racket[start],
-@racket[start/..], @tt{...} , @tt{<root>}) where @racket[useable?] is
+Returns a project object for the first directory in (@tt{start},
+@tt{start/..}, @tt{...} , @tt{<root>}) where @racket[useable?] is
 @racket[#t]. Returns @racket[#f] otherwise.
 }

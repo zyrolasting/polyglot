@@ -6,9 +6,9 @@
 
 @defmodule[polyglot]
 
-This collection provides tools to extract programs and DSLs contained
-within Tagged X-Expressions with the aim of building deeply-integrated
-websites.
+This collection configures @racketmodname[unlike-assets] to build
+deeply-integrated websites using programs embedded in Tagged
+X-Expressions.
 
 For a gentle introduction to Polyglot and its benefits, see
 @other-doc['(lib
@@ -25,3 +25,6 @@ The @racketmodname[polyglot] module includes bindings from
 and @racketmodname[polyglot/functional].
 
 @table-of-contents[]
+@include-section{projects-index.scrbl}
+@include-section{workflows.scrbl}
+@include-section{applying.scrbl}

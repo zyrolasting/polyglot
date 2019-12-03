@@ -2,17 +2,21 @@
 @require[@for-label[polyglot
                     @only-in[markdown parse-markdown]
                     racket/base
-                    racket/contract]
+                    racket/contract
+                    unlike-assets]
          polyglot]
 
-@title[#:tag "polyglot-txexpr"]{Tagged X-Expression Tools}
+@title{@tt{polyglot/txexpr}: Workflows from Scratch}
 @defmodule[polyglot/txexpr]
 
-This module includes all bindings from the @seclink["top" #:doc '(lib
-"txexpr/scribblings/txexpr.scrbl") "txexpr"] and @seclink["top" #:doc '(lib
-"xml/xml.scrbl") "xml"] modules, plus procedures you can use to build advanced
-workflows around tagged X-expressions. None of these procedures are dependent
-on any built-in workflow.
+This module provides all bindings from the @racketmodname[txexpr] and
+@racketmodname[xml] modules, plus the below.
+
+@racketmodname[polyglot/txexpr] offers workflow-independent tools to define
+where programs exist within annotated documents, and to create new documents
+according to how you process those programs. Combining this module with your
+own subclass of @racket[unlike-compiler%] allows you to write static site
+generators that evolve independently of built-in workflows.
 
 @section{Analysis}
 @defproc[(tx-search-tagged [tx txexpr?]

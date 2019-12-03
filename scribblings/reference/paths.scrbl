@@ -4,25 +4,21 @@
 		    racket/contract
                     racket/path]]
 
-@title{Where Things Are}
+@title{@tt{polyglot/paths}}
 @defmodule[polyglot/paths]
 
-As implied in @secref{setup}, Polyglot uses several paths.
-
-First and most importantly, there's the...
-
 @defthing[polyglot-project-directory (parameter/c (and/c complete-path? directory-exists?)) #:value (current-directory)]{
-This is where Polyglot will do its most important work.
+This sets the base directory in which Polyglot will read asset files
+and write distribution files. If you encounter incorrect file I/O
+activity, make sure this value is what you expect it to be.
 
-As shown in @secref{setup}, you can specify this using the command-line interface.
+You normally set this using @tt{polyglot} command lines.
 }
 
 @defthing[polyglot-temp-directory (parameter/c (and/c complete-path? directory-exists?)) #:value (find-system-path 'temp-rel)]{
-This is where Polyglot will store temporary Racket modules generated from your source code.
-
-This directory will experience frequent reads and writes during
-processing. To increase performance, set this to a directory using an
-in-memory filesystem like @tt{tempfs} (Assuming that
+Polyglot uses this directory to read and write files contained within
+your content. To increase performance, set this to a directory using
+an in-memory filesystem like @tt{tempfs} (Assuming that
 @racket[(find-system-path 'temp-rel)] is not already on an in-memory
 filesystem).
 }
@@ -44,7 +40,7 @@ relative to a different directory:
 @item{@racket[assets-rel] is relative to @racket[(project-rel "assets")]. This is where Polyglot will look for files you use to develop your website.}
 @item{@racket[dist-rel] is relative to @racket[(project-rel "dist")]. This is where Polyglot will write output files that can be published for end-users to consume.}
 @item{@racket[polyglot-rel] is relative to the Polyglot package's installation directory on your system. This should not be used for production, but you can use this to access private modules and experiment with self-hosting builds.}
-@item{@racket[system-temp-rel] is relative to @racket[(polyglot-temp-directory)]. Polyglot uses this to prepare temporary files according to @secref{rackdown}}
+@item{@racket[system-temp-rel] is relative to @racket[(polyglot-temp-directory)].}
 ]
 }
 
