@@ -55,7 +55,7 @@ Equivalent to
 }
 
 where @racket[keep] is a function that filters out any paths that are
-asset paths in @racket[project].
+not asset paths in @racket[project].
 
 @defproc[(make-polyglot-builder [project-directory useable-polyglot-directory?]
                                 [#:cycle-after cycle-after (or/c #f exact-positive-integer?) 100]
