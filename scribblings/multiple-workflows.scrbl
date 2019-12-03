@@ -63,7 +63,7 @@ functional project's distribution.
 
 @verbatim[#:indent 4]|{
 $ polyglot build old
-$ mv old/dist functional/dist/other
+$ mv old/dist new/dist/other
 }|
 
 This works, but don't do this in your own projects. If the old site decides to
