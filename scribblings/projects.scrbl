@@ -67,7 +67,7 @@ Returns the name of the project directory. Equivalent to:
                                           (is-a?/c polyglot-project%)]{
 Copies a polyglot project template by @racket[name] to @racket[destination],
 and returns a project object pointing to @racket[destination]. If
-@racket[force] is a true value, @racket[destination] is deleted in advance.
+@racket[force?] is a true value, @racket[destination] is deleted in advance.
 
 The @tt{polyglot start} command uses this procedure.
 }
