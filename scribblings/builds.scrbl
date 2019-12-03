@@ -51,8 +51,11 @@ Equivalent to
 (parameterize ([polyglot-project-directory (get-field directory project)])
   (unless (directory-exists? (dist-rel))
     (send project ensure-empty-distribution!))
-  (send compiler compile! #:changed changed #:remove removed))]
+  (send compiler compile! #:changed (keep changed) #:remove (keep removed)))]
 }
+
+where @racket[keep] is a function that filters out any paths that are
+asset paths in @racket[project].
 
 @defproc[(make-polyglot-builder [project-directory useable-polyglot-directory?]
                                 [#:cycle-after cycle-after (or/c #f exact-positive-integer?) 100]
@@ -76,9 +79,13 @@ you.
 @racketblock[
 (define project-directory (build-path (current-directory) "my-project"))
 (define build! (make-polyglot-builder project-directory #:entry-assets '("index.md")))
+
+(define (asset-paths . names)
+  (map (lambda (el) (build-path project-directory "assets" el)) names))
+
 (build!)
-(build! #:changed '("contact.md"))
-(build! #:removed '("junk.md") #:changed '("about.md"))
+(build! #:changed (asset-paths "contact.md"))
+(build! #:removed (asset-paths "junk.md") #:changed (asset-paths "about.md"))
 (code:comment "...")
 ]
 
@@ -91,13 +98,16 @@ procedures in @racketmodname[polyglot/projects] or
 in @racket[make-polyglot-workflow-object]. @racket[#:live?] is always set to
 @racket[#t] when using @racket[make-polyglot-builder].
 
-Whenever the builder procedure creates a workflow object @racket[W], it will
-stage each asset @racket[A] in @racket[entry-assets] for processing using
-@racket[(send W add! (send W clarify A))] (See @racket[unlike-compiler%]). By a
-default convention, @racket{index.md} is the @racket[unclear/c] name of the
-initial page of any Polyglot project. You will not be able to
-@method[unlike-compiler% add!] additional assets to the compiler except
-through the workflow implementation.
+@racket[#:changed] and @racket[#:removed] assets are @racket[clear/c]
+names for parity with @racket[build-polyglot-project!]. On the other
+hand, whenever the builder procedure creates a workflow object
+@racket[W], it will stage each @racket[unclear/c] asset name
+@racket[A] in @racket[entry-assets] for processing using @racket[(send
+W add! (send W clarify A))] (See @racket[unlike-compiler%]). By a
+default convention, @racket{index.md} is the @racket[unclear/c] name
+of the initial page of any Polyglot project. You will not be able to
+@method[unlike-compiler% add!] additional assets to the compiler
+except through the workflow implementation.
 
 If @racket[cycle-after] is a positive integer, then after every
 @racket[cycle-after] builds the compiler will be replaced with a fresh
