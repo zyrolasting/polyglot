@@ -3,7 +3,10 @@
 (define deps '("base" "file-watchers" "txexpr" "unlike-assets" "aws" "markdown"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib"))
 (define pkg-desc "An unlike compiler that generates static websites using a Markdown and any #lang")
-(define scribblings '(("scribblings/polyglot.scrbl" (multi-page))))
+(define scribblings '(("scribblings/guide/polyglot-guide.scrbl" (multi-page) (tools))
+                      ("scribblings/reference/polyglot-reference.scrbl" (multi-page) (library))
+                      ("scribblings/how-tos/polyglot-how-tos.scrbl" (multi-page) (omit-start))
+                      ("scribblings/tutorials/polyglot-tutorials.scrbl" (multi-page) (omit-start))))
 (define version "1.11")
 (define pkg-authors '(sage))
 (define raco-commands
