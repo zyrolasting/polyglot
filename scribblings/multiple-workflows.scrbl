@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@require[@for-label[racket/base racket/runtime-path polyglot]]
+@require[@for-label[racket/base racket/runtime-path polyglot unlike-assets]]
 
 @title[#:tag "multiple-workflows"]{Multiple Workflows}
 Even if a workflow does some things well, you will eventually tire of
