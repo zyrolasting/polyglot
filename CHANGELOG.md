@@ -21,6 +21,7 @@ with this project, you should use the latest version.
 
 ## [2.0] - 2019-12-04
 * Rewrite documentation into guide, reference, how-tos, and tutorials.
+* Fix a unit test
 
 ## [1.11] - 2019-12-02
 * Fix relative path writes in CSS `url()` expressions (#33, #34)
