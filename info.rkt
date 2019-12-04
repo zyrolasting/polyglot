@@ -7,7 +7,7 @@
                       ("scribblings/reference/polyglot-reference.scrbl" (multi-page) (library))
                       ("scribblings/how-tos/polyglot-how-tos.scrbl" (multi-page) (omit-start))
                       ("scribblings/tutorials/polyglot-tutorials.scrbl" (multi-page) (omit-start))))
-(define version "1.11")
+(define version "2.0")
 (define pkg-authors '(sage))
 (define raco-commands
   '(("polyglot" (submod polyglot/private/cli/entry main) "polyglot CLI" #f)))

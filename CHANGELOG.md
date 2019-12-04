@@ -17,8 +17,10 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
+* Nothing yet.
 
-* Split documentation into guide, reference, how-tos, and tutorials.
+## [2.0] - 2019-12-04
+* Rewrite documentation into guide, reference, how-tos, and tutorials.
 
 ## [1.11] - 2019-12-02
 * Fix relative path writes in CSS `url()` expressions (#33, #34)
@@ -146,7 +148,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v1.10...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.0...HEAD
+[2.0]: https://github.com/zyrolasting/polyglot/compare/v1.11...v2.0
 [1.11]: https://github.com/zyrolasting/polyglot/compare/v1.10...v1.11
 [1.10]: https://github.com/zyrolasting/polyglot/compare/v1.9...v1.10
 [1.9]: https://github.com/zyrolasting/polyglot/compare/v1.8...v1.9
