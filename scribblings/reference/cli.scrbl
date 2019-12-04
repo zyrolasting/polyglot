@@ -3,8 +3,9 @@
 
 @title{@tt{polyglot} CLI}
 
-To simplify use, Polyglot comes with a CLI that acts as a front-end to
-the @racketmodname[polyglot] collection.
+To simplify use, Polyglot comes with a @tt{polyglot} CLI that acts as a
+front-end to the @racketmodname[polyglot] collection. You can also use @tt{raco
+polyglot} for backwards compatibility.
 
 The @tt{build}, @tt{demo} and @tt{develop} commands forward events
 from @racket[unlike-assets-logger] to STDOUT. The @tt{build} and
