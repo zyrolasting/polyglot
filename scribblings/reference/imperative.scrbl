@@ -47,7 +47,7 @@ builds (e.g. @racket[(dynamic-require (assets-rel "holiday.rkt") 'halloween)]).
 
 The @racket[dynamic-require] must return a @racket[(-> txexpr? (listof
 txexpr?))] procedure that transforms the original Tagged X-expression holding
-the @tt[data-macro] attribute to at least zero new elements.
+the @tt{data-macro} attribute to at least zero new elements.
 }
 }
 
