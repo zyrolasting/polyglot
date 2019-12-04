@@ -34,6 +34,20 @@ the instance uses @racket[run-txexpr/imperative!].
 
 Use this to sanitize untrusted code, generate application elements based on content,
 or attach common metadata to documents.
+
+The default implementation searches @racket[tx-expressions] for elements with a
+@tt{data-macro} attribute. If the attribute exists, it must be a string of at
+most two words (e.g. @racket["holiday"] or @racket["holiday halloween"]).  If a
+second word is not specified, it is assumed to be @racket["replace-element"].
+
+The first word is converted to a path to a Racket module in the @tech{assets
+directory}, and the second word is converted to a symbol used to extract a
+provided identifier via @racket[dynamic-require], with reload support for live
+builds (e.g. @racket[(dynamic-require (assets-rel "holiday.rkt") 'halloween)]).
+
+The @racket[dynamic-require] must return a @racket[(-> txexpr? (listof
+txexpr?))] procedure that transforms the original Tagged X-expression holding
+the @tt[data-macro] attribute to at least zero new elements.
 }
 }
 
