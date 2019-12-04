@@ -28,3 +28,4 @@ and @racketmodname[polyglot/functional].
 @include-section{projects-index.scrbl}
 @include-section{workflows.scrbl}
 @include-section{applying.scrbl}
+@include-section{contributions.scrbl}
