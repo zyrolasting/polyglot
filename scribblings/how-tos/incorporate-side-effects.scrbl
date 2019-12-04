@@ -38,8 +38,7 @@ You can use the same trick above to capture and reformat content:
 @racketmod[#:file "<script type=\"application/racket\">...</script>"
 racket/base
 
-(require polyglot racket/port)
-(provide replace-page)
+(require racket/port)
 
 (define-values (i o) (make-pipe))
 (parameterize ([current-output-port o])
