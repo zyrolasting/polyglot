@@ -60,10 +60,10 @@
   (require rackunit)
   (test-case "make-dist-path-string"
     (test-equal? "Produce relative paths as strings given two complete paths"
-                 (make-dist-path-string (current-directory)
-                                        (build-path (current-directory) "some/where.rkt"))
+                 (make-dist-path-string (build-path "/blah" "some/where.rkt")
+                                        (build-path "/blah"))
                  "some/where.rkt")
     (test-equal? "Return webroot path if paths are the same"
-                 (make-dist-path-string (current-directory)
-                                        (simplify-path (build-path (current-directory) 'same)))
+                 (make-dist-path-string (build-path "/blah/")
+                                        (simplify-path (build-path "/blah/" 'same)))
                  "/")))
