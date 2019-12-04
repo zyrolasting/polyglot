@@ -80,7 +80,7 @@ representing the page in which you are working. The intended experience
 is that you can stop writing at any time and make an incision into your
 page with an application element.
 
-@subsection{Library Elements}
+@section{Library Elements}
 Library elements have media type @racket["text/racket"]. Library elements are saved
 to disk before application elements run. This lets you share code and data within
 the page. Unlike app elements, library elements can provide any identifiers they
