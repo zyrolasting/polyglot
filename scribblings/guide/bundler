@@ -1,0 +1,78 @@
+@subsection{Example: Bundling Assets}
+Optimal CSS and JavaScript can be difficult to deliver. Developers
+want to use both in a way that's convenient for them, and let a build
+system figure out how to optimize a soup of related files, CDATA, and
+remote references for end-users.
+
+For an example, here's an app element that prepends page-level CSS
+to a designated element. The developer's premise is that it makes sense
+to associate page styles with the page instead of editing a central
+CSS file.
+
+@racketmod[#:file "<script type=\"application/racket\">...</script>"
+racket/base
+
+(require polyglot
+         css-expr
+         "project/theme.rkt")
+(provide replace-page)
+
+(define page-styles
+  (css-expr->css
+   (css-expr
+    [.plan #:margin (0 auto)
+           #:background-color ,(palette 'dark)
+           #:color ,(palette 'light)])))
+
+(define (replace-page page-tx)
+  (tx-replace
+   page-tx
+   (λ (x) (and (txexpr? x)
+               (equal? (attr-ref x 'id #f)
+                       "style-pile")))
+   (λ (x) `(,(style
+              ,(get-attrs x)
+              ,(cons page-styles (get-elements x)))))))]
+
+On its own, this approach bloats the output HTML by
+including a @tt{<style>} element in the output.
+
+That might not be a problem initially, but its possible that other
+pages doing the same thing might grow too large to deliver the same
+way.
+
+We can also install a post-processor that writes the aggregated style
+rules to the distribution, and removes them from the output HTML.
+
+@racketmod[#:file ".polyglotrc.rkt"
+racket/base
+(provide polyglot+%)
+(require polyglot)
+
+(define polyglot+%
+  (class* polyglot/functional%
+    (define/override (preprocess-page page-tx)
+      (tx-replace-tagged page-tx
+                        'page
+                        (λ (x)
+                          `((script ((type "application/racket")
+                                     (id ,(genid page-tx)))
+                                    "#lang racket/base"
+                                    "(require \"project/layouts.rkt\")"
+                                    "(provide replace-page)"
+                                    "(define (replace-page x)"
+                                    ,(format "  (~a ~e x))"
+                                             (attr-ref x 'layout "one-column")
+                                             (attr-ref x 'title "Untitled")))))))
+
+    (define/override (postprocess-page page-tx)
+      (tx-replace page-tx
+                  (λ (x) (and (txexpr? x)
+                              (equal? (attr-ref x 'id)
+                                      "style-pile")))
+                  (λ (x)
+                    (display-to-file #:exists 'append
+                                     (string-join (get-elements x))
+                                     (dist-rel (string-append (number->string (current-seconds))
+                                                              ".css")))
+                    null)))))]

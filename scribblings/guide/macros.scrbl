@@ -58,15 +58,15 @@ with a @tt{data-macro} attribute.
 @margin-note{Why @tt{<meta itemprop>}?
 @itemlist[
 @item{HTML5 allows it in a @tt{<body>}}
-@item{It does not impact the appearance of a page when viewed by a human, but still adds meaning for a program.}
+@item{It does not impact the appearance of a page when viewed by a human, but
+still adds meaning for a program.}
 @item{@tt{meta} is a void element, so you don't have to type a closing tag.}]}
 
 I use a @tt{<meta itemprop>} pattern here, but the element does not matter.
-The imperative workflow responds by trying to load the module at
-@racket[(assets-rel "set-layout.rkt")] and running a provided
-@racket[replace-element] procedure. We'll assume this implementation
-is handy.
+The imperative workflow responds by trying to load @tt{assets/set-layout.rkt}
+and running a provided @racket[replace-element] procedure.
 
+We'll assume this implementation is handy:
 
 @racketmod[#:file "set-layout.rkt"
 racket/base
@@ -88,9 +88,9 @@ racket/base
     ,(format "(two-column ~e (nav-layout) kids))" page-title))))
 ]
 
-In this setup, @racket[target] is the entire @tt{<meta>} element
-as a @racket[txexpr]. @racket[replace-element] will simply return
-the layout-defining application element to take its place.
+Here, @racket[target] is the entire @tt{<meta>} element as a Tagged
+X-expression. @racket[replace-element] will simply return the layout-defining
+application element to take its place.
 
 @italic{Take careful note that @racket[replace-element] is returning a list
 containing only a @tt{script} element.} Like application elements,
@@ -134,10 +134,10 @@ Subclass @racket[polyglot/imperative%] and override
         new-content))))
 ]
 
-This makes the imperative workflow replace all application elements
-with new application elements under a prescribed limited
-language. This can be help with untrusted code.
+This makes the imperative workflow replace all application elements with new
+application elements under a prescribed limited language. This can be help with
+untrusted code.
 
-If you want to specialize the imperative workflow's preprocessing
-and still leverage @tt{data-macro}, call @racket[(super preprocess-txexprs txexprs)]
-in your overriding method.
+If you want to specialize the imperative workflow's preprocessing and still
+leverage @tt{data-macro}, call @racket[(super preprocess-txexprs txexprs)] in
+your overriding method.
