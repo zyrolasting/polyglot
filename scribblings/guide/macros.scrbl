@@ -126,7 +126,7 @@ Subclass @racket[polyglot/imperative%] and override
           (splitf-txexpr
            (λ (x) (and (txexpr? x)
                        (equal? 'script)
-                       (equal? (attr-ref x 'type #f) "appliaction/racket")))
+                       (equal? (attr-ref x 'type #f) "application/racket")))
            (λ (x) `(script ((type "application/racket"))
                            "#lang limited"
                            ,@(filter (λ (s) (not (string-contains? s "#lang")))
