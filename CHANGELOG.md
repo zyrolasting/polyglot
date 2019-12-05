@@ -152,7 +152,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.0...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.1...HEAD
+[2.1]: https://github.com/zyrolasting/polyglot/compare/v2.0...v2.1
 [2.0]: https://github.com/zyrolasting/polyglot/compare/v1.11...v2.0
 [1.11]: https://github.com/zyrolasting/polyglot/compare/v1.10...v1.11
 [1.10]: https://github.com/zyrolasting/polyglot/compare/v1.9...v1.10
