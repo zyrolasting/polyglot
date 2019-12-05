@@ -17,7 +17,7 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
-* Nothing yet.
+* Remove `raco` prefix in subcommand help table.
 
 ## [2.1] - 2019-12-05
 * Support file-to-file relative paths in distributions

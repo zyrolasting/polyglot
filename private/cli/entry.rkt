@@ -43,7 +43,7 @@
 (define (show-subcommands . _)
   (printf "Available subcommands:~n")
   (for ([(subcmd-name desc) (in-hash help-table)])
-       (printf "  raco polyglot ~a~a~a~n"
+       (printf "  polyglot ~a~a~a~n"
                subcmd-name
                (make-string (- 12 (string-length subcmd-name)) #\space)
                desc)))
