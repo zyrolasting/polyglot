@@ -19,6 +19,9 @@ with this project, you should use the latest version.
 ## [Unreleased]
 * Nothing yet.
 
+## [2.1] - 2019-12-05
+* Support file-to-file relative paths in distributions
+
 ## [2.0] - 2019-12-04
 * Rewrite documentation into guide, reference, how-tos, and tutorials.
 * Fix a unit test

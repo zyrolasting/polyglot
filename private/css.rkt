@@ -13,7 +13,8 @@
          file/sha1
          unlike-assets/policy
          unlike-assets/logging
-         "../paths.rkt")
+         "../paths.rkt"
+         "./dist.rkt")
 
 (define (process-css clear compiler)
   (define rx-matches (call-with-input-file #:mode 'text clear discover-dependencies))
@@ -24,30 +25,35 @@
   advance)
 
 (define (write-css clear compiler rx-matches)
-  (define css-text
-    (for/fold ([css (file->string clear)])
+  (define css-text (file->string clear))
+  (define css-file-name
+    (call-with-input-string
+      css-text
+      (λ (port)
+         (path-replace-extension
+          (substring (sha1 port) 0 8)
+          #".css"))))
+
+  (define replaced-name
+    (apply build-path
+           (let ([elements (reverse (explode-path clear))])
+             (reverse (cons css-file-name
+                            (cdr elements))))))
+
+  (define dst (dist-rel (make-dist-path-string replaced-name (assets-rel))))
+
+  (define css-text/rewritten
+    (for/fold ([css css-text])
               ([rx-match rx-matches])
       (string-replace css
                       (car rx-match)
                       (format "url('~a')"
-                              (make-dist-path-string
-                               (send compiler
-                                     lookup
-                                     (send compiler
-                                           clarify
-                                           (cadr rx-match))))))))
-  (define dst
-    (call-with-input-string
-      css-text
-      (λ (port)
-        (dist-rel
-         (path-replace-extension
-          (substring (sha1 port) 0 8)
-          #".css")))))
-  (with-output-to-file dst #:exists 'replace
-    (λ () (displayln css-text)))
-  (<info "Wrote ~a" dst)
-  dst)
+                              (find-dist-relative-path compiler
+                                                       dst
+                                                       (cadr rx-match))))))
+
+  (with-output-to-dist-file dst
+    (λ () (displayln css-text/rewritten))))
 
 (define (discover-dependencies in)
   (filter-map
