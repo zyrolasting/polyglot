@@ -13,11 +13,15 @@
               clarify
               unclear-asset-path)))
 
-(define (find-dist-relative-path compiler dist-resource-path unclear-asset-path)
-  (let-values ([(base name _) (split-path dist-resource-path)])
+(define (find-dist-relative-path dependent-dist-path dependency-dist-path)
+  (let-values ([(base name _) (split-path dependent-dist-path)])
     (path->string (find-relative-path base
-                                      (unclear-asset-path->dist-path compiler
-                                                                     unclear-asset-path)))))
+                                      dependency-dist-path))))
+
+(define (find-dist-relative-path/unclear compiler dist-resource-path unclear-asset-path)
+  (find-dist-relative-path dist-resource-path
+                           (unclear-asset-path->dist-path compiler
+                                                          unclear-asset-path)))
 
 (define (with-output-to-dist-file path proc)
   (make-parent-directory* path)

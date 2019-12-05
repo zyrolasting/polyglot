@@ -23,23 +23,11 @@
          "./txexpr.rkt"
          "./paths.rkt"
          "./private/fs.rkt"
-         "./private/css.rkt")
+         "./private/css.rkt"
+         "./private/dist.rkt")
 
 (define (make-minimal-html-page body)
   `(html (head (title "Untitled")) (body . ,body)))
-
-(define (create-manifest unclear-deps compiler)
-  (sequence-fold
-   (λ (result unclear)
-     (dict-set result
-               unclear
-               ; Accounts for the fact we do not mark .md files as dependencies of one another.
-               (if (equal? (path-get-extension unclear) #".md")
-                   (dist-rel (path-replace-extension unclear #".html"))
-                   (send compiler lookup
-                         (send compiler clarify unclear)))))
-   (make-immutable-hash)
-   unclear-deps))
 
 (define/contract (delegate-to-asset-module clear compiler) advance/c
   (<info "Delegating to ~a's write-dist-file" clear)
@@ -49,14 +37,16 @@
 
 ; Translate resolved dependencies and prior X-expression to fulfilled document
 (define (resolve-dependencies txexpr/expanded unclear-deps clear compiler)
-  (define path (dist-rel (path-replace-extension (basename clear) #".html")))
+  (define output-html-path
+    (dist-rel
+     (path-replace-extension
+      (make-dist-path-string clear
+                             (assets-rel))
+      #".html")))
+
   (define-values (literal-refs non-literal-refs)
     (partition (λ (s) (equal? (path-get-extension s) #".literal"))
                unclear-deps))
-
-  (define manifest (create-manifest non-literal-refs compiler))
-
-  (define num-dist-path-elements (length (explode-path (dist-rel))))
 
   (define txexpr/literals-replaced
     (apply-manifest txexpr/expanded
@@ -68,17 +58,25 @@
 
   (define txexpr/final
     (apply-manifest txexpr/literals-replaced
-                    manifest
-                    make-dist-path-string))
+                    (make-immutable-hash
+                     (map (λ (unclear)
+                            ; Accounts for the fact that .md files
+                            ; don't have strict dependency
+                            ; relationships.
+                            (define normalized
+                              (if (equal? (path-get-extension unclear) #".md")
+                                  (dist-rel (path-replace-extension unclear #".html"))
+                                  (unclear-asset-path->dist-path compiler unclear)))
 
-  (with-output-to-file path #:exists 'replace
-    (λ ()
-      (displayln "<!DOCTYPE html>")
-      (displayln (xexpr->html txexpr/final))))
+                            (cons unclear normalized))
+                          non-literal-refs))
+                    (λ (to-rewrite)
+                      (find-dist-relative-path output-html-path
+                                               to-rewrite))))
 
-  (<info "Wrote ~a" path)
-
-  path)
+  (with-output-to-dist-file output-html-path
+    (λ _ (displayln "<!DOCTYPE html>")
+         (displayln (xexpr->html txexpr/final)))))
 
 
 (define (add-dependencies! clear compiler txexpr/expanded)
