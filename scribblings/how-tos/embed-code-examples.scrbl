@@ -29,33 +29,7 @@ racket/base
 (write `(script ((id "example") (type "application/racket")) . ,code))
 ]
 
-If a build generates infinitely many application elements, then it will not
-terminate.
-
 @section{Functional Workflow}
-
-@(functional-workflow) tracks app and lib elements by their @tt{id} attribute
-values, and removes them once those elements are processed. An app element can
-therefore replace itself with a slightly different version with a new ID to
-avoid removal before the new pass.
-
-The following example only modifies the @tt{id} attribute to illustrate
-the point, and is not an endorsement to use the @tt{id} attribute as an ordinal
-for loops in general.
-
-@racketmod[#:file "<script type=\"application/racket\">...</script>"
-racket/base
-
-(require polyglot)
-(provide replace-page)
-
-(define (replace-page page-tx)
-  (tx-replace-me page-tx
-                 (λ (x)
-                   (define i (string->number (attr-ref 'id x "0")))
-                   (if (< i 10)
-                       `(,(attr-set x 'id (number->string (add1 i))))
-                       `((p "done"))))))]
 
 An equivalent working code example for the Functional Workflow is as follows:
 
