@@ -1,6 +1,10 @@
 #lang scribble/manual
 
-@require[@for-label[racket polyglot]]
+@require[@for-label[racket
+                    polyglot
+                    (only-in markdown parse-markdown)
+                    unlike-assets
+                    unlike-assets/logging]]
 
 @title{@tt{polyglot/imperative}}
 
