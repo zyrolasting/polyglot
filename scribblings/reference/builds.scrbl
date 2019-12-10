@@ -111,3 +111,18 @@ surprises during long work sessions at the cost of periodic rebuilds. It also
 limits memory consumption for some expensive builds. To disable this feature,
 set @racket[cycle-after] to @racket[#f].
 }
+
+@defthing[polyglot-live? (parameter/c boolean?) #:value #f]{
+When @racket[#t], you may assume that the end user expects an ongoing
+build. The @tt{polyglot develop} CLI command sets this to @racket[#t]
+immediately.
+
+If you are writing your own build service using polyglot, set this to
+@racket[#t] before instantiating any workflow class. Check this value
+if you are writing a workflow that behaves differently during live
+builds, such as kicking off a development server.
+
+While it is possible to set this to @racket[#f] within the dynamic
+extent of a workflow that applies other workflows in an opinionated
+way, be sure you understand the consequences of doing so.
+}

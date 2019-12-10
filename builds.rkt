@@ -9,6 +9,7 @@
 
 (provide
  (contract-out
+  [polyglot-live? (parameter/c boolean?)]
   [make-polyglot-workflow-object (->* ((is-a?/c polyglot-project%))
                                       (#:live? boolean?
                                        #:forced-workflow (or/c #f (subclass?/c unlike-compiler%))
@@ -38,6 +39,8 @@
            "base.rkt"
            "private/fs.rkt"
            (submod "./projects.rkt" test)))
+
+(define polyglot-live? (make-parameter #f))
 
 (define (keep-own-asset-paths project paths)
   (filter (λ (path) (send project asset-path? path))

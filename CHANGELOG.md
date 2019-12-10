@@ -18,6 +18,7 @@ with this project, you should use the latest version.
 
 ## [Unreleased]
 * Remove `raco` prefix in subcommand help table.
+* Add `polyglot-live?` parameter
 
 ## [2.1] - 2019-12-05
 * Support file-to-file relative paths in distributions

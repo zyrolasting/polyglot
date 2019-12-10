@@ -24,6 +24,7 @@
     [("--delay") ms "The number of milliseconds to allow between changes "
                     "before trying to compile again. Default: 500."]
     #:args (path)
+    (polyglot-live? #t)
     (define-values (directory project build!) (init-from-user-path path))
 
     (define (changed? activity)
