@@ -75,7 +75,7 @@
     (delete-directory/files other-tmpdir)))
 
 
-(define (build-polyglot-project! project compiler #:changed [changed '()] #:removed [removed '()])  
+(define (build-polyglot-project! project compiler #:changed [changed '()] #:removed [removed '()])
   (parameterize ([polyglot-project-directory (get-field directory project)])
     (unless (directory-exists? (dist-rel))
       (send project ensure-empty-distribution!))
