@@ -17,7 +17,11 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
+
+## [2.2] - 2019-12-10
 * Remove `raco` prefix in subcommand help table.
+* Remove superfluous content in documentation
+* Fix broken code links in imperative workflow documentation
 * Add `polyglot-live?` parameter
 
 ## [2.1] - 2019-12-05
@@ -153,7 +157,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.1...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.2...HEAD
+[2.2]: https://github.com/zyrolasting/polyglot/compare/v2.1...v2.2
 [2.1]: https://github.com/zyrolasting/polyglot/compare/v2.0...v2.1
 [2.0]: https://github.com/zyrolasting/polyglot/compare/v1.11...v2.0
 [1.11]: https://github.com/zyrolasting/polyglot/compare/v1.10...v1.11
