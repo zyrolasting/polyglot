@@ -1,3 +1,4 @@
+[![](https://img.shields.io/badge/%E2%99%A5-support-red)](https://sagegerard.com/subscribe.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/polyglot/index.html)
 [![](https://tokei.rs/b1/github/zyrolasting/polyglot)](https://github.com/zyrolasting/polyglot)
@@ -9,8 +10,6 @@
 $ raco pkg install polyglot
 $ raco docs polyglot
 ```
-
-For guaranteed support on short notice, consider [purchasing a subscription](https://sagegerard.com/subscribe.html).
 
 ## I don't know how you managed it, but your README is broken.
 
