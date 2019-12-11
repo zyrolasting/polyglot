@@ -13,7 +13,7 @@ $ raco docs polyglot
 
 ## I don't know how you managed it, but your README is broken.
 
-It's a feature. No, really, the mess of text below is not an accident 
+It's a feature. No, really, the mess of text below is not an accident
 (Although it is more readable in raw form).
 
 This README file functions as a demo and a working
@@ -49,14 +49,14 @@ directory. Open the HTML file inside in your browser. If it did not work, please
 ;;; From https://docs.racket-lang.org/guide/hash-lang_reader.html
 
 (require syntax/strip-context)
- 
+
 (provide (rename-out [literal-read read]
                      [literal-read-syntax read-syntax]))
- 
+
 (define (literal-read in)
   (syntax->datum
    (literal-read-syntax #f in)))
- 
+
 (define (literal-read-syntax src in)
   (with-syntax ([str (port->string in)])
     (strip-context
