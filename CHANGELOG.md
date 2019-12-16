@@ -17,6 +17,8 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
+* Fix whitespace errors
+* Fix use of incorrect function in CSS handler
 
 ## [2.2] - 2019-12-10
 * Remove `raco` prefix in subcommand help table.

@@ -48,9 +48,9 @@
       (string-replace css
                       (car rx-match)
                       (format "url('~a')"
-                              (find-dist-relative-path compiler
-                                                       dst
-                                                       (cadr rx-match))))))
+                              (find-dist-relative-path/unclear compiler
+                                                               dst
+                                                               (cadr rx-match))))))
 
   (with-output-to-dist-file dst
     (λ () (displayln css-text/rewritten))))
