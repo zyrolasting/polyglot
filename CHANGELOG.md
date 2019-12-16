@@ -17,6 +17,9 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
+* Nothing yet.
+
+## [2.3] - 2019-12-16
 * Fix whitespace errors and typos
 * Fix use of incorrect function in CSS handler
 * Allow users to override asset and dist directories.
@@ -163,7 +166,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.2...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.3...HEAD
+[2.3]: https://github.com/zyrolasting/polyglot/compare/v2.2...v2.3
 [2.2]: https://github.com/zyrolasting/polyglot/compare/v2.1...v2.2
 [2.1]: https://github.com/zyrolasting/polyglot/compare/v2.0...v2.1
 [2.0]: https://github.com/zyrolasting/polyglot/compare/v1.11...v2.0
