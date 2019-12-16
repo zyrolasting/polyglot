@@ -7,7 +7,6 @@
 (provide lines->file/clobber
          instantiate-ephemeral-module
          make-temp-ephmod-directory
-         with-dynamically-provided
          with-ephemeral-module)
 
 (require racket/file
@@ -22,9 +21,6 @@
                    r))
    '()
    (reverse syms)))
-
-(define (with-dynamically-provided module-path syms proc)
-  (apply proc (dynamic-require/multi module-path syms)))
 
 (define (lines->file/clobber path lines)
   (display-lines-to-file #:exists 'truncate/replace
