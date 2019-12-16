@@ -17,10 +17,10 @@
          "./dynamic-modules.rkt"
          "../txexpr.rkt")
 
-(define (script->path script rel)
+(define (script->path script dir)
   (define path
-    (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f rel))])
-                   (build-path rel (string->path (attr-ref script 'id)))))
+    (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f dir))])
+                   (build-path dir (string->path (attr-ref script 'id)))))
   (path-replace-extension path #".rkt"))
 
 (define (script-of-type? type x)
