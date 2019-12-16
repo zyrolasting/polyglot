@@ -42,7 +42,7 @@
      elements
      app-script?
      (λ (x)
-       (define path (write-script x tmp-rel))
+       (define path (write-script x (tmp-rel)))
        (define-values (fragment errors) (load-script path))
        (<info "<script> ~a yields fragment:" path)
        (<info "~e" fragment)
@@ -64,7 +64,7 @@
             elements
             lib-script?
             (λ (x)
-               (write-script x tmp-rel)
+               (write-script x (tmp-rel))
                null))))
     (λ ()
        (delete-directory/files (tmp-rel)))))

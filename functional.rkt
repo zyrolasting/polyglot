@@ -38,7 +38,7 @@
   (if (list? matches)
       (for/list ([x (in-list matches)])
         (script-info x
-                     (write-script x tmp-rel)
+                     (write-script x (tmp-rel))
                      (λ (other) (and (txexpr? other)
                                      (equal? (attr-ref other 'id #f)
                                              (attr-ref x 'id))))))

@@ -44,8 +44,8 @@
     (values (port->list read readable-stdout)
             (port->list read readable-stderr)))
 
-(define (write-script script rel)
-  (let ([path (script->path script (rel))])
+(define (write-script script dir)
+  (let ([path (script->path script dir)])
     (lines->file/clobber path (get-text-elements script))
     (<info "Wrote script: ~a" path)
     path))
@@ -63,7 +63,7 @@
                "(write \"a\" (current-error-port))"
                "(write \"b\" (current-error-port))"))
     (define spath (script->path element (system-temp-rel)))
-    (write-script element system-temp-rel)
+    (write-script element (system-temp-rel))
     (define-values (fragment errors) (load-script spath))
     (check-equal? fragment '("x" "y"))
     (check-equal? errors '("a" "b"))
