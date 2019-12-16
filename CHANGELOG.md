@@ -1,4 +1,4 @@
-# Change log
+# Changelog
 
 This file summarizes changes to the project over time.
 
