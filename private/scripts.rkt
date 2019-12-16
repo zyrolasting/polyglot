@@ -6,7 +6,8 @@
          write-script
          script-of-type?
          app-script?
-         lib-script?)
+         lib-script?
+         make-temp-ephmod-directory)
 
 (require racket/list
          racket/port
@@ -15,7 +16,17 @@
          racket/file
          unlike-assets/logging
          "./dynamic-modules.rkt"
+         "../paths.rkt"
          "../txexpr.rkt")
+
+(define (make-temp-ephmod-directory)
+  ;; Creates a temp directory in the temporary file system containing
+  ;; a symbolic link to the project directory. This lets dynamic modules
+  ;; use the project while leveraging tempfs and OS-specific cleanup jobs.
+  (define temp-dir (make-temporary-file "ephmod~a" 'directory (system-temp-rel)))
+  (make-file-or-directory-link (project-rel)
+                               (build-path temp-dir "project"))
+  (path-rel temp-dir))
 
 (define (script->path script dir)
   (define path

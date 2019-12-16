@@ -22,7 +22,6 @@
          unlike-assets
          unlike-assets/logging
          [except-in markdown xexpr->string]
-         "./private/dynamic-modules.rkt"
          "./private/fs.rkt"
          "./private/scripts.rkt"
          "./base.rkt"
