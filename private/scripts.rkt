@@ -17,8 +17,6 @@
          "./dynamic-modules.rkt"
          "../txexpr.rkt")
 
-(define get-script-cdata (curry filter string?))
-
 (define (script->path script rel)
   (define path
     (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f (rel)))])
@@ -48,7 +46,7 @@
 
 (define (write-script script rel)
   (let ([path (script->path script rel)])
-    (lines->file/clobber path (get-script-cdata script))
+    (lines->file/clobber path (get-text-elements script))
     (<info "Wrote script: ~a" path)
     path))
 

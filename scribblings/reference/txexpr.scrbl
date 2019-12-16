@@ -19,6 +19,10 @@ own subclass of @racket[unlike-compiler%] allows you to write static site
 generators that evolve independently of built-in workflows.
 
 @section{Analysis}
+@defproc[(get-text-elements [tx txexpr?]) (listof string?)]{
+Returns all string children of @racket[tx].
+}
+
 @defproc[(tx-search-tagged [tx txexpr?]
                            [tag symbol?])
                            (listof txexpr?)]{

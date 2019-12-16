@@ -19,7 +19,9 @@
 (define replaced/c (listof txexpr?))
 
 (provide (all-from-out txexpr xml)
-         (contract-out [genid (-> txexpr?
+         (contract-out [get-text-elements
+                        (-> txexpr? (listof string?))]
+                       [genid (-> txexpr?
                                   string?)]
                        [tag-equal?
                         (-> symbol?
@@ -79,6 +81,8 @@
                                              dict?)
                                             ((-> path-string? string?))
                                             txexpr?)]))
+
+(define get-text-elements (curry filter string?))
 
 (define (genid tx)
   (define all-ids
