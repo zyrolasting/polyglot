@@ -19,8 +19,8 @@
 
 (define (script->path script rel)
   (define path
-    (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f (rel)))])
-                   (rel (string->path (attr-ref script 'id)))))
+    (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f rel))])
+                   (build-path rel (string->path (attr-ref script 'id)))))
   (path-replace-extension path #".rkt"))
 
 (define (script-of-type? type x)
@@ -45,7 +45,7 @@
             (port->list read readable-stderr)))
 
 (define (write-script script rel)
-  (let ([path (script->path script rel)])
+  (let ([path (script->path script (rel))])
     (lines->file/clobber path (get-text-elements script))
     (<info "Wrote script: ~a" path)
     path))
@@ -62,7 +62,7 @@
                "(write \"y\" (current-output-port))"
                "(write \"a\" (current-error-port))"
                "(write \"b\" (current-error-port))"))
-    (define spath (script->path element system-temp-rel))
+    (define spath (script->path element (system-temp-rel)))
     (write-script element system-temp-rel)
     (define-values (fragment errors) (load-script spath))
     (check-equal? fragment '("x" "y"))
@@ -72,5 +72,5 @@
     (delete-file spath))
 
   (test-equal? "Derive filesystem paths from script txexpr"
-    (script->path '(script ((id "coolio"))) project-rel)
+    (script->path '(script ((id "coolio"))) (project-rel))
     (project-rel "coolio.rkt")))
