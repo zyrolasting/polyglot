@@ -72,6 +72,15 @@ $ polyglot develop my-website
 The rules for how the @tt{develop} command treats paths are the same
 as the @tt{build} command.
 
+You can specify a delay, in milliseconds, that must elapse after the last
+detected change in assets before the command tries rebuilding your site. By
+default, this is 500 milliseconds. You can use this to aggregate changes and
+avoid triggering too many builds when saving changes rapidly in your project.
+
+@verbatim[#:indent 2]|{
+$ polyglot develop --delay 1000 my-website
+}|
+
 @section{@tt{polyglot demo}: Build Demo Project}
 
 @verbatim[#:indent 2]|{
