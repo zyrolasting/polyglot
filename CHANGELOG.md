@@ -21,6 +21,8 @@ with this project, you should use the latest version.
 * Fix use of incorrect function in CSS handler
 * Allow users to override asset and dist directories.
 * Add tutorial for CSS preprocessing
+* Make sure removed files are gone by the time a rebuild occurs.
+* Make `--delay` actually do something, and document what it does.
 
 ## [2.2] - 2019-12-10
 * Remove `raco` prefix in subcommand help table.
