@@ -15,9 +15,9 @@
          racket/function
          racket/file
          unlike-assets/logging
-         "./dynamic-modules.rkt"
-         "../paths.rkt"
-         "../txexpr.rkt")
+         "./private/dynamic-modules.rkt"
+         "./paths.rkt"
+         "./txexpr.rkt")
 
 (define (make-temp-ephmod-directory)
   ;; Creates a temp directory in the temporary file system containing
@@ -63,7 +63,7 @@
 
 (module+ test
   (require rackunit
-           "../paths.rkt")
+           "./paths.rkt")
 
   (test-case "load-script"
     (define element

@@ -21,7 +21,7 @@
          unlike-assets/policy
          [except-in markdown xexpr->string]
          "./private/fs.rkt"
-         "./private/scripts.rkt"
+         "./elements.rkt"
          "./base.rkt"
          "./paths.rkt"
          "./txexpr.rkt")
