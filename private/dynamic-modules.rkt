@@ -4,16 +4,14 @@
 ;; Right now I leverage the file system until I learn
 ;; how to generate modules that use #lang in memory.
 
-(provide
-  lines->file/clobber
-  instantiate-ephemeral-module 
-  make-temp-ephmod-directory
-  with-dynamically-provided
-  with-ephemeral-module)
+(provide lines->file/clobber
+         instantiate-ephemeral-module
+         make-temp-ephmod-directory
+         with-dynamically-provided
+         with-ephemeral-module)
 
-(require
-  racket/file
-  "../paths.rkt")
+(require racket/file
+         "../paths.rkt")
 
 (define (dynamic-require/multi module-path syms)
  (foldl
@@ -60,7 +58,7 @@
 (define (with-lines->file path lines proc)
   (dynamic-wind
     (λ () (lines->file/clobber path lines))
-    proc 
+    proc
     (λ () (delete-file path))))
 
 (define (make-temp-ephmod-directory)
@@ -74,8 +72,7 @@
 
 
 (module+ test
-  (require
-    rackunit)
+  (require rackunit)
 
   (test-case "Ephemeral dynamic modules from string content"
     (define module-cdata
@@ -88,7 +85,7 @@
           "(write \"e\" (current-error-port))"))
 
     (define path (make-temporary-file))
-    (with-lines->file 
+    (with-lines->file
       path
       module-cdata
       (lambda ()

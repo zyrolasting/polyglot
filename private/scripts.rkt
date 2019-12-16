@@ -2,22 +2,20 @@
 
 ;;; Integrate <script> nodes in Tagged X-expressions with Racket modules.
 
-(provide
-  load-script
-  write-script
-  script-of-type?
-  app-script?
-  lib-script?)
+(provide load-script
+         write-script
+         script-of-type?
+         app-script?
+         lib-script?)
 
-(require
- racket/list
- racket/port
-  racket/string
-  racket/function
-  racket/file
-  unlike-assets/logging
-  "./dynamic-modules.rkt"
-  "../txexpr.rkt")
+(require racket/list
+         racket/port
+         racket/string
+         racket/function
+         racket/file
+         unlike-assets/logging
+         "./dynamic-modules.rkt"
+         "../txexpr.rkt")
 
 (define get-script-cdata (curry filter string?))
 
@@ -55,9 +53,8 @@
     path))
 
 (module+ test
-  (require
-    rackunit
-    "../paths.rkt")
+  (require rackunit
+           "../paths.rkt")
 
   (test-case "load-script"
     (define element
