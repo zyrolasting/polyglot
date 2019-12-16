@@ -10,7 +10,7 @@ can get both using @racketmodname[css-expr]. This tutorial
 will show you a way to integrate @racket[css-expr] into your workflow.
 
 
-@section{Step 1: Start a New Unstyled Project}
+@section{Step 1: Start a New Project}
 
 Run @tt{polyglot start my-project}. A @tt{my-project} directory will appear
 with some starter code. You'll notice that when you build this project using
