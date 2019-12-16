@@ -19,6 +19,7 @@ with this project, you should use the latest version.
 ## [Unreleased]
 * Fix whitespace errors
 * Fix use of incorrect function in CSS handler
+* Allow users to override asset and dist directories.
 
 ## [2.2] - 2019-12-10
 * Remove `raco` prefix in subcommand help table.
