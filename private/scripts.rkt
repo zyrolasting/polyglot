@@ -10,7 +10,8 @@
   lib-script?)
 
 (require
-  racket/list
+ racket/list
+ racket/port
   racket/string
   racket/function
   racket/file
@@ -25,7 +26,6 @@
     (with-handlers ([exn:fail? (λ _ (make-temporary-file "script-element-cdata~a" #f (rel)))])
                    (rel (string->path (attr-ref script 'id)))))
   (path-replace-extension path #".rkt"))
-
 
 (define (script-of-type? type x)
   (and (list? x)
@@ -42,18 +42,11 @@
   (or (lib-script? x)
       (app-script? x)))
 
-(define (pipe-port->data port)
-  (reverse
-    (let loop ([next (read port)] [data null])
-      (if (not (eof-object? next))
-          (loop (read port) (cons next data))
-          data))))
-
 (define (load-script path)
   (define-values (readable-stdout _ readable-stderr)
     (instantiate-ephemeral-module path))
-    (values (pipe-port->data readable-stdout)
-            (pipe-port->data readable-stderr)))
+    (values (port->list read readable-stdout)
+            (port->list read readable-stderr)))
 
 (define (write-script script rel)
   (let ([path (script->path script rel)])
