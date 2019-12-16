@@ -10,3 +10,4 @@ want to follow a recipe to get common things done, see @other-doc['(lib
 
 @table-of-contents[]
 @include-section{multiple-workflows.scrbl}
+@include-section{css-preprocessing.scrbl}
