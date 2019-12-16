@@ -20,7 +20,7 @@ a @italic{distribution} built from the
 "README in the source code"].
 
 If the command fails, Polyglot is probably unable to create symbolic links. It
-needs symbolic to function (See @racket[make-file-or-directory-link]). On
+needs symbolic links to function (See @racket[make-file-or-directory-link]). On
 current versions of Windows, you may need to give an account permission to
 create links. If it's just not working and you need help,
 @hyperlink["https://github.com/zyrolasting/polyglot/issues"]{open an issue}.
