@@ -159,12 +159,6 @@ error stating that @tt{styles.rkt} does not exist during a live build. This is
 because some editors might temporarily delete a file before renaming an
 autosaved version to take its place. Polyglot will detect the deletion both the
 deletion and the re-addition of the file as changes that warrant a new
-build. Try refreshing your browser after making a style change to see
-if your new style rules apply despite the error. If they did, you can
-safely ignore it.
-
-If you want to do away with the error entirely, try specifying the
-@tt{--delay} option in @tt{polyglot develop} to aggregate more
-filesystem changes before trying a new build.
-
-@verbatim|{$ polyglot develop --delay 1000 my-project}|
+build. Try refreshing your browser after making a style change to see if your
+new style rules apply despite the error. If they did, you can safely ignore
+it. Otherwise, try running @tt{touch} on the pages you wish to preview.
