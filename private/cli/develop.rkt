@@ -21,8 +21,10 @@
   (command-line
     #:program "develop"
     #:once-each
-    [("--delay") ms "The number of milliseconds to allow between changes "
-                    "before trying to compile again. Default: 500."]
+    [("--delay") ms
+                 "The number of milliseconds to allow between changes "
+                 "before trying to compile again. Default: 500."
+                 (timeout (string->number ms))]
     #:args (path)
     (polyglot-live? #t)
     (define-values (directory project build!) (init-from-user-path path))
