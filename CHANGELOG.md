@@ -17,7 +17,7 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
-* Fix whitespace errors
+* Fix whitespace errors and typos
 * Fix use of incorrect function in CSS handler
 * Allow users to override asset and dist directories.
 * Add tutorial for CSS preprocessing
