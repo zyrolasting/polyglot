@@ -4,6 +4,7 @@
 (require
   raco/command-name
   racket/class
+  racket/function
   racket/list
   racket/cmdline
   racket/file
@@ -42,7 +43,11 @@
       (filter-activity changed? activity-log))
 
     (define (get-removed activity-log)
-      (filter-activity removed? activity-log))
+      ; Some editors delete files for a brief moment
+      ; when saving (e.g. Emacs). Double check that the
+      ; files are still gone.
+      (filter (negate file-exists?)
+              (filter-activity removed? activity-log)))
 
     (define (build-with-report changed removed)
       (with-report/counts
