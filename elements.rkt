@@ -2,12 +2,16 @@
 
 ;;; Integrate <script> nodes in Tagged X-expressions with Racket modules.
 
-(provide load-script
-         write-script
-         script-of-type?
-         app-script?
-         lib-script?
-         make-temp-ephmod-directory)
+(require racket/contract)
+(provide
+ (contract-out
+  [script-element? (-> any/c boolean?)]
+  [load-script (-> path? (values list? list?))]
+  [write-script (-> script-element? path? path?)]
+  [script-of-type? (-> string? any/c boolean?)]
+  [app-script? (-> any/c boolean?)]
+  [lib-script? (-> any/c boolean?)]
+  [make-temp-ephmod-directory (-> procedure?)]))
 
 (require racket/list
          racket/port
@@ -27,6 +31,9 @@
   (make-file-or-directory-link (project-rel)
                                (build-path temp-dir "project"))
   (path-rel temp-dir))
+
+(define (script-element? x)
+  (tag-equal? 'script x))
 
 (define (script->path script dir)
   (define path
