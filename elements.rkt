@@ -11,7 +11,7 @@
   [script-of-type? (-> string? any/c boolean?)]
   [app-script? (-> any/c boolean?)]
   [lib-script? (-> any/c boolean?)]
-  [make-temp-ephmod-directory (-> procedure?)]))
+  [make-temp-ephmod-directory (-> path?)]))
 
 (require racket/list
          racket/port
@@ -30,7 +30,7 @@
   (define temp-dir (make-temporary-file "ephmod~a" 'directory (system-temp-rel)))
   (make-file-or-directory-link (project-rel)
                                (build-path temp-dir "project"))
-  (path-rel temp-dir))
+  temp-dir)
 
 (define (script-element? x)
   (tag-equal? 'script x))

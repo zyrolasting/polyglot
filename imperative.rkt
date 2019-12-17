@@ -34,14 +34,14 @@
 (define fallback-provided-name 'replace-element)
 (define default-layout make-minimal-html-page)
 
-(define (apply-rackdown tmp-rel elements [initial-layout default-layout])
+(define (apply-rackdown tmpd elements [initial-layout default-layout])
   (define layout initial-layout)
   (define expanded
     (interlace-txexprs
      elements
      app-script?
      (λ (x)
-       (define path (write-script x (tmp-rel)))
+       (define path (write-script x tmpd))
        (define-values (fragment errors) (load-script path))
        (<info "<script> ~a yields fragment:" path)
        (<info "~e" fragment)
@@ -53,25 +53,25 @@
 
 ;; Declare all script nodes expressing inline Racket modules.
 (define (with-libraries elements proc)
-  (define tmp-rel (make-temp-ephmod-directory))
+  (define tmpd (make-temp-ephmod-directory))
   (dynamic-wind
     void
     (λ ()
       (proc
-        tmp-rel
+        tmpd
         (interlace-txexprs
             elements
             lib-script?
             (λ (x)
-               (write-script x (tmp-rel))
+               (write-script x tmpd)
                null))))
     (λ ()
-       (delete-directory/files (tmp-rel)))))
+       (delete-directory/files tmpd))))
 
 (define (run-rackdown elements [initial-layout default-layout])
   (define expanded
-    (with-libraries elements (λ (tmp-rel elements)
-                               (apply-rackdown tmp-rel
+    (with-libraries elements (λ (tmpd elements)
+                               (apply-rackdown tmpd
                                                elements
                                                initial-layout))))
   (car (interlace-txexprs

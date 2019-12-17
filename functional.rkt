@@ -32,12 +32,12 @@
 ; ------------------------------------------------------------------------
 (struct script-info (element path predicate))
 
-(define (group-scripts! tx tmp-rel match?)
+(define (group-scripts! tx tmpd match?)
   (define matches (findf*-txexpr tx match?))
   (if (list? matches)
       (for/list ([x (in-list matches)])
         (script-info x
-                     (write-script x (tmp-rel))
+                     (write-script x tmpd)
                      (λ (other) (and (txexpr? other)
                                      (equal? (attr-ref other 'id #f)
                                              (attr-ref x 'id))))))
@@ -158,7 +158,7 @@
            (if (not (equal? page/before page/after))
                (loop page/after (sub1 on-pass))
                page/after)))
-    (λ _ (delete-directory/files (tmpd)))))
+    (λ _ (delete-directory/files tmpd))))
 
 
 (define polyglot/functional%
@@ -194,10 +194,10 @@
                       (script ((type "a") (id "s")) "A2")
                       (script ((type "c") (id "t")) "C1")))
 
-    (define tmp-rel (make-temp-ephmod-directory))
+    (define tmpd (make-temp-ephmod-directory))
     (define (group! type)
       (group-scripts! tx
-                      tmp-rel
+                      tmpd
                       (λ (x) (and (txexpr? x)
                                   (equal? (attr-ref x 'type #f)
                                           type)))))
@@ -216,4 +216,4 @@
                           ((script-info-predicate si)
                            (script-info-element si)))
                         combined))
-    (delete-directory/files (tmp-rel))))
+    (delete-directory/files tmpd)))
