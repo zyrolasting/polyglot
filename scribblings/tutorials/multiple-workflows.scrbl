@@ -2,6 +2,8 @@
 
 @require[@for-label[racket/base
                     racket/class
+                    racket/dict
+                    racket/file
                     racket/runtime-path
                     polyglot
                     unlike-assets]
