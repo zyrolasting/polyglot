@@ -20,10 +20,13 @@
 (define (develop)
   (define timeout (make-parameter 500))
   (define port (make-parameter 8080))
+  (define start-server? (make-parameter #t))
 
   (command-line
     #:program "develop"
     #:once-each
+    [("-n" "--no-server") "Set to prevent launching dev server."
+                          (start-server? #f)]
     [("-p" "--port") user-port
                      "The port to use for the dev server. Default: 8080."
                      (port (string->number user-port))]
@@ -91,7 +94,9 @@
         (loop)))))
 
     (define stop
-      (start-server (dist-rel) (port)))
+      (if (start-server?)
+          (start-server (dist-rel) (port))
+          void))
 
     (define info-version ((get-info/full (polyglot-rel)) 'version))
     (with-handlers ([exn:break? (λ _
@@ -101,7 +106,9 @@
                                    (stop)
                                    (exit 0))])
       (printf "~n~n~a~nPolyglot ~a~n" (make-string 40 #\=) info-version)
-      (printf "Development server online at http://localhost:~a~n" (port))
+      (printf "Distribution: ~a~n" (dist-rel))
+      (when (start-server?)
+          (printf "Development server online at http://localhost:~a~n" (port)))
       (printf "Press ^C to stop.~n")
       (thread-wait aggregator)
       (thread-wait watcher))))
