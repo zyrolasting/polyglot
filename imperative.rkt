@@ -40,7 +40,7 @@
   (define expanded
     (interlace-txexprs
      elements
-     app-script?
+     app-element?
      (λ (x)
        (define path (write-script x tmpd))
        (define-values (stdout stdin stderr) (load-script path))
@@ -64,7 +64,7 @@
         tmpd
         (interlace-txexprs
             elements
-            lib-script?
+            lib-element?
             (λ (x)
                (write-script x tmpd)
                null))))

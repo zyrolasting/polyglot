@@ -76,8 +76,8 @@
 
   (tx-replace
    page
-   (λ (x) (and (or (app-script? x)
-                   (lib-script? x))
+   (λ (x) (and (or (app-element? x)
+                   (lib-element? x))
                (= (string-length (attr-ref x 'id "")) 0)))
    (λ (x)
      (list (attr-set x
@@ -115,8 +115,8 @@
 ; ------------------------------------------------------------------------
 (define (pass page tmpd)
   (define initial-page (replace-page/scripts-with-ids page))
-  (define apps (group-scripts! initial-page tmpd app-script?))
-  (define libs (group-scripts! initial-page tmpd lib-script?))
+  (define apps (group-scripts! initial-page tmpd app-element?))
+  (define libs (group-scripts! initial-page tmpd lib-element?))
 
   ; Shape workflow such that (listen) gets meaningful feedback.
   (define steps

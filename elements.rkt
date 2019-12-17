@@ -8,9 +8,9 @@
   [script-element? (-> any/c boolean?)]
   [load-script (-> path? (values input-port? output-port? input-port?))]
   [write-script (-> script-element? path? path?)]
-  [script-of-type? (-> string? any/c boolean?)]
-  [app-script? (-> any/c boolean?)]
-  [lib-script? (-> any/c boolean?)]
+  [script-element-of-type? (-> string? any/c boolean?)]
+  [app-element? (-> any/c boolean?)]
+  [lib-element? (-> any/c boolean?)]
   [make-temp-ephmod-directory (-> path?)]))
 
 (require racket/list
@@ -40,20 +40,20 @@
                    (build-path dir (string->path (attr-ref script 'id)))))
   (path-replace-extension path #".rkt"))
 
-(define (script-of-type? type x)
+(define (script-element-of-type? type x)
   (and (list? x)
        (equal? (get-tag x) 'script)
        (equal? type (attr-ref x 'type #f))))
 
-(define (app-script? x)
-  (or (script-of-type? "application/rackdown" x)
-      (script-of-type? "application/racket" x)))
+(define (app-element? x)
+  (or (script-element-of-type? "application/rackdown" x)
+      (script-element-of-type? "application/racket" x)))
 
-(define lib-script? (curry script-of-type? "text/racket"))
+(define lib-element? (curry script-element-of-type? "text/racket"))
 
-(define (app-or-lib-script? x)
-  (or (lib-script? x)
-      (app-script? x)))
+(define (app-or-lib-element? x)
+  (or (lib-element? x)
+      (app-element? x)))
 
 (define (load-script path [make-input void])
   (instantiate-ephemeral-module path #:input make-input))

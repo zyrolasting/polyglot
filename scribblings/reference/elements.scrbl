@@ -20,24 +20,24 @@ Returns @racket[#t] if @racket[tx] is a tagged X-expression with tag
 @racket['script].
 }
 
-@defproc[(script-of-type? [type string?] [tx any/c]) boolean?]{
+@defproc[(script-element-of-type? [type string?] [tx any/c]) boolean?]{
 Returns @racket[#t] if @racket[(script-element? tx)] is @racket[#t] and the
 @tt{type} attribute equals @racket[type].
 }
 
-@defproc[(app-script? [tx any/c]) boolean?]{
+@defproc[(app-element? [tx any/c]) boolean?]{
 Equivalent to @racketblock[
-  (or (script-of-type? "application/rackdown" x)
-      (script-of-type? "application/racket" x))]
+  (or (script-element-of-type? "application/rackdown" x)
+      (script-element-of-type? "application/racket" x))]
 }
 
-@defproc[(lib-script? [tx any/c]) boolean?]{
-Equivalent to @racket[(script-of-type? "text/racket" tx)].
+@defproc[(lib-element? [tx any/c]) boolean?]{
+Equivalent to @racket[(script-element-of-type? "text/racket" tx)].
 }
 
-@defproc[(app-or-lib-script? [tx any/c]) boolean?]{
-Equivalent to @racketblock[(or (lib-script? x)
-                               (app-script? x))]
+@defproc[(app-or-lib-element? [tx any/c]) boolean?]{
+Equivalent to @racketblock[(or (lib-element? x)
+                               (app-element? x))]
 }
 
 @defproc[(write-script [script script-element?] [dir directory-exists?]) path?]{
