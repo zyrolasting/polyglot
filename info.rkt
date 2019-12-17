@@ -13,3 +13,6 @@
   '(("polyglot" (submod polyglot/private/cli/entry main) "polyglot CLI" #f)))
 (define racket-launcher-libraries '("private/cli/entry.rkt"))
 (define racket-launcher-names '("polyglot"))
+
+(define test-omit-paths '("scribblings"))
+(define compile-omit-paths '("private/skel"))
