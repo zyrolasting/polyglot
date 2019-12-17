@@ -17,8 +17,12 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
+* Nothing yet.
+
+## [2.5] - 2019-12-17
 * Remove dead code
 * Fix link to `unlike-assets-logger` in docs
+* Remove breaking dependency to `css-expr` in docs
 
 ## [2.4] - 2019-12-16
 * Add `make-temp-ephmod-directory` to `polyglot/paths`
@@ -173,7 +177,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.4...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.5...HEAD
+[2.5]: https://github.com/zyrolasting/polyglot/compare/v2.4...v2.5
 [2.4]: https://github.com/zyrolasting/polyglot/compare/v2.3...v2.4
 [2.3]: https://github.com/zyrolasting/polyglot/compare/v2.2...v2.3
 [2.2]: https://github.com/zyrolasting/polyglot/compare/v2.1...v2.2
