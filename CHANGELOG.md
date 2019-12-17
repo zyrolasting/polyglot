@@ -22,7 +22,7 @@ with this project, you should use the latest version.
 ## [2.5] - 2019-12-17
 * Remove dead code
 * Fix link to `unlike-assets-logger` in docs
-* Remove breaking dependency to `css-expr` in docs
+* Fix `css-expr` dependency break
 
 ## [2.4] - 2019-12-16
 * Add `make-temp-ephmod-directory` to `polyglot/paths`
