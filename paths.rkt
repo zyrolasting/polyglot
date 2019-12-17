@@ -2,6 +2,7 @@
 
 (require racket/contract
          racket/runtime-path
+         racket/file
          racket/path
          unlike-assets)
 
@@ -21,6 +22,7 @@
           [dist-rel path-builder/c]
           [polyglot-rel path-builder/c]
           [system-temp-rel path-builder/c]
+          [make-temp-ephmod-directory (-> path?)]
           [make-dist-path-string (->* (complete-path?)
                                       (complete-path?)
                                       path-string?)]))
@@ -50,6 +52,12 @@
   (if (equal? base/simple rel/simple)
       "/"
       (path->string (find-relative-path base/simple rel/simple))))
+
+(define (make-temp-ephmod-directory)
+  (define temp-dir (make-temporary-file "ephmod~a" 'directory (system-temp-rel)))
+  (make-file-or-directory-link (project-rel)
+                               (build-path temp-dir "project"))
+  temp-dir)
 
 (define polyglot-project-directory (make-parameter (current-directory)))
 (define polyglot-assets-directory (derive-path-parameter (λ _ (build-path (polyglot-project-directory) "assets"))))

@@ -71,3 +71,9 @@ Behaves like @racket[find-relative-path], except if the simple forms
 of @racket[base] and @racket[relative-to] are equal, this will return
 @racket["/"] (meaning "webroot").
 }
+
+@defproc[(make-temp-ephmod-directory) path?]{
+Creates a temporary directory in @racket[(polyglot-temp-directory)]. The new
+directory will contain a symbolic link called @tt{project} pointing to
+@racket[(polyglot-project-directory)].
+}

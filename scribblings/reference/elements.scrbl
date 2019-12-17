@@ -9,12 +9,6 @@
 @racketmodname[polyglot/elements] integrates the Racket module system
 with tagged X-expressions via @racket[dynamic-require].
 
-@defproc[(make-temp-ephmod-directory) path?]{
-Creates a temporary directory in @racket[(polyglot-temp-directory)]. The new
-directory will contain a symbolic link called @tt{project} pointing to
-@racket[(polyglot-project-directory)].
-}
-
 @defproc[(script-element? [tx any/c]) boolean?]{
 Returns @racket[#t] if @racket[tx] is a tagged X-expression with tag
 @racket['script].
