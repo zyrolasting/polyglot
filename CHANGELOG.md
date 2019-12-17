@@ -16,7 +16,10 @@ level contracts, see v1.6). The social contract is that you should not
 upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
-## [Unreleased]
+## Unreleased
+* Nothing yet
+
+## [2.4] - 2019-12-16
 * Add `make-temp-ephmod-directory` to `polyglot/paths`
 * Add `polyglot/elements` and docs
 * Change package description
@@ -169,7 +172,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.3...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.4...HEAD
+[2.4]: https://github.com/zyrolasting/polyglot/compare/v2.3...v2.4
 [2.3]: https://github.com/zyrolasting/polyglot/compare/v2.2...v2.3
 [2.2]: https://github.com/zyrolasting/polyglot/compare/v2.1...v2.2
 [2.1]: https://github.com/zyrolasting/polyglot/compare/v2.0...v2.1
