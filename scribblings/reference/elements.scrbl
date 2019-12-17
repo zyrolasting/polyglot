@@ -1,6 +1,6 @@
 #lang scribble/manual
 
-@require[@for-label[racket polyglot]]
+@require[@for-label[racket polyglot unlike-assets/logging]]
 
 @title{@tt{polyglot/elements}}
 
