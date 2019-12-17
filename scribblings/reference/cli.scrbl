@@ -69,6 +69,20 @@ website in response to changes in assets detected using
 $ polyglot develop my-website
 }|
 
+The @tt{develop} command will also start a local development server
+unless @tt{-n} or @tt{-}@tt{-no-server} is specified. You can also
+set a port using @tt{-p}/@tt{-}@tt{-port}, or use the default of
+@racket[8080].
+
+@verbatim[#:indent 2]|{
+$ polyglot develop -p 6790 my-website
+$ polyglot develop -n my-website # Server won't start
+}|
+
+The process that monitors and rebuilds assets operates independently of the
+server. If you do not start the development server, the @tt{develop} command
+will still rebuild assets in response to changes.
+
 The rules for how the @tt{develop} command treats paths are the same
 as the @tt{build} command.
 
