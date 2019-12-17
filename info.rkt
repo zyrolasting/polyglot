@@ -2,7 +2,7 @@
 (define collection "polyglot")
 (define deps '("base" "file-watchers" "txexpr" "unlike-assets" "aws" "markdown"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib"))
-(define pkg-desc "An unlike compiler that generates static websites using a Markdown and any #lang")
+(define pkg-desc "Build websites with any mix of programming languages among prose.")
 (define scribblings '(("scribblings/guide/polyglot-guide.scrbl" (multi-page) (tools))
                       ("scribblings/reference/polyglot-reference.scrbl" (multi-page) (library))
                       ("scribblings/how-tos/polyglot-how-tos.scrbl" (multi-page) (omit-start))
