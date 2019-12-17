@@ -14,3 +14,4 @@ assets. Any workflow class is a valid value for @racket[polyglot+%] in
 
 @include-section{built-in-workflows.scrbl}
 @include-section{txexpr.scrbl}
+@include-section{elements.scrbl}
