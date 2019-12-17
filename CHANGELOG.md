@@ -17,7 +17,8 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Nothing yet
+* Remove dead code
+* Fix link to `unlike-assets-logger` in docs
 
 ## [2.4] - 2019-12-16
 * Add `make-temp-ephmod-directory` to `polyglot/paths`
