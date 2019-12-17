@@ -13,4 +13,5 @@
      "./paths.rkt"
      "./imperative.rkt"
      "./functional.rkt"
-     "./projects.rkt")
+     "./projects.rkt"
+     "./elements.rkt")

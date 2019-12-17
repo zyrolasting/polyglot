@@ -20,9 +20,9 @@ recipes used to carry out specific tasks, see @other-doc['(lib
 
 The @racketmodname[polyglot] module includes bindings from
 @racketmodname[polyglot/builds], @racketmodname[polyglot/paths],
-@racketmodname[polyglot/txexpr], @racketmodname[polyglot/projects],
-@racketmodname[polyglot/base], @racketmodname[polyglot/imperative],
-and @racketmodname[polyglot/functional].
+@racketmodname[polyglot/txexpr], @racket[polyglot/elements],
+@racketmodname[polyglot/projects], @racketmodname[polyglot/base],
+@racketmodname[polyglot/imperative], and @racketmodname[polyglot/functional].
 
 @table-of-contents[]
 @include-section{projects-index.scrbl}
