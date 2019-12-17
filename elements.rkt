@@ -6,7 +6,7 @@
 (provide
  (contract-out
   [script-element? (-> any/c boolean?)]
-  [load-script (-> path? (values list? list?))]
+  [load-script (-> path? (values input-port? output-port? input-port?))]
   [write-script (-> script-element? path? path?)]
   [script-of-type? (-> string? any/c boolean?)]
   [app-script? (-> any/c boolean?)]
@@ -14,7 +14,6 @@
   [make-temp-ephmod-directory (-> path?)]))
 
 (require racket/list
-         racket/port
          racket/string
          racket/function
          racket/file
@@ -56,11 +55,8 @@
   (or (lib-script? x)
       (app-script? x)))
 
-(define (load-script path)
-  (define-values (readable-stdout _ readable-stderr)
-    (instantiate-ephemeral-module path))
-    (values (port->list read readable-stdout)
-            (port->list read readable-stderr)))
+(define (load-script path [make-input void])
+  (instantiate-ephemeral-module path #:input make-input))
 
 (define (write-script script dir)
   (let ([path (script->path script dir)])
@@ -70,6 +66,7 @@
 
 (module+ test
   (require rackunit
+           racket/port
            "./paths.rkt")
 
   (test-case "load-script"
@@ -82,7 +79,9 @@
                "(write \"b\" (current-error-port))"))
     (define spath (script->path element (system-temp-rel)))
     (write-script element (system-temp-rel))
-    (define-values (fragment errors) (load-script spath))
+    (define-values (o i e) (load-script spath))
+    (define-values (fragment errors) (values (port->list read o)
+                                             (port->list read e)))
     (check-equal? fragment '("x" "y"))
     (check-equal? errors '("a" "b"))
 
