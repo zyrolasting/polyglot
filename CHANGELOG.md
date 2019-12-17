@@ -17,7 +17,10 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## [Unreleased]
-* Nothing yet.
+* Add `make-temp-ephmod-directory` to `polyglot/paths`
+* Add `polyglot/elements` and docs
+* Change package description
+* Delete dead code
 
 ## [2.3] - 2019-12-16
 * Fix whitespace errors and typos
