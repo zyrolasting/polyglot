@@ -37,9 +37,9 @@ You'll see a new directory called @tt{my-website}. It has some starter code
 to play with.
 
 @section{Step 2: Write Content}
-
-The @tt{develop} command rebuilds your website in response to changes in
-assets. Let it run in another terminal.
+@margin-note{The development server is for just that: development. Do not use it on production systems.}
+The @tt{develop} command starts a local development server and rebuilds your
+website in response to changes in assets. Let it run in another terminal.
 
 @verbatim[#:indent 2]|{
 $ polyglot develop my-website
