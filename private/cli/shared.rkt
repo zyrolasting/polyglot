@@ -7,8 +7,7 @@
          racket/file
          racket/rerequire
          unlike-assets/logging
-         "../../main.rkt"
-         "../fs.rkt")
+         "../../main.rkt")
 
 (define polyglot-class/cli-asserted (make-parameter #f))
 

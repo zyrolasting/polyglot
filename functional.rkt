@@ -22,7 +22,6 @@
          unlike-assets
          unlike-assets/logging
          [except-in markdown xexpr->string]
-         "./private/fs.rkt"
          "./elements.rkt"
          "./base.rkt"
          "./paths.rkt"

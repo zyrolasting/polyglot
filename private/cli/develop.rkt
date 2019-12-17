@@ -13,7 +13,6 @@
   file-watchers
   "../../main.rkt"
   "../../paths.rkt"
-  "../fs.rkt"
   "shared.rkt")
 
 (define (develop)

@@ -3,7 +3,6 @@
 (provide build)
 (require racket/cmdline
          "../../main.rkt"
-         "../fs.rkt"
          "shared.rkt")
 
 (define (build)

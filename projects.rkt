@@ -31,8 +31,7 @@
   (require racket/runtime-path
            racket/list
            rackunit
-           unlike-assets
-           "private/fs.rkt")
+           unlike-assets)
   ; Testing against the project templates is dogfooding.
   (define-runtime-path skels "./private/skel")
 

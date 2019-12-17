@@ -12,7 +12,6 @@
   aws/keys
   "../../main.rkt"
   "../../paths.rkt"
-  "../fs.rkt"
   "shared.rkt")
 
 (define bucket (make-parameter "default-bucket"))

@@ -37,7 +37,6 @@
            rackunit
            unlike-assets
            "base.rkt"
-           "private/fs.rkt"
            (submod "./projects.rkt" test)))
 
 (define polyglot-live? (make-parameter #f))

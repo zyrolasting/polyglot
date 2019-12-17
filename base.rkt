@@ -22,7 +22,6 @@
          unlike-assets/policy
          "./txexpr.rkt"
          "./paths.rkt"
-         "./private/fs.rkt"
          "./private/css.rkt"
          "./private/dist.rkt")
 

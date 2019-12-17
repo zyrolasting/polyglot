@@ -4,12 +4,12 @@
   raco/command-name
   racket/cmdline
   racket/function
+  racket/path
   racket/vector
   unlike-assets/logging
   unlike-assets
   file-watchers
   "../../main.rkt"
-  "../fs.rkt"
   "build.rkt"
   "develop.rkt"
   "publish.rkt"
@@ -24,7 +24,7 @@
 (show-level?       #f)
 (error-port-levels '(fatal error))
 (prescribed-prefix "")
-(format-clear      basename)
+(format-clear      (λ (path) (path->string (file-name-from-path path))))
 (format-unclear    identity)
 
 (define help-table `#hash(

@@ -21,7 +21,6 @@
          unlike-assets/logging
          unlike-assets/policy
          [except-in markdown xexpr->string]
-         "./private/fs.rkt"
          "./elements.rkt"
          "./base.rkt"
          "./paths.rkt"
@@ -143,6 +142,9 @@
   (test-case
     "Can preprocess tagged X-expressions from asset folder"
     (define provided-name "replacer")
+    (define (empty-directory path)
+      (delete-directory/files path #:must-exist? #f)
+      (make-directory path))
 
     (define (e2e provided-name)
       (define compiler (new polyglot/imperative%))
