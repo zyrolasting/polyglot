@@ -17,7 +17,10 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Add development server
+* Nothing yet.
+
+## [2.6] - 2019-12-17
+* Launch development server with `polyglot develop`.
 
 ## [2.5] - 2019-12-17
 * Remove dead code
@@ -177,7 +180,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.5...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.6...HEAD
+[2.6]: https://github.com/zyrolasting/polyglot/compare/v2.5...v2.6
 [2.5]: https://github.com/zyrolasting/polyglot/compare/v2.4...v2.5
 [2.4]: https://github.com/zyrolasting/polyglot/compare/v2.3...v2.4
 [2.3]: https://github.com/zyrolasting/polyglot/compare/v2.2...v2.3
