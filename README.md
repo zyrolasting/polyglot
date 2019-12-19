@@ -1,6 +1,6 @@
 [![](https://img.shields.io/badge/%E2%99%A5-Support%20Ethical%20Software-red)](https://sagegerard.com/subscribe.html)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/polyglot/index.html)
+[![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/polyglot-guide/index.html)
 [![](https://tokei.rs/b1/github/zyrolasting/polyglot)](https://github.com/zyrolasting/polyglot)
 
 `polyglot` creates websites using a mix of any DSLs you want in a single source file.
