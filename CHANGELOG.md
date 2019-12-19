@@ -17,7 +17,7 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Nothing yet.
+* Fix doc link in README
 
 ## [2.6] - 2019-12-17
 * Launch development server with `polyglot develop`.
