@@ -18,6 +18,7 @@ with this project, you should use the latest version.
 
 ## Unreleased
 * Fix doc link in README
+* Add `srcset` to dependency discovery
 
 ## [2.6] - 2019-12-17
 * Launch development server with `polyglot develop`.

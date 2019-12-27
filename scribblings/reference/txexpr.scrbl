@@ -42,13 +42,29 @@ Returns a procedure that checks if a value causes @racket[tag-equal?] to return
 }
 
 @defproc[(discover-dependencies [tx txexpr?]) (listof string?)]{
-Returns the values of @racket[href] or @racket[src] attributes in
+Returns the values of @tt{href}, @tt{src}, or @tt{srcset} attributes in
 @racket[tx] that appear to refer to assets on a local file system.
 This will check for complete paths, relative paths, and URLs with
 the @racket["file://"] scheme.
 
+If a single element contains multiple eligible attribute values, they
+will all appear in the returned output.
+
 Relative paths will not be made complete. It's up to you to decide a base directory.
 This frees you from needing to use @racket[(assets-rel)].
+
+Values that appear on parent elements will come before values
+that appear on child elements in the output. In the event multiple
+dependency values appear on a single element, they will appear in
+the order respecting the attribute list on that element.
+
+@racketinput[
+(discover-dependencies
+  '(parent ((href "a.png"))
+           (child ((href "b.png") (src "c.png")))))]
+@racketresult[
+'("a.png" "b.png" "c.png")
+]
 }
 
 @section{Replacing Elements}
@@ -187,7 +203,7 @@ To guarentee full replacement of elements, use @racket[substitute-many-in-txexpr
 			 [manifest dict?]
                          [rewrite (-> string? string?) (lambda ...)])
 			 txexpr?]{
-Returns a new @racket[txexpr] such that each @racket[href] and @racket[src]
+Returns a new @racket[txexpr] such that each @tt{href}, @tt{src}, and @tt{srcset}
 attribute value that appears as a key @tt{K} in @racket[manifest] is replaced
 with @racket[(rewrite (dict-ref manifest K))]. By default, @racket[rewrite]
 returns only the @racket[name] value returned from @racket[split-path].
