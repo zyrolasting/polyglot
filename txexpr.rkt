@@ -242,28 +242,34 @@
   (or (findf*-txexpr tx (λ (x) (tag-equal? t x)))
       '()))
 
-(define (get-dependency-ref node)
-  (attr-ref node 'src
-            (lambda _
-              (attr-ref node 'href
-                        (lambda _ #f)))))
+(define dependency-attribute-keys '(src href srcset))
+
+(define (get-dependency-refs node)
+  (reverse (foldl (λ (attr-kv-list res)
+                    (let ([key (car attr-kv-list)]
+                          [value (cadr attr-kv-list)])
+                      (if (member key dependency-attribute-keys)
+                          (cons value res)
+                 res)))
+                  '()
+                  (get-attrs node))))
 
 (define (get-dependency-key x)
-  (or (and (attrs-have-key? x 'src) 'src)
-      (and (attrs-have-key? x 'href) 'href)
-      #f))
+  (ormap (λ (key) (and (attrs-have-key? x key) key))
+         dependency-attribute-keys))
+
+(define (local-dependency? ref)
+  (and (not (equal? ref "/"))
+       (local-asset-url? ref)))
 
 (define (discover-dependencies x)
-  (map
-    get-dependency-ref
-    (or
-      (findf*-txexpr x
-        (lambda (node)
-          (and (txexpr? node)
-               (let ([ref (get-dependency-ref node)])
-                 (and (not (equal? ref "/"))
-                      (local-asset-url? (get-dependency-ref node)))))))
-      null)))
+  (if (list? x)
+      (filter local-dependency?
+              (foldl (λ (el res)
+                       (append res (discover-dependencies el)))
+                     (get-dependency-refs x)
+                     (get-elements x)))
+      null))
 
 (define (asset-basename path)
   (define-values (base name must-be-dir?)
@@ -353,19 +359,26 @@
             (λ _ '((x) (x) (x)))))
     '((b) (b) (p (b) (b) (b) (b)) (b) (x) (x) (x) (b (b) (b)) (b) (b)))
 
-  (test-equal? "Manifest can replace `src` and `href` attributes"
+  (test-equal? "Manifest can replace `src`, `href`, and `srcset` attributes"
     (apply-manifest '(html
                       (head
                        (link ((href "a.css"))))
                       (body
-                       (img ((src "b.png")))))
+                       (picture
+                         (source ((srcset "b.png")
+                                  (media "(min-width: 1280px)")))
+                         (img ((src "c.png"))))))
                     '(("a.css" . "123.css")
-                      ("b.png" . "456.png")))
+                      ("b.png" . "456.png")
+                      ("c.png" . "789.png")))
     '(html
       (head
        (link ((href "123.css"))))
       (body
-       (img ((src "456.png"))))))
+       (picture
+        (source ((media "(min-width: 1280px)")
+                 (srcset "456.png")))
+        (img ((src "789.png")))))))
 
   (test-equal? "apply-manifest allows custom rewrites"
     (apply-manifest '(html
@@ -393,13 +406,15 @@
                (section
                 (h1 "Heading")
                 (a ((href "https://example.com"))
-                   (img ((src "mark.png")))))
+                   (picture (source ((srcset "hurp.png")))
+                            (img ((src "mark.png"))))))
                (section
                 (h1 "Heading")
                 (a ((href "/path/to/image.svg")) "Click to view")))
               (a ((href "#top")) "Back to top"))
              (script ((type "text/javascript") (src "main.js"))))))
     '("blah.css"
+      "hurp.png"
       "mark.png"
       "/path/to/image.svg"
       "main.js")))
