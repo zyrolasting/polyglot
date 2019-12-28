@@ -3,6 +3,7 @@
                     @only-in[markdown parse-markdown]
                     racket/base
                     racket/contract
+                    racket/dict
                     unlike-assets]
          polyglot]
 
