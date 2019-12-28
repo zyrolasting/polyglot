@@ -17,7 +17,7 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Nothing yet.
+* Convert to multi-collection package
 
 ## [2.7] - 2019-12-28
 * Fix doc link in README

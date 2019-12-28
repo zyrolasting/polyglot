@@ -1,0 +1,12 @@
+#lang info
+
+(define collection 'multi)
+
+(define pkg-desc "tests for \"polyglot\"")
+(define pkg-authors '(sage))
+
+(define deps '())
+(define build-deps '("base"
+                     "rackunit-lib"
+                     "polyglot-lib"))
+(define update-implies '("web-server-lib"))
