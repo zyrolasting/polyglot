@@ -18,8 +18,10 @@ with this project, you should use the latest version.
 
 ## Unreleased
 * Fix doc link in README
+* Add missing links in docs to `polyglot/elements` and `racket/dict` bindings.
 * Add `srcset` to dependency discovery
 * Set `discover-dependencies` to respect lexical order of dependency attribute values
+* Add missing `web-server-lib` dependency
 
 ## [2.6] - 2019-12-17
 * Launch development server with `polyglot develop`.
