@@ -1,6 +1,6 @@
 #lang info
 (define collection "polyglot")
-(define deps '("base" "file-watchers" "txexpr" "unlike-assets" "aws" "markdown"))
+(define deps '("base" "file-watchers" "txexpr" "unlike-assets" "aws" "markdown" "web-server-lib"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib" "css-expr"))
 (define pkg-desc "Build websites with any mix of programming languages among prose.")
 (define scribblings '(("scribblings/guide/polyglot-guide.scrbl" (multi-page) (tools))
