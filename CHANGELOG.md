@@ -17,6 +17,9 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
+* Nothing yet.
+
+## [2.7] - 2019-12-28
 * Fix doc link in README
 * Add missing links in docs to `polyglot/elements` and `racket/dict` bindings.
 * Add `srcset` to dependency discovery
@@ -184,7 +187,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.6...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.7...HEAD
+[2.7]: https://github.com/zyrolasting/polyglot/compare/v2.6...v2.7
 [2.6]: https://github.com/zyrolasting/polyglot/compare/v2.5...v2.6
 [2.5]: https://github.com/zyrolasting/polyglot/compare/v2.4...v2.5
 [2.4]: https://github.com/zyrolasting/polyglot/compare/v2.3...v2.4
