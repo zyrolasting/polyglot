@@ -15,12 +15,13 @@ you convert it to HTML, you might get links to resources like
 @litchar{blah.html}. How does the HTML document get that name, and how do we
 know the link isn't broken?
 
-Once app and lib elements have been processed to produce a finished page, the
-Base Workflow starts a @defterm{dependency discovery} phase where it searches
-for paths to other files in @tt{src} and @tt{href} attributes of the HTML
-elements derived from your Markdown, and in the @tt{url()} expressions of your
-CSS. The Base Workflow notices the links that are @bold{either absolute paths
-on your filesystem, or paths relative to your assets directory}.
+Once app and lib elements have been processed to produce a finished
+page, the Base Workflow starts a @defterm{dependency discovery} phase
+where it searches for paths to other files in @tt{src}, @tt{href}, and
+@tt{srcset} attributes of the HTML elements derived from your
+Markdown, and in the @tt{url()} expressions of your CSS. The Base
+Workflow notices the links that are @bold{either absolute paths on
+your filesystem, or paths relative to your assets directory}.
 
 Consider this Markdown:
 
@@ -123,10 +124,10 @@ code runs after finding dependencies in a page, but before writing
 HTML5 documents to disk.
 
 @section{CSS Handling (@racket[".css"])}
-In CSS files, the values in @tt{url()} expressions are treated just like the
-@tt{href} and @tt{src} attribute values in HTML elements parsed from Markdown.
-The Base Workflow does @italic{not} inspect the @tt{url()} expressions inside
-@tt{<style>} elements.
+In CSS files, the values in @tt{url()} expressions are treated just
+like the @tt{href}, @tt{src}, and @tt{srcset} attribute values in HTML
+elements parsed from Markdown.  The Base Workflow does @italic{not}
+inspect the @tt{url()} expressions inside @tt{<style>} elements.
 
 You can leverage this along with Racket module dependencies to generate
 assets for presentation.
