@@ -4,8 +4,8 @@
 (provide polyglot/functional%
          (contract-out
           [current-replace-element-predicate (parameter/c (-> txexpr? any/c))]
-          [run-txexpr/functional! (-> (or/c (non-empty-listof txexpr?))
-                                      (non-empty-listof txexpr?))]
+          [run-txexpr/functional! (-> (or/c txexpr? (non-empty-listof txexpr?))
+                                      txexpr?)]
 
           [tx-replace-me (-> txexpr?
                              (-> txexpr?
