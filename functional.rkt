@@ -37,7 +37,7 @@
       (for/list ([x (in-list matches)])
         (script-info x
                      (write-script x tmpd)
-                     (λ (other) (and (txexpr? other)
+                     (λ (other) (and (txexpr-has-attrs? other)
                                      (equal? (attr-ref other 'id #f)
                                              (attr-ref x 'id))))))
       '()))
@@ -58,7 +58,7 @@
   (define all-ids
     (map (λ (with-id) (attr-ref with-id 'id))
          (or (findf*-txexpr page
-                            (λ (x) (and (txexpr? x)
+                            (λ (x) (and (txexpr-has-attrs? x)
                                         (attrs-have-key? x 'id)
                                         (attr-ref x 'id #f))))
              '())))
@@ -197,7 +197,7 @@
     (define (group! type)
       (group-scripts! tx
                       tmpd
-                      (λ (x) (and (txexpr? x)
+                      (λ (x) (and (list? x)
                                   (equal? (attr-ref x 'type #f)
                                           type)))))
 

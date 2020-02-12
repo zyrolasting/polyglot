@@ -84,11 +84,16 @@
 
 (define get-text-elements (curry filter string?))
 
+(define (txexpr-has-attrs? tx)
+  (with-handlers ([exn:fail? (λ _ #f)])
+    (and (car (get-attrs tx))
+         #t)))
+
 (define (genid tx)
   (define all-ids
     (map (λ (with-id) (attr-ref with-id 'id))
          (or (findf*-txexpr tx
-                            (λ (x) (and (txexpr? x)
+                            (λ (x) (and (txexpr-has-attrs? x)
                                         (attrs-have-key? x 'id)
                                         (attr-ref x 'id #f))))
              '())))
@@ -106,12 +111,13 @@
   (string-append longest-id (symbol->string (gensym))))
 
 (define (tag-equal? t tx)
-  (and (txexpr? tx)
-       (equal? t (get-tag tx))))
+  (with-handlers ([exn:fail? (λ _ #f)])
+    (equal? t (get-tag tx))))
 
 (define (make-tag-predicate tags)
   (λ (tx) (ormap (λ (t) (tag-equal? t tx))
                  tags)))
+
 
 ;; Like splitf-txexpr, except each matching element can be replaced by
 ;; more than one element. Elements left without children as a result
@@ -177,7 +183,9 @@
   (define (normalize-argument v)
     (if (list? v) v (list v)))
 
-  (define elements/normalized (if (txexpr? elements) (list elements) elements))
+  (define elements/normalized (if (symbol? (car elements))
+                                  (list elements)
+                                  elements))
   (define replace?/normalized (normalize-argument replace?))
   (define replace/normalized (normalize-argument replace))
   (define replace?/len (length replace?/normalized))
