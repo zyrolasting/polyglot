@@ -33,9 +33,7 @@
          tx-replace-tagged/aggressive
          interlace-txexprs
          apply-manifest
-         discover-dependencies
-         get-dependency-ref
-         get-dependency-key)
+         discover-dependencies)
 
 (module+ safe
   (provide
