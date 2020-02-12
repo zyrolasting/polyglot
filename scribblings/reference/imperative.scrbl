@@ -8,12 +8,14 @@
 
 @title{@tt{polyglot/imperative}}
 
-@defmodule[polyglot/imperative]
+@defmodule[#:multi (polyglot/imperative (submod polyglot/imperative safe))]
 
 The Imperative Workflow seeks application elements within Markdown
 files and runs them under the expectation that they will produce
 content as a side-effect. In that sense, app elements behave similarly
 to @litchar{<?php echo ...; ?>} in PHP.
+
+To use module-level contracts, require the @racket[safe] submodule.
 
 @defclass[polyglot/imperative% polyglot/base% ()]{
 Implements the imperative workflow.

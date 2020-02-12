@@ -8,7 +8,9 @@
 
 @title{@tt{polyglot/functional}}
 
-@defmodule[polyglot/functional]
+@defmodule[#:multi (polyglot/functional (submod polyglot/functional safe))]
+
+To use module-level contracts, require the @racket[safe] submodule.
 
 @defclass[polyglot/functional% polyglot/base% ()]{
 Specializes @racket[polyglot/base%] to process Markdown files

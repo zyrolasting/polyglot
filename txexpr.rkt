@@ -19,76 +19,99 @@
 (define replaced/c (listof txexpr?))
 
 (provide (all-from-out txexpr xml)
-         (contract-out [get-text-elements
-                        (-> txexpr? (listof string?))]
-                       [genid (-> txexpr?
-                                  string?)]
-                       [tag-equal?
-                        (-> symbol?
-                            any/c
-                            boolean?)]
-                       [make-tag-predicate
-                        (-> (non-empty-listof symbol?)
-                            (-> any/c boolean?))]
-                       [tx-search-tagged
-                        (-> txexpr?
-                            symbol?
-                            (listof txexpr-element?))]
-                       [substitute-many-in-txexpr
-                        (-> txexpr?
-                            txe-predicate/c
-                            replacer/c
-                            (values transformed/c replaced/c))]
-                       [substitute-many-in-txexpr/loop
-                        (->* (txexpr?
-                              txe-predicate/c
-                              replacer/c)
-                             (#:max-replacements exact-integer?)
-                             (values transformed/c replaced/c))]
-                       [tx-replace
-                        (-> txexpr?
-                            txe-predicate/c
-                            (-> txexpr-element? (listof txexpr?))
-                            txexpr?)]
-                       [tx-replace-tagged
-                        (-> txexpr?
-                            symbol?
-                            (-> txexpr? (listof txexpr?))
-                            txexpr?)]
-                       [tx-replace/aggressive
-                        (-> txexpr?
-                            txe-predicate/c
-                            (-> txexpr-element? (listof txexpr?))
-                            txexpr?)]
-                       [tx-replace-tagged/aggressive
-                        (-> txexpr?
-                            symbol?
-                            (-> txexpr? (listof txexpr?))
-                            txexpr?)]
-                       [interlace-txexprs
-                        (->* ((or/c txexpr?
-                                    (non-empty-listof txexpr?))
-                              (or/c txe-predicate/c
-                                    (non-empty-listof txe-predicate/c))
-                              (or/c replacer/c
-                                    (non-empty-listof replacer/c)))
-                             (#:max-replacements exact-integer?
-                              #:max-passes exact-integer?)
-                             (non-empty-listof txexpr?))]
-                       [discover-dependencies (-> txexpr?
-                                                  (listof string?))]
-                       [apply-manifest (->* (txexpr?
-                                             dict?)
-                                            ((-> path-string? string?))
-                                            txexpr?)]))
+         get-text-elements
+         genid
+         tag-equal?
+         make-tag-predicate
+         tx-search-tagged
+         txexpr-has-attrs?
+         substitute-many-in-txexpr
+         substitute-many-in-txexpr/loop
+         tx-replace
+         tx-replace-tagged
+         tx-replace/aggressive
+         tx-replace-tagged/aggressive
+         interlace-txexprs
+         apply-manifest
+         discover-dependencies)
+
+(module+ safe
+  (provide
+   (contract-out [get-text-elements
+                  (-> txexpr? (listof string?))]
+                 [genid (-> txexpr?
+                            string?)]
+                 [tag-equal?
+                  (-> symbol?
+                      any/c
+                      boolean?)]
+                 [make-tag-predicate
+                  (-> (non-empty-listof symbol?)
+                      (-> any/c boolean?))]
+                 [tx-search-tagged
+                  (-> txexpr?
+                      symbol?
+                      (listof txexpr-element?))]
+                 [substitute-many-in-txexpr
+                  (-> txexpr?
+                      txe-predicate/c
+                      replacer/c
+                      (values transformed/c replaced/c))]
+                 [substitute-many-in-txexpr/loop
+                  (->* (txexpr?
+                        txe-predicate/c
+                        replacer/c)
+                       (#:max-replacements exact-integer?)
+                       (values transformed/c replaced/c))]
+                 [tx-replace
+                  (-> txexpr?
+                      txe-predicate/c
+                      (-> txexpr-element? (listof txexpr?))
+                      txexpr?)]
+                 [tx-replace-tagged
+                  (-> txexpr?
+                      symbol?
+                      (-> txexpr? (listof txexpr?))
+                      txexpr?)]
+                 [tx-replace/aggressive
+                  (-> txexpr?
+                      txe-predicate/c
+                      (-> txexpr-element? (listof txexpr?))
+                      txexpr?)]
+                 [tx-replace-tagged/aggressive
+                  (-> txexpr?
+                      symbol?
+                      (-> txexpr? (listof txexpr?))
+                      txexpr?)]
+                 [interlace-txexprs
+                  (->* ((or/c txexpr?
+                              (non-empty-listof txexpr?))
+                        (or/c txe-predicate/c
+                              (non-empty-listof txe-predicate/c))
+                        (or/c replacer/c
+                              (non-empty-listof replacer/c)))
+                       (#:max-replacements exact-integer?
+                        #:max-passes exact-integer?)
+                       (non-empty-listof txexpr?))]
+                 [discover-dependencies (-> txexpr?
+                                            (listof string?))]
+                 [apply-manifest (->* (txexpr?
+                                       dict?)
+                                      ((-> path-string? string?))
+                                      txexpr?)])))
 
 (define get-text-elements (curry filter string?))
+
+(define (txexpr-has-attrs? tx)
+  (with-handlers ([exn:fail? (λ _ #f)])
+    (and (car (get-attrs tx))
+         #t)))
 
 (define (genid tx)
   (define all-ids
     (map (λ (with-id) (attr-ref with-id 'id))
          (or (findf*-txexpr tx
-                            (λ (x) (and (txexpr? x)
+                            (λ (x) (and (txexpr-has-attrs? x)
                                         (attrs-have-key? x 'id)
                                         (attr-ref x 'id #f))))
              '())))
@@ -106,12 +129,13 @@
   (string-append longest-id (symbol->string (gensym))))
 
 (define (tag-equal? t tx)
-  (and (txexpr? tx)
-       (equal? t (get-tag tx))))
+  (with-handlers ([exn:fail? (λ _ #f)])
+    (equal? t (get-tag tx))))
 
 (define (make-tag-predicate tags)
   (λ (tx) (ormap (λ (t) (tag-equal? t tx))
                  tags)))
+
 
 ;; Like splitf-txexpr, except each matching element can be replaced by
 ;; more than one element. Elements left without children as a result
@@ -177,7 +201,9 @@
   (define (normalize-argument v)
     (if (list? v) v (list v)))
 
-  (define elements/normalized (if (txexpr? elements) (list elements) elements))
+  (define elements/normalized (if (symbol? (car elements))
+                                  (list elements)
+                                  elements))
   (define replace?/normalized (normalize-argument replace?))
   (define replace/normalized (normalize-argument replace))
   (define replace?/len (length replace?/normalized))
