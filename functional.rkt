@@ -1,16 +1,22 @@
 #lang racket/base
 
-(require racket/contract)
 (provide polyglot/functional%
-         (contract-out
-          [current-replace-element-predicate (parameter/c (-> txexpr? any/c))]
-          [run-txexpr/functional! (-> (or/c txexpr? (non-empty-listof txexpr?))
-                                      txexpr?)]
+         current-replace-element-predicate
+         run-txexpr/functional!
+         tx-replace-me)
 
-          [tx-replace-me (-> txexpr?
-                             (-> txexpr?
-                                 (listof txexpr-element?))
-                             txexpr?)]))
+(module+ safe
+  (require racket/contract)
+  (provide polyglot/functional%
+           (contract-out
+            [current-replace-element-predicate (parameter/c (-> txexpr? any/c))]
+            [run-txexpr/functional! (-> (or/c txexpr? (non-empty-listof txexpr?))
+                                        txexpr?)]
+            [tx-replace-me (-> txexpr?
+                               (-> txexpr?
+                                   (listof txexpr-element?))
+                               txexpr?)])))
+
 
 (require racket/class
          racket/file

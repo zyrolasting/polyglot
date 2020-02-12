@@ -1,12 +1,18 @@
 #lang racket/base
 
-(require racket/contract)
 (provide polyglot/imperative%
          (rename-out [polyglot/imperative% polyglot%]
                      [run-txexpr/imperative! run-txexpr!])
-         (contract-out
-          [run-txexpr/imperative! (-> (or/c (non-empty-listof txexpr?) txexpr?)
-                                      (non-empty-listof txexpr?))]))
+         run-txexpr/imperative!)
+
+(module+ safe
+  (require racket/contract)
+  (provide polyglot/imperative%
+           (rename-out [polyglot/imperative% polyglot%]
+                       [run-txexpr/imperative! run-txexpr!])
+           (contract-out
+            [run-txexpr/imperative! (-> (or/c (non-empty-listof txexpr?) txexpr?)
+                                        (non-empty-listof txexpr?))])))
 
 (require racket/class
          racket/dict

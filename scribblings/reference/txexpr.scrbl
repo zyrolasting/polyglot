@@ -8,10 +8,13 @@
          polyglot]
 
 @title{@tt{polyglot/txexpr}: Workflows from Scratch}
-@defmodule[polyglot/txexpr]
+
+@defmodule[#:multi (polyglot/txexpr (submod polyglot/txexpr safe))]
 
 This module provides all bindings from the @racketmodname[txexpr] and
 @racketmodname[xml] modules, plus the below.
+
+To use module-level contracts, require the @racket[safe] submodule.
 
 @racketmodname[polyglot/txexpr] offers workflow-independent tools to define
 where programs exist within annotated documents, and to create new documents
