@@ -114,7 +114,8 @@ matching elements.
                      txexpr?]{
 Replaces each element @tt{E} matching a predicate with the list of elements
 returned from @tt{(replace E)}. Note that this can create empty parent elements.
-Acts as a shorthand for @racket[substitute-many-in-txexpr].
+Behaves like @racket[substitute-many-in-txexpr], except it only returns the
+first value.
 }
 
 @defproc[(tx-replace-tagged [tx txexpr?]
@@ -245,14 +246,16 @@ discovered build-time assets are replaced with production-ready assets.
                                 txexpr?])]{
 Aggressive variants of @racket[tx-replace] and @racket[tx-replace-tagged].
 
-Acts as a shorthand for @racket[substitute-many-in-txexpr/loop].
+Acts as a shorthand for @racket[substitute-many-in-txexpr/loop], except
+it only returns the first value.
 }
 
 @defproc[(substitute-many-in-txexpr/loop [tx txexpr?]
                                          [replace? (-> txexpr? any/c)]
                                          [replace (-> txexpr? (listof txexpr?))]
                                          [#:max-replacements max-replacements exact-integer? 1000])
-                                         txexpr?]{
+                                         (values (or/c (listof txexpr-element?) txexpr?)
+                                                 (listof txexpr?))]{
 Repeats @racket[substitute-many-in-txexpr] until no substitutions
 are possible. To illustrate, this would not terminate if it weren't for
 @tt{max-replacements}:
@@ -265,6 +268,8 @@ are possible. To illustrate, this would not terminate if it weren't for
 
 @racket[substitute-many-in-txexpr/loop] raises @racket[exn:fail] if
 it iterates once more after performing @tt{max-replacements}.
+
+The return values are like those returned from @racket[substitute-many-in-txexpr].
 }
 
 @defproc[
