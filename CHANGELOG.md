@@ -17,7 +17,9 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Fixed broken `run-txexpr/functional!` contract
+* Fixed broken `run-txexpr/functional!` contract.
+* Fixed incorrect return value specs in `polyglot/txexpr` manual.
+* Wrote `safe` submodules to move expensive contracts aside for default use.
 
 ## [2.7] - 2019-12-28
 * Fix doc link in README
