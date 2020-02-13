@@ -2,6 +2,8 @@
 
 (provide publish)
 (require
+  racket/file
+  racket/path
   racket/port
   racket/set
   racket/list
@@ -21,8 +23,7 @@
 
 (define (bucket-rel key) (format "~a/~a" (bucket) key))
 (define (path->bucket+key path)
-  (define-values (_ name must-be-dir?) (split-path path))
-  (bucket-rel name))
+  (bucket-rel (find-relative-path (dist-rel) path)))
 
 (define (put-file path)
   (define media-type ((path->mime-proc) path))
@@ -52,14 +53,13 @@
     (<info "DELETE ~a" key)))
 
 (define (upload-distribution local)
-  (for ([file-name local])
-    (define path (dist-rel file-name))
+  (for ([path local])
     (unless (dry-run?) (put-file path))
     (<info "PUT ~a" (path->bucket+key path))))
 
 (define (publish-website)
   (define remote (ls (bucket-rel "")))
-  (define local (directory-list (dist-rel)))
+  (define local (find-files file-exists? (dist-rel)))
   (define ∃-diff (compute-∃-diff (map path->string local) remote))
   (upload-distribution local)
   (when (and (delete-diff?) (not (empty? ∃-diff)))
