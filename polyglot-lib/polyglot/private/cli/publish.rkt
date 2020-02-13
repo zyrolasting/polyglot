@@ -65,17 +65,6 @@
   (when (and (delete-diff?) (not (empty? ∃-diff)))
     (delete-unused ∃-diff)))
 
-(module+ test
-  (require rackunit)
-  (test-case
-    "Mime-type selections"
-    (define (test-pair pair)
-      (check-equal? ((path->mime-proc) (build-path (car pair))) (cdr pair)))
-    (for ([pair '(("a.html" . "text/html")
-                  ("a.css"  . "text/css")
-                  ("a.wtf"  . "application/x-unknown-content-type"))])
-         (test-pair pair))))
-
 (define (publish)
   (command-line
     #:program "publish"

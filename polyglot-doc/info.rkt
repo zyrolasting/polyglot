@@ -1,0 +1,11 @@
+#lang info
+(define collection 'multi)
+(define deps '("base"))
+(define build-deps '("polyglot-lib" "scribble-lib" "racket-doc"  "css-expr"))
+(define pkg-desc "Documentation for Polyglot")
+(define update-implies '("polyglot-lib"))
+(define pkg-authors '(sage))
+(define scribblings '(("polyglot/scribblings/guide/polyglot-guide.scrbl" (multi-page) (tools))
+                      ("polyglot/scribblings/reference/polyglot-reference.scrbl" (multi-page) (library))
+                      ("polyglot/scribblings/how-tos/polyglot-how-tos.scrbl" (multi-page) (omit-start))
+                      ("polyglot/scribblings/tutorials/polyglot-tutorials.scrbl" (multi-page) (omit-start))))

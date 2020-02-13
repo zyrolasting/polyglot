@@ -3,5 +3,5 @@
 .\#*
 .DS_Store
 compiled/
-/doc/
+doc/
 dist

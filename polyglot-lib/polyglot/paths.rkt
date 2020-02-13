@@ -29,6 +29,25 @@
 
 (define-runtime-path polyglot-runtime-path ".")
 
+(module+ test
+  ; We'll need paths to private skeleton files to make sure
+  ; the test package can build them.
+  (provide skels skel-paths)
+  (require racket/list)
+
+  (define-runtime-path skels "./private/skel")
+
+  (define skel-paths
+    (filter-map
+     (λ (name)
+       (define path (build-path skels name))
+       (and (directory-exists? path)
+            ; The extra "." provides a trailing directory separator
+            ; we'll need for assertions.
+            (simplify-path (build-path path "."))))
+     (directory-list skels))))
+
+
 (define (derive-path-parameter build-conventional-path)
   (make-derived-parameter (make-parameter #f)
                           (λ (v) v)
@@ -69,31 +88,3 @@
 (define dist-rel        (path-builder polyglot-dist-directory "."))
 (define system-temp-rel (path-builder polyglot-temp-directory "."))
 (define polyglot-rel    (path-rel polyglot-runtime-path))
-
-(module+ test
-  (require racket/file
-           rackunit)
-
-  (test-case "make-dist-path-string"
-    (test-equal? "Produce relative paths as strings given two complete paths"
-                 (make-dist-path-string (build-path "/blah" "some/where.rkt")
-                                        (build-path "/blah"))
-                 "some/where.rkt")
-    (test-equal? "Return webroot path if paths are the same"
-                 (make-dist-path-string (build-path "/blah/")
-                                        (simplify-path (build-path "/blah/" 'same)))
-                 "/"))
-
-  (test-case "Users may override derived paths"
-    (define (check-fallbacks)
-      (check-equal? (polyglot-assets-directory) (build-path (polyglot-project-directory) "assets"))
-      (check-equal? (polyglot-dist-directory) (build-path (polyglot-project-directory) "dist")))
-    (dynamic-wind
-      check-fallbacks
-      (λ _
-        (parameterize ([polyglot-project-directory (current-directory)]
-                       [polyglot-assets-directory (current-directory)]
-                       [polyglot-dist-directory (current-directory)])
-          (check-equal? (polyglot-assets-directory) (polyglot-dist-directory))
-          (check-equal? (polyglot-assets-directory) (polyglot-project-directory))))
-      check-fallbacks)))
