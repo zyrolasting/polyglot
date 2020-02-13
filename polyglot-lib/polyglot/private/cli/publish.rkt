@@ -84,6 +84,10 @@
   (read-keys/aws-cli)
   (s3-region (region))
 
-  (exit (with-handlers ([exn? (λ (e) (log-exn e) 1)])
-          (with-report/void publish-website)
-          0)))
+  (exit (with-handlers ([exn? (λ _ 1)])
+          (with-report/void (λ ()
+                              (with-handlers ([exn? (λ (e)
+                                                      (log-exn e)
+                                                      (raise e))])
+                                (publish-website)))))
+          0))
