@@ -20,6 +20,8 @@ with this project, you should use the latest version.
 * Fixed broken `run-txexpr/functional!` contract.
 * Fixed incorrect return value specs in `polyglot/txexpr` manual.
 * Wrote `safe` submodules to move expensive contracts aside for default use.
+* Divided source into several multi-collection packages.
+* Added support for subdirectories in `publish` command.
 
 ## [2.7] - 2019-12-28
 * Fix doc link in README
