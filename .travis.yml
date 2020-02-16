@@ -33,7 +33,7 @@ before_install:
 - export PATH="${RACKET_DIR}/bin:${PATH}" #install-racket.sh can't set for us
 
 install:
- - raco pkg install --auto --name polyglot
+ - raco pkg install --auto ./polyglot-lib ./polyglot-doc ./polyglot-test ./polyglot
 
 before_script:
 
