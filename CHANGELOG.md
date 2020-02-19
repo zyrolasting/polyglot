@@ -17,12 +17,14 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
+* Nothing yet
+
+## [2.8] - 2020-02-19
 * Fixed broken `run-txexpr/functional!` contract.
 * Fixed incorrect return value specs in `polyglot/txexpr` manual.
 * Wrote `safe` submodules to move expensive contracts aside for default use.
 * Divided source into several multi-collection packages.
 * Added support for subdirectories in `publish` command.
-* Never cache published `application/rss+xml` objects.
 
 ## [2.7] - 2019-12-28
 * Fix doc link in README
@@ -192,7 +194,8 @@ with this project, you should use the latest version.
 * Start Racket package
 * Add `raco polyglot` command with `develop`, `build`, `demo`, and `publish` subcommands.
 
-[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.7...HEAD
+[Unreleased]: https://github.com/zyrolasting/polyglot/compare/v2.8...HEAD
+[2.8]: https://github.com/zyrolasting/polyglot/compare/v2.7...v2.8
 [2.7]: https://github.com/zyrolasting/polyglot/compare/v2.6...v2.7
 [2.6]: https://github.com/zyrolasting/polyglot/compare/v2.5...v2.6
 [2.5]: https://github.com/zyrolasting/polyglot/compare/v2.4...v2.5
