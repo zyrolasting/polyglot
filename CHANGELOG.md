@@ -22,6 +22,7 @@ with this project, you should use the latest version.
 * Wrote `safe` submodules to move expensive contracts aside for default use.
 * Divided source into several multi-collection packages.
 * Added support for subdirectories in `publish` command.
+* Never cache published `application/rss+xml` objects.
 
 ## [2.7] - 2019-12-28
 * Fix doc link in README

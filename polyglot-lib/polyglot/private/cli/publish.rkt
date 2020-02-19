@@ -25,6 +25,11 @@
 (define (path->bucket+key path)
   (bucket-rel (find-relative-path (dist-rel) path)))
 
+(define (never-cache? media-type)
+  (ormap (λ (other) (equal? media-type other))
+         '("text/html"
+           "application/rss+xml")))
+
 (define (put-file path)
   (define media-type ((path->mime-proc) path))
   (define bucket+key (path->bucket+key path))
@@ -40,7 +45,7 @@
                 'x-amz-acl 'public-read
                 'Content-Disposition "inline"
                 'Cache-Control (format "max-age=~e"
-                                       (if (equal? media-type "text/html") 0 31536000)))))
+                                       (if (never-cache? media-type) 0 31536000)))))
 
 (define (compute-∃-diff local remote)
   (set->list
