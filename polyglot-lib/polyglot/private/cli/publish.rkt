@@ -94,5 +94,5 @@
                               (with-handlers ([exn? (λ (e)
                                                       (log-exn e)
                                                       (raise e))])
-                                (publish-website)))))
-          0))
+                                (publish-website))))
+          0)))
