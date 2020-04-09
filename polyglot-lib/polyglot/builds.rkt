@@ -3,7 +3,10 @@
 (require racket/class
          racket/contract
          racket/dict
+         racket/match
          unlike-assets
+         unlike-assets/reactive
+         unlike-assets/policy
          "./projects.rkt"
          "./paths.rkt")
 
@@ -103,3 +106,40 @@
                                  #:changed changed
                                  #:removed removed)
         (set! build-number (add1 build-number))))))
+
+
+(define (make-polyglot-builder/reactive project-directory
+                                        #:forced-workflow [forced-workflow #f]
+                                        #:fallback-workflow [fallback-workflow #f])
+  (define project (new polyglot-project% [directory project-directory]))
+  (define instance
+    (make-polyglot-workflow-object project
+                                   #:live? #t
+                                   #:forced-workflow forced-workflow
+                                   #:fallback-workflow fallback-workflow))
+
+
+  (define key->live-build
+    (apply make-key->live-build/sequence
+           (append (dynamic-require (build-path project-directory ".polyglotrc.rkt")
+                                    'polyglot-extensions
+                                    (λ () null))
+                   (list (polyglot-class-adapter project-directory instance)))))
+
+  (make-u/a-build-system
+   (λ (key recurse)
+     (parameterize ([polyglot-project-directory project-directory])
+       (key->live-build key recurse)))))
+
+(define (polyglot-class-adapter project-directory instance)
+  (define key->live-build
+    (let ([mtimes (make-hash)])
+      (make-key->live-build/unlike-compiler instance file-exists?
+                                            (λ (clear)
+                                              (equal?
+                                               (with-handlers ([exn:fail? (λ (e) #f)])
+                                                 (file-or-directory-modify-seconds clear))
+                                               (hash-ref! mtimes clear #f))))))
+  (λ (key recurse)
+    (parameterize ([polyglot-project-directory project-directory])
+      (key->live-build key recurse))))

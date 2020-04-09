@@ -50,9 +50,8 @@
                (current-error-port))
     (exit 1))
 
-  (values
-   directory
-   project
-   (make-polyglot-builder
-    directory
-    #:entry-assets (list (get-entry-asset project normalized)))))
+  (define entry (get-entry-asset project normalized))
+  (define builder (make-polyglot-builder/reactive directory))
+  (builder entry)
+
+  (values directory project builder))
