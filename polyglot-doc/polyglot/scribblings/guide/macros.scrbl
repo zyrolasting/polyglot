@@ -2,7 +2,7 @@
 
 @require[@for-label[racket/base racket/class txexpr polyglot]]
 
-@title[#:tag "polyglot-macros"]{Page Macros and Preproessing}
+@title[#:tag "polyglot-macros"]{Page Macros and Preprocessing}
 
 Racket macros replace Racket code inside of application elements and libraries.
 However, they do not operate on the page containing the elements themselves.
