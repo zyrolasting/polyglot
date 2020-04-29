@@ -17,7 +17,7 @@ upgrade until you have reason to do so, and if you are starting out
 with this project, you should use the latest version.
 
 ## Unreleased
-* Nothing yet
+* Add missing version declaration in `info.rkt`.
 
 ## [2.8] - 2020-02-19
 * Fixed broken `run-txexpr/functional!` contract.
