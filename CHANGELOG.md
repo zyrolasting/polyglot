@@ -18,6 +18,7 @@ with this project, you should use the latest version.
 
 ## Unreleased
 * Add missing version declaration in `info.rkt`.
+* Manually pin `unlike-assets` dependencies in prep for breaking change.
 
 ## [2.8] - 2020-02-19
 * Fixed broken `run-txexpr/functional!` contract.
