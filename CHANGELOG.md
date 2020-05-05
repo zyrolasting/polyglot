@@ -18,7 +18,6 @@ with this project, you should use the latest version.
 
 ## Unreleased
 * Add missing version declaration in `info.rkt`.
-* Manually pin `unlike-assets` dependencies in prep for breaking change.
 * Copy README to `polyglot-lib` to fix `demo` command.
 
 ## [2.8] - 2020-02-19
