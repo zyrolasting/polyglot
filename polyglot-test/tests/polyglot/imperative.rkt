@@ -112,4 +112,8 @@
         (run-txexpr/imperative! (parse-markdown rackdown)
                                 (λ (kids)
                                   `(body . ,kids)))
-        '(body (p "Hello") (p "test!")))))
+        '(body (p "Hello") (p "test!")))
+
+    (check-equal?
+     (run-txexpr/imperative! (parse-markdown rackdown))
+     '((p "Hello") (p "test!")))))
