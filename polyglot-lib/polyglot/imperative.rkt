@@ -12,7 +12,7 @@
                        [run-txexpr/imperative! run-txexpr!])
            (contract-out
             [run-txexpr/imperative! (-> (or/c (non-empty-listof txexpr?) txexpr?)
-                                        (non-empty-listof txexpr?))])))
+                                        (or/c txexpr? (non-empty-listof txexpr?)))])))
 
 (require racket/class
          racket/dict
@@ -78,11 +78,16 @@
                                (apply-rackdown tmpd
                                                elements
                                                initial-layout))))
-  (car (interlace-txexprs
+  (define interlaced
+    (interlace-txexprs
         expanded
         (λ (x) (and (tag-equal? 'p x)
                     (= (length (get-elements x)) 0)))
-        (λ _ null))))
+        (λ _ null)))
+
+  (if (txexpr? expanded)
+      (car interlaced)
+      interlaced))
 
 
 (define polyglot/imperative%
