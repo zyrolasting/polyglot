@@ -38,7 +38,8 @@
       void
       (λ ()
          (make-input io) ; In case a top-level form blocks for input.
-         (dynamic-require path #f)
+         (with-handlers ([exn? write])
+           (dynamic-require path #f))
          (values oi io ei))
       (λ ()
         (close-output-port oo)

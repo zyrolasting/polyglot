@@ -58,6 +58,8 @@ ports. @racket[load-script] will apply @racket[make-input] to an output port
 before loading the module to populate a buffer.  That buffer may be consumed
 via @racket[current-input-port] in the module's top-level forms.
 
+You are responsible for closing all returned ports.
+
 @racketblock[
 (define-values (readable-stdout writeable-stdin readable-stderr)
   (load-script (write-script '(script ((id "blah"))

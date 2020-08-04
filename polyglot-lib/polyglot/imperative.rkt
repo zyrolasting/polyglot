@@ -47,6 +47,11 @@
        (define-values (stdout stdin stderr) (load-script path))
        (define-values (fragment errors) (values (port->list read stdout)
                                                 (port->list read stderr)))
+
+       (close-input-port stdout)
+       (close-output-port stdin)
+       (close-input-port stderr)
+
        (<info "<script> ~a yields fragment:" path)
        (<info "~e" fragment)
        (set! layout (dynamic-require path 'layout (thunk layout)))
