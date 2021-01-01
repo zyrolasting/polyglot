@@ -2,6 +2,7 @@
 
 (require rackunit
          racket/function
+         txexpr
          (submod polyglot/txexpr safe))
 
 (define i-element? (curry tag-equal? 'i))
@@ -66,26 +67,27 @@
                     (λ _ '((x) (x) (x)))))
              '((b) (b) (p (b) (b) (b) (b)) (b) (x) (x) (x) (b (b) (b)) (b) (b)))
 
-(test-equal? "Manifest can replace `src`, `href`, and `srcset` attributes"
-             (apply-manifest '(html
-                               (head
-                                (link ((href "a.css"))))
-                               (body
-                                (picture
-                                 (source ((srcset "b.png")
-                                          (media "(min-width: 1280px)")))
-                                 (img ((src "c.png"))))))
-                             '(("a.css" . "123.css")
-                               ("b.png" . "456.png")
-                               ("c.png" . "789.png")))
-             '(html
-               (head
-                (link ((href "123.css"))))
-               (body
-                (picture
-                 (source ((media "(min-width: 1280px)")
-                          (srcset "456.png")))
-                 (img ((src "789.png")))))))
+(test-case "Manifest can replace `src`, `href`, and `srcset` attributes"
+  (check-txexprs-equal?
+   (apply-manifest '(html
+                     (head
+                      (link ((href "a.css"))))
+                     (body
+                      (picture
+                       (source ((srcset "b.png")
+                                (media "(min-width: 1280px)")))
+                       (img ((src "c.png"))))))
+                   '(("a.css" . "123.css")
+                     ("b.png" . "456.png")
+                     ("c.png" . "789.png")))
+   '(html
+     (head
+      (link ((href "123.css"))))
+     (body
+      (picture
+       (source ((media "(min-width: 1280px)")
+                (srcset "456.png")))
+       (img ((src "789.png"))))))))
 
 (test-equal? "apply-manifest allows custom rewrites"
              (apply-manifest '(html
